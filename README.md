@@ -16,3 +16,4 @@ Objectives
 - uid/gid mapping is managed using nss-unbit project
 - each container runs with its uid/gid
 - each container has its /etc/hosts and /etc/resolv.conf
+- each vassal in the container subscribe to a central http router with a specific key (domain)
