@@ -29,3 +29,5 @@ Objectives
 - each vassal in the container subscribe to a central http router with a specific key (domain)
 - containers Emperors configure alarms by default for: disk quota, oom, memory thresholds, restarts
 - gather metrics and generate graphs
+- SNI is the only https/spdy supported approach
+- cron and external processes (like dbs) are managed as vassals
