@@ -13,7 +13,7 @@ contrary to the current unbit.it hosting platform, the next generation one will 
 - everyone can build it on his/her systems (and eventually buy commercial support from unbit.com ;)
 - will not rely on apache (so .htaccess will not be supported, unless you install apache in your container and proxy it via uWSGI routing)
 
-Objectives
+Goals
 ----------
 
 - each customer has a pool of containers
@@ -24,10 +24,10 @@ Objectives
 - each container has its dedicated firewall based on the tuntap router plugin
 - ssh access is governed by the container emperor using the pam-unbit project
 - uid/gid mapping is managed using nss-unbit project
-- each container runs with its uid/gid
-- each container has its /etc/hosts and /etc/resolv.conf
-- each vassal in the container subscribe to a central http router with a specific key (domain)
-- containers Emperors configure alarms by default for: disk quota, oom, memory thresholds, restarts
+- each container runs with its own uid/gid
+- each container has its own /etc/hosts and /etc/resolv.conf
+- each vassal in the container subscribes to a central http router with a specific key (domain)
+- containers' Emperor by default configure alarms for: disk quota, oom, memory thresholds, restarts
 - gather metrics and generate graphs
 - SNI is the only https/spdy supported approach
 - cron and external processes (like dbs) are managed as vassals
