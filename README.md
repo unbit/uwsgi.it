@@ -31,3 +31,9 @@ Objectives
 - gather metrics and generate graphs
 - SNI is the only https/spdy supported approach
 - cron and external processes (like dbs) are managed as vassals
+
+
+TODO
+----
+
+- we still need to find the silver bullet for secure subscriptions (we need to avoid unallowed containers to subscribe to specific domains, but we need multiple containers [on multiple machines too] to subscribe for the same domain)
