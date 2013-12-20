@@ -10,7 +10,7 @@ contrary to the current unbit.it hosting platform, the next generation one will 
 
 - fully open source (currently at least 60% of the unbit.it kernel patches are not released to the public)
 - can be installed on vanilla kernels
-- everyone can build it on his/her systems
+- everyone can build it on his/her systems (and eventually buy commercial support from unbit.com ;)
 - will not rely on apache (so .htaccess will not be supported, unless you install apache in your container and proxy it via uWSGI routing)
 
 Objectives
