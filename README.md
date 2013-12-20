@@ -3,6 +3,16 @@ uwsgi.it
 
 The next-generation Unbit hosting platform
 
+Intro
+-----
+
+contrary to the current unbit.it hosting platform, the next generation one will be:
+
+- fully open source (currently at least 60% of the unbit.it kernel patches are not released to the public)
+- can be installed on vanilla kernels
+- everyone can build it on their systems
+- will not rely on apache (so .htaccess will not be supported, unless you install apache in your container and proxy it via uWSGI routing)
+
 Objectives
 ----------
 
@@ -18,3 +28,4 @@ Objectives
 - each container has its /etc/hosts and /etc/resolv.conf
 - each vassal in the container subscribe to a central http router with a specific key (domain)
 - containers Emperors configure alarms by default for: disk quota, oom, memory thresholds, restarts
+- gather metrics and generate graphs
