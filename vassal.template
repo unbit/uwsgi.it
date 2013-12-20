@@ -8,52 +8,52 @@ auto-procname = true
 procname-prefix-spaced = [{{container.uid}}]
 
 if-not-dir = /containers/{{container.uid}}
-hook-asap = exec:mkdir /containers/{{container.uid}}
+hook-asap = mkdir: /containers/{{container.uid}}
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}
 endif =
 
 if-not-dir = /containers/{{container.uid}}/run
-hook-asap = exec:mkdir /containers/{{container.uid}}/run
+hook-asap = mkdir: /containers/{{container.uid}}/run
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/run
 endif =
 
 if-not-dir = /sys/fs/cgroup/{{container.uid}}
-hook-asap = exec:mkdir /sys/fs/cgroup/{{container.uid}}
+hook-asap = mkdir: /sys/fs/cgroup/{{container.uid}}
 endif =
 
 if-not-dir = /containers/{{container.uid}}/run/subscribe
-hook-asap = exec:mkdir /containers/{{container.uid}}/run/subscribe
+hook-asap = mkdir: /containers/{{container.uid}}/run/subscribe
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/run/subscribe
 endif =
 
 if-not-dir = /containers/{{container.uid}}/run/cgroup
-hook-asap = exec:mkdir /containers/{{container.uid}}/run/cgroup
+hook-asap = mkdir: /containers/{{container.uid}}/run/cgroup
 endif =
 
 if-not-dir = /containers/{{container.uid}}/vassals
-hook-asap = exec:mkdir /containers/{{container.uid}}/vassals
+hook-asap = mkdir: /containers/{{container.uid}}/vassals
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/vassals
 endif =
 
 if-not-dir = /containers/{{container.uid}}/.old_root/{{container.uid}}
-hook-asap = exec:mkdir -p /containers/{{container.uid}}/.old_root/{{container.uid}}
+hook-asap = mkdir: -p /containers/{{container.uid}}/.old_root/{{container.uid}}
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/.old_root
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/.old_root/{{container.uid}}
 endif =
 
 
 if-not-dir = /containers/{{container.uid}}/tmp
-hook-asap = exec:mkdir /containers/{{container.uid}}/tmp
+hook-asap = mkdir: /containers/{{container.uid}}/tmp
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/tmp
 endif =
 
 if-not-dir = /containers/{{container.uid}}/logs
-hook-asap = exec:mkdir /containers/{{container.uid}}/logs
+hook-asap = mkdir: /containers/{{container.uid}}/logs
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/logs
 endif =
 
 if-not-dir = /containers/{{container.uid}}/.ssh
-hook-asap = exec:mkdir /containers/{{container.uid}}/.ssh
+hook-asap = mkdir: /containers/{{container.uid}}/.ssh
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/.ssh
 endif =
 
