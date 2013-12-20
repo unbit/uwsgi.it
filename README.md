@@ -19,7 +19,7 @@ Objectives
 - each customer has a pool of containers
 - each container has an associated disk quota, a cpu share and a fixed amount of memory
 - each container has an associated Emperor
-- best possibile isolation between containers
+- best possibie isolation between containers
 - each container can be mapped to a different distribution
 - each container has its dedicated firewall based on the tuntap router plugin
 - ssh access is governed by the container emperor using the pam-unbit project
