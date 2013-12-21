@@ -13,7 +13,8 @@ generate_uuid = lambda: str(uuid.uuid4())
 
 class Customer(models.Model):
     user = models.OneToOneField(User)
-    vat = models.CharField(max_length=255)
+    vat = models.CharField(max_length=255,blank=True,null=True)
+    company = models.CharField(max_length=255,blank=True,null=True)
 
     ctime = models.DateTimeField(auto_now_add=True)
     mtime = models.DateTimeField(auto_now=True)
@@ -27,7 +28,7 @@ class Server(models.Model):
     name = models.CharField(max_length=255,unique=True)
     address = models.GenericIPAddressField()
 
-    hd = models.CharField(max_length=255,unique=True)
+    hd = models.CharField(max_length=255)
 
     memory = models.PositiveIntegerField("Memory MB")
     storage = models.PositiveIntegerField("Storage MB")
@@ -39,11 +40,15 @@ class Server(models.Model):
 
     @property
     def used_memory(self):
-        return self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
+        n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
+        if not n: return 0
+        return n
 
     @property
     def used_storage(self):
-        return self.container_set.all().aggregate(models.Sum('storage'))['storage__sum']
+        n = self.container_set.all().aggregate(models.Sum('storage'))['storage__sum']
+        if not n: return 0
+        return n
 
     @property
     def free_memory(self):
@@ -70,7 +75,7 @@ class Distro(models.Model):
 
 class Container(models.Model):
     name = models.CharField(max_length=255)
-    ssh_keys_raw = models.TextField("SSH keys")
+    ssh_keys_raw = models.TextField("SSH keys", blank=True,null=True)
     distro = models.ForeignKey(Distro)
     server = models.ForeignKey(Server)
     # in megabytes
@@ -90,6 +95,8 @@ class Container(models.Model):
     def clean(self):
         current_storage = self.server.container_set.all().aggregate(models.Sum('storage'))['storage__sum']
         current_memory = self.server.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
+        if not current_storage: current_storage = 0
+        if not current_memory: current_memory = 0
         if self.pk:
             orig = Container.objects.get(pk=self.pk)
             current_storage -= orig.storage

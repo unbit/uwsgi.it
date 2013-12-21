@@ -12,9 +12,14 @@ class ServerAdmin(admin.ModelAdmin):
 
 class ContainerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage')
+    list_filter = ('server', 'distro')
+    search_fields = ('name',)
+
+class DomainAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'customer')
 
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer)
 admin.site.register(Container, ContainerAdmin)
-admin.site.register(Domain)
+admin.site.register(Domain, DomainAdmin)
