@@ -57,9 +57,9 @@ hook-asap = mkdir: /containers/{{container.uid}}/.ssh
 hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/.ssh
 endif =
 
-if-not-file = /containers/{{container.uid}}/.ssh/authorized_keys
-hook-asap = exec:echo "{{container.ssh_key}}" > /containers/{{container.uid}}/.ssh/authorized_keys
-hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/.ssh/authorized_keys
+if-not-file = /containers/{{container.uid}}/.ssh/uwsgi_authorized_keys
+hook-asap = exec:echo "{{container.ssh_key}}" > /containers/{{container.uid}}/.ssh/uwsgi_authorized_keys
+hook-asap = exec:chown {{container.uid}}:{{container.uid}} /containers/{{container.uid}}/.ssh/uwsgi_authorized_keys
 endif =
 
 hook-asap = hostname:{{hostname}}
