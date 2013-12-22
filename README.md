@@ -31,6 +31,7 @@ Goals
 - gather metrics and generate graphs
 - SNI is the only https/spdy supported approach
 - cron and external processes (like dbs) are managed as vassals
+- supported languages will be Perl, CPython, PyPy, Ruby, Lua and php (yes php apps works even without .htaccess...) 
 
 How it works
 ------------
@@ -63,3 +64,4 @@ TODO
 
 - fastrouter-only implementation for nginx integration
 - is SPDY support whorty ?
+- Are CGIs still of interest ? 
