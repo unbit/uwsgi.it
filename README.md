@@ -31,7 +31,6 @@ Goals
 - gather metrics and generate graphs
 - SNI is the only https/spdy supported approach
 - cron and external processes (like dbs) are managed as vassals
-- 
 
 How it works
 ------------
