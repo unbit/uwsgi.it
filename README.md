@@ -32,6 +32,7 @@ Goals
 - SNI is the only https/spdy supported approach
 - cron and external processes (like dbs) are managed as vassals
 - supported languages will be Perl, CPython, PyPy, Ruby, Lua and php (yes php apps works even without .htaccess...) 
+- Websockets support (in the routers/proxy) is enabled by default
 
 How it works
 ------------
