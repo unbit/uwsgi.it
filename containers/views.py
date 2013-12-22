@@ -12,6 +12,8 @@ def containers(request):
         j = [{'uid':container.uid, 'mtime': container.munix } for container in server.container_set.all()]
         return HttpResponse(json.dumps(j), content_type="application/json")
     except:
+        import sys
+        print sys.exc_info()
         return HttpResponseForbidden('Forbidden')
 
 def container(request, id):

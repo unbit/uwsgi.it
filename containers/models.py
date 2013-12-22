@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-import time
+import calendar
 import ipaddress
 import uuid
 from django.core.exceptions import ValidationError
@@ -88,6 +88,8 @@ class Container(models.Model):
 
     uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
 
+    note = models.TextField(blank=True,null=True)
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
@@ -131,7 +133,7 @@ class Container(models.Model):
 
     @property
     def munix(self):
-        return int(time.mktime(self.mtime.timetuple()))
+        return calendar.timegm(self.mtime.utctimetuple())
 
     @property
     def ssh_keys(self):
