@@ -5,11 +5,15 @@ import ipaddress
 import uuid
 from django.core.exceptions import ValidationError
 import string
+from Crypto.PublicKey import RSA
 
 
 # Create your models here.
 
 generate_uuid = lambda: str(uuid.uuid4())
+
+def generate_rsa():
+    return RSA.generate(2048).exportKey()
 
 class Customer(models.Model):
     user = models.OneToOneField(User)
@@ -20,6 +24,20 @@ class Customer(models.Model):
     mtime = models.DateTimeField(auto_now=True)
 
     uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
+
+    rsa_key = models.TextField(default=generate_rsa, unique=True)
+
+    @property
+    def rsa_key_lines(self):
+        return self.rsa_key.split('\n')
+
+    @property
+    def rsa_pubkey(self):
+        return RSA.importKey(self.rsa_key).publickey().exportKey()
+
+    @property
+    def rsa_pubkey_lines(self):
+        return self.rsa_pubkey.split('\n')
 
     def __unicode__(self):
         return self.user.username
