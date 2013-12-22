@@ -51,6 +51,12 @@ Domains to containers mapping is done via the uWSGI secured subscription system.
 
 Subscriptions can pass SSL certificates to the router that reconfigure it to map them to domains (via SNI)
 
+Three perl processes manage the infrastruture configuration:
+
+- configurator.pl -> manage containers vassal files
+- dominator.pl -> manage domains to rsa key mappings
+- collector.pl -> gather statistics from the various exposed metrics
+
 
 TODO
 ----
