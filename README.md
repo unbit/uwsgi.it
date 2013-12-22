@@ -14,7 +14,7 @@ contrary to the current unbit.it hosting platform, the next generation one will 
 - will not rely on apache (so .htaccess will not be supported, unless you install apache in your container and proxy it via uWSGI routing)
 
 Goals
-----------
+-----
 
 - each customer has a pool of containers
 - each container has an associated disk quota, a cpu share and a fixed amount of memory
@@ -31,9 +31,22 @@ Goals
 - gather metrics and generate graphs
 - SNI is the only https/spdy supported approach
 - cron and external processes (like dbs) are managed as vassals
+- 
+
+How it works
+------------
+
+On server startup the emperor.ini is run. This Emperor manage vassals in /etc/uwsgi/vassals
+
+Each vassal is spawned in a new Linux namespace and cgroup (all is native, no lxc is involved)
+
+Each vassal spawns a sub-Emperor with uid and gid > 30000, the user (the owner of the container) can now use
+this sub-Emperor to spawn its vassals.
+
+
 
 
 TODO
 ----
 
-- we still need to find the silver bullet for secure subscriptions (we need to avoid unallowed containers to subscribe to specific domains, but we need multiple containers [on multiple machines too] to subscribe for the same domain)
+- fastrouter-only implementation for nginx integration
