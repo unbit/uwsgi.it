@@ -41,6 +41,10 @@ On server startup the emperor.ini is run. This Emperor manage vassals in /etc/uw
 
 Each vassal is spawned in a new Linux namespace and cgroup (all is native, no lxc is involved)
 
+A vassal named '30000' serves the api (a django app)
+
+All of the other vassals are created by the api.
+
 Each vassal spawns a sub-Emperor with uid and gid > 30000, the user (the owner of the container) can now use
 this sub-Emperor to spawn its vassals.
 
@@ -58,6 +62,9 @@ Three perl processes manage the infrastruture configuration:
 - configurator.pl -> manage containers vassal files
 - dominator.pl -> manage domains to rsa key mappings
 - collector.pl -> gather statistics from the various exposed metrics
+
+
+A web interface written in perl/Dancer will integrate with the api to give users/customer a user-friendly tool
 
 
 TODO
