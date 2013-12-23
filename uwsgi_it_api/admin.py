@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from containers.models import *
+from uwsgi_it_api.models import *
 
 class ServerAdmin(admin.ModelAdmin):
     def memory_status(self):
