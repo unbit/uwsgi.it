@@ -94,3 +94,9 @@ def me(request):
 def distros(request):
     j = [{'id':d.pk, 'name':d.name} for d in Distro.objects.all()]
     return HttpResponse(json.dumps(j), content_type="application/json")
+
+@need_basicauth
+def domains(request):
+    customer = request.user.customer
+    j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid} for d in customer.domain_set.all()]
+    return HttpResponse(json.dumps(j), content_type="application/json")

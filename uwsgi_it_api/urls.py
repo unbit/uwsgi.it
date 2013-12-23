@@ -6,4 +6,5 @@ urlpatterns = patterns('uwsgi_it_api.views',
     (r'^containers/(\d+)\.ini$', 'container_ini'),
     (r'^me/$', 'me'),
     (r'^distros/$', 'distros'),
+    (r'^domains/$', 'domains'),
 )
