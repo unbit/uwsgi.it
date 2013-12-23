@@ -127,6 +127,10 @@ def domains(request):
             response.status_code = 413
             return response
         j = json.loads(request.read())
+        if Domain.objects.filter(name=j['name']):
+            response = HttpResponse('Conflict\n')
+            response.status_code = 409
+            return response
         if dns_check(j['name'], customer.uuid):
             try:
                 customer.domain_set.create(name=j['name'])
