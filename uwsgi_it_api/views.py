@@ -102,8 +102,20 @@ def container(request, id):
     return HttpResponse(json.dumps(c), content_type="application/json")
 
 @need_basicauth
+@csrf_exempt
 def me(request):
     customer = request.user.customer
+    if request.method == 'POST':
+        if int(request.META['CONTENT_LENGTH']) > 65536:
+            response = HttpResponse('Request entity too large\n')
+            response.status_code = 413
+            return response
+        allowed_keys = ('vat', 'company')
+        j = json.loads(request.read())
+        for key in j:
+            if key in allowed_keys:
+                setattr(customer, key, j[key])
+        customer.save()
     c = {
         'vat': customer.vat,
         'company': customer.company,
