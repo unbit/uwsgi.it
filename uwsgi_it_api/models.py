@@ -6,6 +6,7 @@ import uuid
 from django.core.exceptions import ValidationError
 import string
 from Crypto.PublicKey import RSA
+from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 
 
 # Create your models here.
@@ -129,7 +130,7 @@ class Container(models.Model):
 
     @property
     def uid(self):
-        return 30000+self.pk
+        return UWSGI_IT_BASE_UID+self.pk
 
     @property
     def hostname(self):

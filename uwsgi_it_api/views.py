@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from containers.models import *
+from uwsgi_it_api.models import *
+from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 from django.http import HttpResponse,HttpResponseForbidden
 from django.template.loader import render_to_string
 import json
@@ -19,7 +20,7 @@ def containers(request):
 def container(request, id):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
-        container = server.container_set.get(pk=(int(id)-30000))
+        container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
         j = render_to_string('vassal.ini', {'container': container})
         return HttpResponse(j, content_type="text/plain")
     except:
