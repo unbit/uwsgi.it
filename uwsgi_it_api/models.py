@@ -57,6 +57,9 @@ class Server(models.Model):
 
     uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
 
+    etc_resolv_conf = models.TextField("/etc/resolv.conf", default='',blank=True)
+    etc_hosts = models.TextField("/etc/hosts", default='',blank=True)
+
     @property
     def used_memory(self):
         n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
@@ -79,6 +82,14 @@ class Server(models.Model):
 
     def __unicode__(self):
         return "%s - %s" % (self.name, self.address)
+
+    @property
+    def etc_resolv_conf_lines(self):
+        return self.etc_resolv_conf.replace('\r', '\n').replace('\n\n', '\n').split('\n')
+
+    @property
+    def etc_hosts_lines(self):
+        return self.etc_hosts.replace('\r', '\n').replace('\n\n', '\n').split('\n')
 
 class Distro(models.Model):
     name = models.CharField(max_length=255,unique=True)
