@@ -188,7 +188,7 @@ domains are mapped to customers, each container of the customer
 can subscribe to them
 """
 class Domain(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,unique=True)
     customer = models.ForeignKey(Customer)
 
     ctime = models.DateTimeField(auto_now_add=True)
