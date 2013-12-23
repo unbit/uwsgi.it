@@ -102,6 +102,8 @@ class Distro(models.Model):
 
     uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
 
+    note = models.TextField(blank=True,null=True)
+
     def __unicode__(self):
         return self.name
 
