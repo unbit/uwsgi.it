@@ -10,6 +10,11 @@ from django.contrib.auth import authenticate, login
 import dns.resolver
 from django.views.decorators.csrf import csrf_exempt
 
+def check_body(request):
+    if int(request.META['CONTENT_LENGTH']) > 65536:
+        response = HttpResponse('Request entity too large\n')
+        response.status_code = 413
+        return response
 
 def need_certificate(func):
     @wraps(func)
@@ -107,10 +112,8 @@ def container(request, id):
 def me(request):
     customer = request.user.customer
     if request.method == 'POST':
-        if int(request.META['CONTENT_LENGTH']) > 65536:
-            response = HttpResponse('Request entity too large\n')
-            response.status_code = 413
-            return response
+        response = check_body(request)
+        if response: return response
         allowed_keys = ('vat', 'company')
         j = json.loads(request.read())
         for key in j:
@@ -134,11 +137,10 @@ def distros(request):
 @csrf_exempt
 def domains(request):
     customer = request.user.customer
+
     if request.method == 'POST':
-        if int(request.META['CONTENT_LENGTH']) > 65536:
-            response = HttpResponse('Request entity too large\n')
-            response.status_code = 413
-            return response
+        response = check_body(request)
+        if response: return response
         j = json.loads(request.read())
         if Domain.objects.filter(name=j['name']):
             response = HttpResponse('Conflict\n')
@@ -155,5 +157,36 @@ def domains(request):
             return response
         else:
             return HttpResponseForbidden('Forbidden\n')
-    j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid} for d in customer.domain_set.all()]
-    return HttpResponse(json.dumps(j), content_type="application/json")
+
+    elif request.method == 'DELETE':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        customer.domain_set.get(name=j['name']).delete()
+        return HttpResponse('Ok\n')
+
+    elif request.method == 'GET':
+        j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid} for d in customer.domain_set.all()]
+        return HttpResponse(json.dumps(j), content_type="application/json")
+
+    response = HttpResponse('Method not allowed\n')
+    response.status_code = 405
+    return response
+
+
+@need_basicauth
+@csrf_exempt
+def domain(request, id):
+    customer = request.user.customer
+    domain = customer.domain_set.get(pk=id)
+    if request.method == 'DELETE':
+        domain.delete()
+        return HttpResponse('Ok\n')
+
+    elif request.method == 'GET':
+        j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid}
+        return HttpResponse(json.dumps(j), content_type="application/json")
+
+    response = HttpResponse('Method not allowed\n')
+    response.status_code = 405
+    return response
