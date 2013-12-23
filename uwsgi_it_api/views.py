@@ -96,8 +96,9 @@ def container(request, id):
         'distro': container.distro.pk,
         'distro_name': container.distro.name,
         'server': container.server.name,
+        'server_address': container.server.address,
         'note': container.note,
-        'ssh_keys': container.ssh_keys_raw,
+        'ssh_keys': container.ssh_keys,
     }
     return HttpResponse(json.dumps(c), content_type="application/json")
 
