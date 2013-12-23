@@ -1,8 +1,8 @@
 The uwsgi.it API
 ----------------
 
-Public api
-----------
+Public api (requires basic auth)
+--------------------------------
 
 GET /containers/<id>
 
