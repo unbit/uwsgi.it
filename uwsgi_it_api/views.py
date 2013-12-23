@@ -89,3 +89,8 @@ def me(request):
         'containers': [cc.uid for cc in customer.container_set.all()],
     }
     return HttpResponse(json.dumps(c), content_type="application/json")
+
+@need_basicauth
+def distros(request):
+    j = [{'id':d.pk, 'name':d.name} for d in Distro.objects.all()]
+    return HttpResponse(json.dumps(j), content_type="application/json")
