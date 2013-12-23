@@ -60,6 +60,8 @@ class Server(models.Model):
     etc_resolv_conf = models.TextField("/etc/resolv.conf", default='',blank=True)
     etc_hosts = models.TextField("/etc/hosts", default='',blank=True)
 
+    note = models.TextField(blank=True,null=True)
+
     @property
     def used_memory(self):
         n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
