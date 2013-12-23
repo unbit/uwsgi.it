@@ -88,8 +88,22 @@ def container_ini(request, id):
         return HttpResponseForbidden('Forbidden\n')    
 
 @need_basicauth
+@csrf_exempt
 def container(request, id):
     container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        allowed_keys = ('name', 'note')
+        j = json.loads(request.read())
+        for key in j:
+            if key in allowed_keys:
+                setattr(container, key, j[key])
+        if 'ssh_keys' in j:
+            container.ssh_keys_raw = '\n'.join(j['ssh_keys'])
+        if 'distro' in j:
+            container.distro = Distro.objects.get(pk=j['distro'])
+        container.save()
     c = {
         'uid': container.uid,
         'name': container.name,
