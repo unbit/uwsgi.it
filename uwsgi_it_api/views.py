@@ -79,3 +79,13 @@ def container(request, id):
         'ssh_keys': container.ssh_keys_raw,
     }
     return HttpResponse(json.dumps(c), content_type="application/json")
+
+@need_basicauth
+def me(request):
+    customer = request.user.customer
+    c = {
+        'vat': customer.vat,
+        'company': customer.company,
+        'containers': [cc.uid for cc in customer.container_set.all()],
+    }
+    return HttpResponse(json.dumps(c), content_type="application/json")
