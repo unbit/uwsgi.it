@@ -60,6 +60,8 @@ class Server(models.Model):
     etc_resolv_conf = models.TextField("/etc/resolv.conf", default='',blank=True)
     etc_hosts = models.TextField("/etc/hosts", default='',blank=True)
 
+    note = models.TextField(blank=True,null=True)
+
     @property
     def used_memory(self):
         n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
@@ -99,6 +101,8 @@ class Distro(models.Model):
     mtime = models.DateTimeField(auto_now=True)
 
     uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
+
+    note = models.TextField(blank=True,null=True)
 
     def __unicode__(self):
         return self.name
