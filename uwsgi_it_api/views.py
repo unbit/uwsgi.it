@@ -17,7 +17,7 @@ def containers(request):
         print sys.exc_info()
         return HttpResponseForbidden('Forbidden')
 
-def container(request, id):
+def container_ini(request, id):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
@@ -27,3 +27,7 @@ def container(request, id):
         import sys
         print sys.exc_info()
         return HttpResponseForbidden('Forbidden')    
+
+def container(request, id):
+    pass
+
