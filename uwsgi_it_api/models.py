@@ -145,8 +145,8 @@ class Container(models.Model):
 
     @property
     def ip(self):
-        # skip the first address as it is always 10.0.0.1
-        addr = self.pk + 1
+        # skip the first two addresses (10.0.0.1 for the gateway, 10.0.0.2 for the api)
+        addr = self.pk + 2
         addr0 = 0x0a000000;
         return ipaddress.IPv4Address(addr0 | (addr & 0x00ffffff))
 
