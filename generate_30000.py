@@ -36,12 +36,14 @@ container = {
     'hostname': c.get('uwsgi','api_domain')[0],
     'uid': 30000,
     'ip': '10.0.0.2',
-    'server': { 'hd':c.get('uwsgi','api_hd')[0]},
+    'server': {
+        'hd':c.get('uwsgi','api_hd')[0],
+        'etc_resolv_conf_lines': c.get('uwsgi','api_resolvconf'),
+        'etc_hosts_lines': c.get('uwsgi','api_hosts'),
+     },
     'quota': 20 * 1024 * 1024 * 1024, 
     'memory_limit_in_bytes': 1024 * 1024 * 1024,
     'distro': {'path': 'precise'},
-    'etc_resolv_conf_lines': c.get('uwsgi','api_resolvconf'),
-    'etc_hosts_lines': c.get('uwsgi','api_hosts'),
     'ssh_keys': c.get('uwsgi','api_ssh_key'),
     'customer': {
         'rsa_key_lines': rsa_key.split('\n'),
