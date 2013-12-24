@@ -33,6 +33,7 @@ settings.configure(TEMPLATE_DIRS=('uwsgi_it_api/templates',), TEMPLATE_STRING_IF
 rsa_key = RSA.generate(2048).exportKey()
 
 container = {
+    'name': '30000',
     'hostname': c.get('uwsgi','api_domain')[0],
     'uid': 30000,
     'ip': '10.0.0.2',
