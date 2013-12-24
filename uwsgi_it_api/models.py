@@ -239,7 +239,11 @@ real metrics now
 """
 
 # stores values from the tuntap router
-class NetworkContainerMetric(ContainerMetric):
+class NetworkRXContainerMetric(ContainerMetric):
+    pass
+
+# stores values from the tuntap router
+class NetworkTXContainerMetric(ContainerMetric):
     pass
 
 # stores values from the container cgroup
@@ -256,4 +260,8 @@ class IOReadContainerMetric(ContainerMetric):
 
 # stores values from the container cgroup
 class IOWriteContainerMetric(ContainerMetric):
+    pass
+
+# uses perl Quota package
+class QuotaContainerMetric(ContainerMetric):
     pass
