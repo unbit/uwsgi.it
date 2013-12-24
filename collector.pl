@@ -48,8 +48,8 @@ sub collect_metrics_mem {
 
 sub collect_metrics_quota {
         my ($uid) = @_;
-	my ($blocks,$soft,$hard) = Quota::query($cfg->val('uwsgi', 'api_hd'), $uid);
-        push_metric($uid, 'container.quota', $hard);
+	my ($blocks) = Quota::query($cfg->val('uwsgi', 'api_hd'), $uid);
+        push_metric($uid, 'container.quota', Math::BigInt->new($blocks) * 1024);
 }
 
 sub collect_metrics_net {
