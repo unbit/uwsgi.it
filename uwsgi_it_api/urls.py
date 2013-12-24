@@ -7,5 +7,6 @@ urlpatterns = patterns('uwsgi_it_api.views',
     (r'^me/$', 'me'),
     (r'^distros/$', 'distros'),
     (r'^domains/$', 'domains'),
+    (r'^domains/rsa/$', 'domains_rsa'),
     (r'^domains/(\d+)$', 'domain'),
 )
