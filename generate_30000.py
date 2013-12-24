@@ -34,7 +34,7 @@ rsa_key = RSA.generate(2048).exportKey()
 
 container = {
     'name': '30000',
-    'hostname': c.get('uwsgi','api_domain')[0],
+    'hostname': c.get('uwsgi','api_domain')[0].replace('.','-'),
     'uid': 30000,
     'ip': '10.0.0.2',
     'server': {
