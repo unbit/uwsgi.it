@@ -23,3 +23,8 @@ admin.site.register(Distro)
 admin.site.register(Customer)
 admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
+
+admin.site.register(NetworkContainerMetric)
+admin.site.register(CPUContainerMetric)
+admin.site.register(MemoryContainerMetric)
+admin.site.register(IOContainerMetric)

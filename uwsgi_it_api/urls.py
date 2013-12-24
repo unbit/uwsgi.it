@@ -9,4 +9,8 @@ urlpatterns = patterns('uwsgi_it_api.views',
     (r'^domains/$', 'domains'),
     (r'^domains/rsa/$', 'domains_rsa'),
     (r'^domains/(\d+)$', 'domain'),
+    (r'^metrics/container.io/(\d+)$', 'metrics_container_io'),
+    (r'^metrics/container.net/(\d+)$', 'metrics_container_net'),
+    (r'^metrics/container.cpu/(\d+)$', 'metrics_container_cpu'),
+    (r'^metrics/container.mem/(\d+)$', 'metrics_container_mem'),
 )

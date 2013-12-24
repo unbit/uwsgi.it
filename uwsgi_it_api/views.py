@@ -93,7 +93,10 @@ def domains_rsa(request):
     server_customers = Customer.objects.filter(container__server=server)
     j = []
     for customer in server_customers:
-        j.append({'rsa': customer.rsa_pubkey, 'domains': list(customer.domain_set.values_list('name',flat=True)) })
+        domains = []
+        for domain in customer.domain_set.all():
+            domains.append({'name': domain.name, 'mtime': domain.munix})
+        j.append({'rsa': customer.rsa_pubkey, 'domains': domains })
     return HttpResponse(json.dumps(j), content_type="application/json")
 
 @need_basicauth
@@ -212,4 +215,22 @@ def domain(request, id):
 
     response = HttpResponse('Method not allowed\n')
     response.status_code = 405
+    return response
+
+@csrf_exempt
+@need_certificate
+def metrics_container_io(request, id):
+    server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+    container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        container.iocontainermetric_set.create(unix=j['unix'],value=j['value'])
+        response = HttpResponse('Created\n')
+        response.status_code = 201
+    else:
+        response = HttpResponse('Method not allowed\n')
+        response.status_code = 405
     return response

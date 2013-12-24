@@ -198,3 +198,58 @@ class Domain(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def munix(self):
+        return calendar.timegm(self.mtime.utctimetuple())
+
+"""
+each metric is stored in a different table
+"""
+class ContainerMetric(models.Model):
+
+    container = models.ForeignKey(Container)
+    # we use a standard number as we will deal with onlu unix timestamp since the epoch
+    unix = models.PositiveIntegerField() 
+    # 64bit value
+    value = models.BigIntegerField()
+
+    def __unicode__(self):
+        return self.unix
+
+    class Meta:
+        abstract = True
+
+class DomainMetric(models.Model):
+
+    domain = models.ForeignKey(Domain)
+    # we use a standard number as we will deal with onlu unix timestamp since the epoch
+    unix = models.PositiveIntegerField()
+    # 64bit value
+    value = models.BigIntegerField()
+
+    def __unicode__(self):
+        return self.unix
+    
+    class Meta:
+        abstract = True
+
+"""
+real metrics now
+"""
+
+# stores values from the tuntap router
+class NetworkContainerMetric(ContainerMetric):
+    pass
+
+# stores values from the container cgroup
+class CPUContainerMetric(ContainerMetric):
+    pass
+
+# stores values from the container cgroup
+class MemoryContainerMetric(ContainerMetric):
+    pass
+
+# stores values from the container cgroup
+class IOContainerMetric(ContainerMetric):
+    pass
