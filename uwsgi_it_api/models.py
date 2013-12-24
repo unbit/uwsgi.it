@@ -215,7 +215,7 @@ class ContainerMetric(models.Model):
     value = models.BigIntegerField()
 
     def __unicode__(self):
-        return self.unix
+        return str(self.unix)
 
     class Meta:
         abstract = True
@@ -251,5 +251,9 @@ class MemoryContainerMetric(ContainerMetric):
     pass
 
 # stores values from the container cgroup
-class IOContainerMetric(ContainerMetric):
+class IOReadContainerMetric(ContainerMetric):
+    pass
+
+# stores values from the container cgroup
+class IOWriteContainerMetric(ContainerMetric):
     pass

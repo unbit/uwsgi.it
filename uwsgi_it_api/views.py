@@ -217,9 +217,7 @@ def domain(request, id):
     response.status_code = 405
     return response
 
-@csrf_exempt
-@need_certificate
-def metrics_container_io(request, id):
+def metrics_container_do(request, id, func):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
     container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
 
@@ -227,10 +225,45 @@ def metrics_container_io(request, id):
         response = check_body(request)
         if response: return response
         j = json.loads(request.read())
-        container.iocontainermetric_set.create(unix=j['unix'],value=j['value'])
+        func(container, j['unix'], j['value'])
         response = HttpResponse('Created\n')
         response.status_code = 201
     else:
         response = HttpResponse('Method not allowed\n')
         response.status_code = 405
     return response
+
+@csrf_exempt
+@need_certificate
+def metrics_container_mem(request, id):
+    def do(container, unix, value):
+        container.memorycontainermetric_set.create(unix=unix,value=value)
+    return metrics_container_do(request, id, do)
+
+@csrf_exempt
+@need_certificate
+def metrics_container_cpu(request, id):
+    def do(container, unix, value):
+        container.cpucontainermetric_set.create(unix=unix,value=value)
+    return metrics_container_do(request, id, do)
+
+@csrf_exempt
+@need_certificate
+def metrics_container_io_read(request, id):
+    def do(container, unix, value):
+        container.ioreadcontainermetric_set.create(unix=unix,value=value)
+    return metrics_container_do(request, id, do)
+
+@csrf_exempt
+@need_certificate
+def metrics_container_io_write(request, id):
+    def do(container, unix, value):
+        container.iowritecontainermetric_set.create(unix=unix,value=value)
+    return metrics_container_do(request, id, do)
+
+@csrf_exempt
+@need_certificate
+def metrics_container_net(request, id):
+    def do(container, unix, value):
+        container.netcontainermetric_set.create(unix=unix,value=value)
+    return metrics_container_do(request, id, do)

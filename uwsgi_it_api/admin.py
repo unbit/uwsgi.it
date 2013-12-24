@@ -18,13 +18,18 @@ class ContainerAdmin(admin.ModelAdmin):
 class DomainAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'customer')
 
+class ContainerMetricAdmin(admin.ModelAdmin):
+    list_display = ('container', 'unix', 'value')
+    list_filter = ('container',)
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer)
 admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
 
-admin.site.register(NetworkContainerMetric)
-admin.site.register(CPUContainerMetric)
-admin.site.register(MemoryContainerMetric)
-admin.site.register(IOContainerMetric)
+admin.site.register(NetworkContainerMetric,ContainerMetricAdmin)
+admin.site.register(CPUContainerMetric,ContainerMetricAdmin)
+admin.site.register(MemoryContainerMetric,ContainerMetricAdmin)
+admin.site.register(IOReadContainerMetric,ContainerMetricAdmin)
+admin.site.register(IOWriteContainerMetric,ContainerMetricAdmin)
