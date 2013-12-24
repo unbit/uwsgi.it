@@ -89,21 +89,12 @@ def container_ini(request, id):
 
 @need_certificate
 def domains_rsa(request):
-    #try:
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
-    print server
-    try:
-        server_customers = server.container_set.prefetch_related('customer__rsa_pubkey').distinct()
-        print server_customers
-    except:
-        import sys
-        print sys.exc_info()
-    j = server_customers
-    #for customer in server_customers:
-    #    j.append({'
+    server_customers = Customer.objects.filter(container__server=server)
+    j = []
+    for customer in server_customers:
+        j.append({'rsa': customer.rsa_pubkey, 'domains': list(customer.domain_set.values_list('name',flat=True)) })
     return HttpResponse(json.dumps(j), content_type="application/json")
-    #except:
-    #return HttpResponseForbidden('Forbidden\n')
 
 @need_basicauth
 @csrf_exempt
