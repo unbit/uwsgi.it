@@ -150,7 +150,7 @@ class Container(models.Model):
     @property
     def hostname(self):
         h = ''
-        allowed = string.ascii_letters + string.digits + '.-'
+        allowed = string.ascii_letters + string.digits + '-'
         for char in self.name:
             if char in allowed:
                 h += char
