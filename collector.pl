@@ -17,8 +17,6 @@ my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api';
 my $ssl_key = $cfg->val('uwsgi', 'api_client_key_file');
 my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
 
-my $quota = Quota::getqcarg($cfg->val('uwsgi', 'api_hd'));
-
 sub collect_metrics {
 	my ($uid, $net_json) = @_;
 	collect_metrics_cpu($uid);
@@ -50,7 +48,7 @@ sub collect_metrics_mem {
 
 sub collect_metrics_quota {
         my ($uid) = @_;
-	my ($blocks,$soft,$hard) = Quota::query($quota, $uid);
+	my ($blocks,$soft,$hard) = Quota::query($cfg->val('uwsgi', 'api_hd'), $uid);
         push_metric($uid, 'container.quota', $hard);
 }
 
