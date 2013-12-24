@@ -4,6 +4,7 @@ use JSON -support_by_pp;
 use Config::IniFiles;
 use POSIX qw(strftime);
 use IO::Socket::INET;
+use Quota;
 
 # required for --log-master
 STDOUT->autoflush(1);
@@ -16,11 +17,14 @@ my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api';
 my $ssl_key = $cfg->val('uwsgi', 'api_client_key_file');
 my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
 
+my $quota = Quota::getqcarg($cfg->val('uwsgi', 'api_hd'));
+
 sub collect_metrics {
 	my ($uid, $net_json) = @_;
 	collect_metrics_cpu($uid);
 	collect_metrics_io($uid);
 	collect_metrics_mem($uid);
+	collect_metrics_quota($uid);
 	if ($net_json) {
 		collect_metrics_net($uid, $net_json);
 	}
@@ -42,6 +46,12 @@ sub collect_metrics_mem {
         close CGROUP;
         chomp $value;
         push_metric($uid, 'container.mem', $value);
+}
+
+sub collect_metrics_quota {
+        my ($uid) = @_;
+	my ($blocks,$soft,$hard) = Quota::query($quota, $uid);
+        push_metric($uid, 'container.quota', $hard);
 }
 
 sub collect_metrics_net {
