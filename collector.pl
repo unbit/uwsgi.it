@@ -3,6 +3,7 @@ use LWP::UserAgent;
 use JSON -support_by_pp;
 use Config::IniFiles;
 use POSIX qw(strftime);
+use IO::Socket::INET;
 
 # required for --log-master
 STDOUT->autoflush(1);
@@ -16,11 +17,13 @@ my $ssl_key = $cfg->val('uwsgi', 'api_client_key_file');
 my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
 
 sub collect_metrics {
-	my ($uid) = @_;
+	my ($uid, $net_json) = @_;
 	collect_metrics_cpu($uid);
 	collect_metrics_io($uid);
 	collect_metrics_mem($uid);
-	#collect_metrics_net($uid);
+	if ($net_json) {
+		collect_metrics_net($uid, $net_json);
+	}
 }
 
 sub collect_metrics_cpu {
@@ -39,6 +42,18 @@ sub collect_metrics_mem {
         close CGROUP;
         chomp $value;
         push_metric($uid, 'container.mem', $value);
+}
+
+sub collect_metrics_net {
+	my ($uid, $tuntap) = @_;
+	my $peers = $tuntap->{peers};
+	foreach(@{$peers}) {
+		if ($_->{uid} == $uid) {
+			push_metric($uid, 'container.net.rx', $_->{rx});
+			push_metric($uid, 'container.net.tx', $_->{tx});
+			return;
+		}
+	}
 }
 
 sub collect_metrics_io {
@@ -82,8 +97,22 @@ for(;;) {
 
 	my $containers = decode_json($response->decoded_content);
 
+	my $net_json = undef;
+	# get json stats from the tuntap router
+	my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1:5001');
+	if ($s) {
+		my $tuntap_json = '';
+		for(;;) {
+			$s->recv(my $buf, 8192);
+			last unless $buf;
+			$tuntap_json .= $buf;
+		}
+		$net_json = decode_json($tuntap_json);	
+	}
+
+
 	foreach(@{$containers}) {
-		collect_metrics($_->{uid});
+		collect_metrics($_->{uid}, $net_json);
 	}
 
 	sleep(60);
