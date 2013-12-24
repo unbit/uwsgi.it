@@ -263,7 +263,21 @@ def metrics_container_io_write(request, id):
 
 @csrf_exempt
 @need_certificate
-def metrics_container_net(request, id):
+def metrics_container_net_rx(request, id):
     def do(container, unix, value):
-        container.netcontainermetric_set.create(unix=unix,value=value)
+        container.networkrxcontainermetric_set.create(unix=unix,value=value)
+    return metrics_container_do(request, id, do)
+
+@csrf_exempt
+@need_certificate
+def metrics_container_net_tx(request, id):
+    def do(container, unix, value):
+        container.networktxcontainermetric_set.create(unix=unix,value=value)
+    return metrics_container_do(request, id, do)
+
+@csrf_exempt
+@need_certificate
+def metrics_container_quota(request, id):
+    def do(container, unix, value):
+        container.quotacontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
