@@ -6,7 +6,9 @@ This procedure assumes an x86_64 Ubuntu 13.10 server (ubuntu-minimal) with ext4 
 /etc/default/grub
 -----------------
 
-First step is ensuring the kernel io scheduler (elevator) is set to cfq (ubuntu enforces it to deadline):
+First step is ensuring the kernel io scheduler (elevator) is set to cfq (ubuntu enforces it to deadline).
+
+Before you ask, being "fair" at the price of a bit of performance is the best approach (imho) for hosting environments. In addition to this, CFQ will avoid a single user to steal of your storage I/O throughput
 
 open `/etc/default/grub` and change
 
