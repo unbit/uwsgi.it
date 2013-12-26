@@ -149,3 +149,24 @@ line, add
 session    required     pam_unbit.so
 ```
 
+
+Preparing the filesystem
+------------------------
+
+now we need to create a set of directories (as root)
+
+```sh
+# used for containers homes
+mkdir /containers
+# used for storing various distributions rootfs
+mkdir /distros
+# fake mountpoint for namespaces
+mkdir /ns
+# uwsgi tree
+mkdir -p /opt/unbit/uwsgi/plugins
+# uwsgi configuration
+mkdir /etc/uwsgi
+mkdir /etc/uwsgi/vassals
+mkdir /etc/uwsgi/domains
+mkdir /etc/uwsgi/ssl
+```
