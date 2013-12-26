@@ -59,8 +59,6 @@ Now you are ready to reboot your server. If it reboots correctly just move to th
 Configuring ssh (/etc/ssh/sshd_config)
 --------------------------------------
 
-Change 
-
 Find the line with 
 
 ```sh
