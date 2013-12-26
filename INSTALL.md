@@ -182,8 +182,8 @@ Building uWSGI
 Building uwsgi.it
 -----------------
 
-Configuring local.ini
----------------------
+Configuring /etc/uwsgi/local.ini
+--------------------------------
 
 The first vassal
 ----------------
