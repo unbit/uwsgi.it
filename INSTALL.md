@@ -1,7 +1,7 @@
 Step by step guide for installing a uwsgi.it node
 -------------------------------------------------
 
-This procedure assumes an x86_64 Ubuntu 13.10 server system (ubuntu-minimal)
+This procedure assumes an x86_64 Ubuntu 13.10 server (ubuntu-minimal) with ext4 filesystem.
 
 /etc/default/grub
 -----------------
@@ -28,4 +28,124 @@ dpkg-reconfigure grub-pc
 
 /etc/fstab
 ----------
+
+We need a working (and customizable) cgroup setup and a filesystem with uota support.
+
+Let's edit /etc/fstab
+
+First step is finding the line on which the rootfs (or more general where /containers, the home of our container will be stored). Once found add quota support:
+
+```sh
+...
+/dev/md/2 / ext4 defaults,usrjquota=aquota.user,jqfmt=vfsv1 0 0
+...
+```
+
+in this example /dev/md2 will store customer's file so we add `usrjquota=aquota.user,jqfmt=vfsv1` to its options
+
+Finally the cgroup line:
+
+```sh
+...
+/dev/md/2 / ext4 defaults,usrjquota=aquota.user,jqfmt=vfsv1 0 0
+none /sys/fs/cgroup cgroup blkio,cpuacct,cpu,memory,devices 0 0
+...
+```
+
+Now you are ready to reboot your server. If it reboots correctly just move to the next step
+
+Configuring ssh (/etc/ssh/sshd_config)
+--------------------------------------
+
+Change 
+
+Find the line with 
+
+```sh
+#AuthorizedKeysFile     %h/.ssh/authorized_keys
+```
+
+and change to
+
+```sh
+AuthorizedKeysFile %h/.ssh/authorized_keys %h/.ssh/uwsgi_authorized_keys
+```
+
+Then find 
+
+```sh
+#PasswordAuthentication yes
+```
+
+and change to
+
+```sh
+PasswordAuthentication no
+```
+
+Finally turn off X11Forwarding
+
+```sh
+X11Forwarding no
+```
+
+Now be ABSOLUTELY sure to set your .ssh/authorized_keys in the account you are currently using to log-in (otherwise you will not be able to log-in back via ssh).
+
+test if you can login with your key and then restart your ssh service:
+
+```sh
+service ssh restart
+```
+
+apt-installing packages
+-----------------------
+
+```sh
+apt-get install git make build-essential libpam-dev
+```
+
+/etc/nsswitch.conf and /etc/pam.d/ssh
+-------------------------------------
+
+we need to extend our uid/gid mappings (and the pam subsystem) to support the container-based setup.
+
+First step is /etc/nsswitch.conf
+
+```sh
+git clone https://github.com/unbit/nss-unbit
+cd nss-unbit
+# run make as root or with sudo
+make
+```
+
+now edit /etc/nsswitch.conf and update passwd, group and shadow to use the 'unbit' engine
+
+```sh
+passwd:         compat unbit
+group:          compat unbit
+shadow:         compat unbit
+...
+```
+
+Now it's the pam time:
+
+```sh
+git clone https://github.com/unbit/pam-unbit
+cd pam-unbit
+# run make as root or with sudo
+make
+```
+
+then edit /etc/pam.d/sshd and below the
+
+```sh
+session    required     pam_env.so user_readenv=1 envfile=/etc/default/locale
+```
+
+line, add
+
+
+```sh
+session    required     pam_unbit.so
+```
 
