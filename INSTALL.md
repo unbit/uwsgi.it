@@ -31,7 +31,7 @@ dpkg-reconfigure grub-pc
 /etc/fstab
 ----------
 
-We need a working (and customizable) cgroup setup and a filesystem with uota support.
+We need a working (and customizable) cgroup setup and a filesystem with uid quota support.
 
 Let's edit /etc/fstab
 
