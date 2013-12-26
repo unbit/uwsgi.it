@@ -170,3 +170,8 @@ mkdir /etc/uwsgi/vassals
 mkdir /etc/uwsgi/domains
 mkdir /etc/uwsgi/ssl
 ```
+
+SSL certificates
+----------------
+
+We will generate SSL certificates in the /etc/uwsgi/ssl directory
