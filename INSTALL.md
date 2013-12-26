@@ -190,3 +190,6 @@ The first distro
 
 The first vassal
 ----------------
+
+Install the api server - Only for the API node -
+------------------------------------------------
