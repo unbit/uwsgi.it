@@ -35,7 +35,7 @@ We need a working (and customizable) cgroup setup and a filesystem with uid quot
 
 Let's edit /etc/fstab
 
-First step is finding the line on which the rootfs (or more general where /containers, the home of our container will be stored). Once found add quota support:
+First step is finding the line on which the rootfs (or more general where /containers, the home of our containers) will be stored. Once found add quota support:
 
 ```sh
 ...
