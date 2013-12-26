@@ -175,3 +175,12 @@ SSL certificates
 ----------------
 
 We will generate SSL certificates in the /etc/uwsgi/ssl directory
+
+Building uWSGI
+--------------
+
+Building uwsgi.it
+-----------------
+
+Configuring local.ini
+---------------------
