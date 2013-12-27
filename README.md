@@ -20,7 +20,7 @@ Goals
 - each container has an associated disk quota, a cpu share and a fixed amount of memory
 - each container has an associated Emperor
 - best possible isolation between containers
-- each container can be mapped to a different distribution
+- each container can be mapped to a different distribution (both 32 and 64 bit)
 - each container has its dedicated firewall based on the tuntap router plugin
 - ssh access is governed by the container emperor using the pam-unbit project
 - uid/gid mapping is managed using nss-unbit project
