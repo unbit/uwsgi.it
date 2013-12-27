@@ -18,7 +18,7 @@ charset: "UTF-8"
 # simple: default and very basic template engine
 # template_toolkit: TT
 
-template: "simple"
+template: "template_toolkit"
 
 # template: "template_toolkit"
 # engines:
@@ -26,3 +26,8 @@ template: "simple"
 #     start_tag: '[%'
 #     end_tag:   '%]'
 
+
+session: Cookie
+session_cookie_key: "b4a12ba1-5ec6-4160-acb7-ee3b3152c82f"
+
+show_errors: 1
