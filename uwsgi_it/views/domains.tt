@@ -1,0 +1,11 @@
+<h1>domains</h1>
+<li>
+<% FOREACH domain IN domains %>
+	<ul><% domain.name %><form method="POST" action="/domains/delete/<%domain.id%>"><input type="submit" value="delete" /></form></ul>
+<% END %>
+</li>
+
+<form method="POST" action="/domains/add">
+	<input type="text" name="name">
+	<input type="submit" value="add">
+</form>

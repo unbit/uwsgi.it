@@ -39,6 +39,11 @@ get '/domains' => sub {
 	template 'domains', {'domains' => $j};
 };
 
+get '/containers' => sub {
+	my $j = get_uwsgi_json(session('username'), session('password'), 'me/containers/');
+	template 'containers', {'containers' => $j};
+};
+
 post '/domains/add' => sub {
 	my $j = {'name' => param('name')};
 	post_uwsgi_json(session('username'), session('password'), $j, 'domains/');
