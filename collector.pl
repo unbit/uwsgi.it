@@ -123,7 +123,8 @@ for(;;) {
 		collect_metrics($_->{uid}, $net_json);
 	}
 
-	sleep(60);
+	# gather metrics every 5 minutes
+	sleep(300);
 }
 
 sub date {
