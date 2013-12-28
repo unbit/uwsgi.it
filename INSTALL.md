@@ -101,10 +101,9 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev openntpd
+apt-get install git make build-essential libpam-dev
 ```
 
-Note: we use openntpd instead of classic ntpd, if you already have ntpd installed, uninstall it and restart apparmor before installing openntpd
 
 /etc/nsswitch.conf and /etc/pam.d/ssh
 -------------------------------------
