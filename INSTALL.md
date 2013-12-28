@@ -101,9 +101,10 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev
+apt-get install git make build-essential libpam-dev ntp
 ```
 
+As we are going to use secured subscription subsystem (that includes anti-replay-attacks mesaures) we need synchronized-clocks (that is why ntp daemon is installed)
 
 /etc/nsswitch.conf and /etc/pam.d/ssh
 -------------------------------------
