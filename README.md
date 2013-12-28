@@ -72,4 +72,10 @@ TODO
 
 - fastrouter-only implementation for nginx integration
 - is SPDY support whorty ?
-- Are CGIs still of interest ? 
+- Are CGIs still of interest ?
+
+
+LONG TERM GOALS
+---------------
+
+- FreeBSD jail support in addition to Linux namespaces ?
