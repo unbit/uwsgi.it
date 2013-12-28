@@ -1,0 +1,10 @@
+home<br/>
+
+<form method="POST" action="/">
+VAT: <input type="text" name="vat" value="<% customer.vat %>"/><br/>
+Company: <input type="text" name="company" value="<% customer.company %>" /><br/>
+<input type="submit" value="update"/>
+</form>
+
+
+

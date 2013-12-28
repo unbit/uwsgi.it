@@ -155,6 +155,27 @@ def me(request):
     return HttpResponse(json.dumps(c), content_type="application/json")
 
 @need_basicauth
+@csrf_exempt
+def me_containers(request):
+    c = []
+    for container in request.user.customer.container_set.all():
+        c.append({
+            'uid': container.uid,
+            'name': container.name,
+            'hostname': container.hostname,
+            'ip': str(container.ip),
+            'memory': container.memory,
+            'storage': container.storage,
+            'uuid': container.uuid,
+            'distro': container.distro.pk,
+            'distro_name': container.distro.name,
+            'server': container.server.name,
+            'server_address': container.server.address,
+        })
+
+    return HttpResponse(json.dumps(c), content_type="application/json")
+
+@need_basicauth
 def distros(request):
     j = [{'id':d.pk, 'name':d.name} for d in Distro.objects.all()]
     return HttpResponse(json.dumps(j), content_type="application/json")
