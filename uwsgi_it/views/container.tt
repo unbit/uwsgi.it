@@ -1,0 +1,28 @@
+<form method="POST">
+
+	uuid: <% container.uuid %><br/>
+
+	uid: <% container.uid %><br/>
+
+	hostname: <% container.hostname %><br/>
+
+	public ip: <% container.server_address %><br/>
+
+	private ip: <% container.ip %><br/>
+
+	memory: <% container.memory %><br/>
+
+	storage: <% container.storage %><br/>
+
+	distribution: <% container.distro_name %><br/>
+
+	name: <input type="text" name="name" value="<% container.name %>"/><br/>
+
+	ssh keys: <textarea name="ssh_keys" rows="17" cols="170"><% FOREACH key IN container.ssh_keys %><% key %>
+<% END %>
+	</textarea><br/>
+
+	note: <textarea name="note" rows="5" cols="80"><%container.note%></textarea><br/>
+
+	<input type="submit" value="update" />
+</form>

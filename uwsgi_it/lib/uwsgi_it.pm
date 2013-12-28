@@ -45,10 +45,15 @@ get '/containers' => sub {
 };
 
 get '/containers/:uid' => sub {
-	print param('uid')."\n";
 	my $j = get_uwsgi_json(session('username'), session('password'), 'containers/'.param('uid'));
 	print Dumper($j);
 	template 'container', {'container' => $j};
+};
+
+get '/containers/:uid/metrics/cpu' => sub {
+	my $j = get_uwsgi_json(session('username'), session('password'), 'containers/'.param('uid').'/metrics/cpu');
+	print Dumper($j);
+	template 'metrics_cpu', {'metrics' => $j};
 };
 
 post '/domains/add' => sub {

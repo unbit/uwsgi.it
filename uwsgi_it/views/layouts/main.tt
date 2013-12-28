@@ -63,5 +63,44 @@ body {
     <script src="https://code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+    <script language="javascript" type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/flot/0.8.1/jquery.flot.min.js"></script>
+	<script language="javascript" type="text/javascript" src="/javascripts/jquery.flot.time.js"></script>
+
+    <script type="text/javascript">
+        $(function() {
+                var d = [];
+        <% FOREACH pair IN metrics %>
+                d.push([<% pair.0 %>*1000,<% pair.1 %>]);
+        <% END %>
+
+        // now consolidate the values (we remove the first one)
+        var last_value = d[0][1];
+        var last_good_value = last_value;
+        d.shift();
+        for(i=0;i<d.length;i++) {
+                if (d[i][1] < last_value) {
+                        d[i][1] = last_good_value;
+                        last_value = d[i][1];
+                }
+                else {
+                        new_value = d[i][1] - last_value;
+                        last_value = d[i][1];
+			d[i][1] = new_value;
+                        last_good_value = last_value;
+                }
+        }
+
+
+                $.plot("#metrics", [d], {
+			xaxis: { mode: "time" },
+			grid: {
+    				backgroundColor: { colors: ["#000", "#999"] }
+			},
+		});
+
+        });
+</script>
+
   </body>
 </html>
