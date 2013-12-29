@@ -34,6 +34,15 @@ Goals
 - supported languages will be Perl, CPython, PyPy, Ruby, Lua and php (yes php apps works even without .htaccess...) 
 - Websockets support (in the routers/proxy) is enabled by default
 
+
+Status
+------
+
+Currently we are in pre-beta status, the api is almost complete, while the example web interface is still in early stage of development.
+
+Beta phase will officially start soon after the installation docs are complete.
+
+
 How it works
 ------------
 
