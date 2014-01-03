@@ -54,7 +54,7 @@ for(;;) {
 	foreach(@files) {
 		next if /^\./;
 		next if /^30000\.ini$/;
-		next unless /^3\d+.ini$/;
+		next unless /^3\d+\.ini$/;
 		unless(exists($available_container{$_})) {
 			unlink '/etc/uwsgi/vassals/'.$_;
 			print date().' '.$_." removed\n";
