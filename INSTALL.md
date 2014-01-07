@@ -195,3 +195,13 @@ The first vassal
 
 Install the api server - Only for the API node -
 ------------------------------------------------
+
+The API server runs in a container as all of the other apps. It is a simple django app answering requests from emperor daemons (configurator, collector and dominator) and from customers.
+
+Data of customers and containers (as well as servers and their topology) can be stored in a SQL database. (we strongly suggest postgresql for it).
+
+You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
+
+
+Clustering
+----------
