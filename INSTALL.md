@@ -193,5 +193,49 @@ The first distro
 The first vassal
 ----------------
 
+The firewall
+------------
+
+udp port 999 is the tuntap remote gateway, its access must be allowed only from the infrastrcture nodes and from port 999 (it is a privileged port so it should be a pretty good protection)
+
+node1 = 1.1.1.1
+node2 = 2.2.2.2
+node3 = 3.3.3.3
+
+on node1:
+
+```sh
+iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 --sport 999 -s 2.2.2.2 -J ACCEPT
+iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 --sport 999 -s 3.3.3.3 -J ACCEPT
+iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 -J DROP
+```
+
+ports 22, 80 and 443 are for public access, there is no need to protect them in a particular way
+
+port udp 123 is for ntp services, default ubuntu policies already protect them at the application level.
+
+port 998 is the fastrouter one it binds itself to udp port 2000 for forwarding subscription to the legion-based http routers (for clustering). As for the tuntp router we can protect legion's subscription server to accept requests only from source port 2000.
+
+The legion subsystem is used for clustering, as tuntap and subscriptions we only need to ensure that udp packets have source port == to the destination one (each legion should get a port >= 2100)
+
+Last port to protect is 998 TCP used by the fastrouter. This things are a bit more complex:
+
+we need to avoid containers to access it
+
+we need to avoid external networks to access it
+
+we need to allow ONLY legion-based http routers to access it
+
 Install the api server - Only for the API node -
 ------------------------------------------------
+
+The API server runs in a container as all of the other apps. It is a simple django app answering requests from emperor daemons (configurator, collector and dominator) and from customers.
+
+Data of customers and containers (as well as servers and their topology) can be stored in a SQL database. (we strongly suggest postgresql for it).
+
+You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
+
+
+Clustering
+----------
+
