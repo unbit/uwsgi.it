@@ -22,11 +22,18 @@ class ContainerMetricAdmin(admin.ModelAdmin):
     list_display = ('container', 'unix', 'value')
     list_filter = ('container',)
 
+class ClusterNodeInline(admin.TabularInline):
+    model = Cluster.nodes.through
+
+class ClusterAdmin(admin.ModelAdmin):
+    inlines = [ ClusterNodeInline, ]
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer)
 admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
+admin.site.register(Cluster, ClusterAdmin)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
 admin.site.register(NetworkTXContainerMetric,ContainerMetricAdmin)
