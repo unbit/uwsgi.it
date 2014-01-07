@@ -196,6 +196,26 @@ The first vassal
 The firewall
 ------------
 
+udp port 999 is the tuntap remote gateway, its access must be allowed only from the infrastrcture nodes and from port 999 (it is a privileged port so it should be a pretty good protection)
+
+node1 = 1.1.1.1
+node2 = 2.2.2.2
+node3 = 3.3.3.3
+
+on node1:
+
+```sh
+iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 --sport 999 -s 2.2.2.2 -J ACCEPT
+iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 --sport 999 -s 3.3.3.3 -J ACCEPT
+iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 -J DROP
+```
+
+ports 22, 80 and 443 are for public access, there is no need to protect them in a particular way
+
+port udp 123 is for ntp services, default ubuntu policies already protect them at the application level.
+
+port 998 is the fastrouter one
+
 Install the api server - Only for the API node -
 ------------------------------------------------
 
