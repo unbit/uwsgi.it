@@ -193,6 +193,9 @@ The first distro
 The first vassal
 ----------------
 
+The firewall
+------------
+
 Install the api server - Only for the API node -
 ------------------------------------------------
 
@@ -205,3 +208,4 @@ You can run the app on one of the nodes or on an external ones. You can eventual
 
 Clustering
 ----------
+
