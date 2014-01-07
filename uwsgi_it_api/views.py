@@ -238,6 +238,12 @@ def domain(request, id):
     response.status_code = 405
     return response
 
+@need_basicauth
+def container_metrics_cpu(request, id):
+    container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    j = [[m.unix, m.value] for m in container.cpucontainermetric_set.all()]
+    return HttpResponse(json.dumps(j), content_type="application/json")
+
 def metrics_container_do(request, id, func):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
     container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))

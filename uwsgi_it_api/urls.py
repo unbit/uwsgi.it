@@ -17,4 +17,6 @@ urlpatterns = patterns('uwsgi_it_api.views',
     (r'^metrics/container.cpu/(\d+)$', 'metrics_container_cpu'),
     (r'^metrics/container.mem/(\d+)$', 'metrics_container_mem'),
     (r'^metrics/container.quota/(\d+)$', 'metrics_container_quota'),
+
+    (r'^containers/(\d+)/metrics/cpu$', 'container_metrics_cpu'),
 )
