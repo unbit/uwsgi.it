@@ -93,6 +93,30 @@ class Server(models.Model):
     def etc_hosts_lines(self):
         return self.etc_hosts.replace('\r', '\n').replace('\n\n', '\n').split('\n')
 
+class Cluster(models.Model):
+    name = models.CharField(max_length=255,unique=True)
+    address = models.GenericIPAddressField()
+    
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
+
+    note = models.TextField(blank=True,null=True)
+
+    nodes = models.ManyToManyField(Server, through='ClusterNode')
+
+    def __unicode__(self):
+        return "%s - %s " % (self.name, self.address)
+
+class ClusterNode(models.Model):
+    cluster = models.ForeignKey(Cluster)
+    server = models.ForeignKey(Server)
+    weight = models.PositiveIntegerField()
+
+    def __unicode__(self):
+        return self.server.name
+
 class Distro(models.Model):
     name = models.CharField(max_length=255,unique=True)
     path = models.CharField(max_length=255,unique=True)
