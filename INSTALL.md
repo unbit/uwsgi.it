@@ -191,6 +191,7 @@ Building uwsgi.it
 git clone https://github.com/unbit/uwsgi.it
 cd uwsgi.it
 cp emperor.conf /etc/init
+cp emperor.ini /etc/uwsgi
 cp -R services /etc/uwsgi
 cp collector.pl configurator.pl dominator.pl /etc/uwsgi/
 ```
