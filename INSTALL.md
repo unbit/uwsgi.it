@@ -187,11 +187,29 @@ mkdir /var/log/uwsgi
 Building uwsgi.it
 -----------------
 
-Building uWSGI
---------------
+```sh
+git clone https://github.com/unbit/uwsgi.it
+cd uwsgi.it
+cp emperor.conf /etc/init
+cp -R services /etc/uwsgi
+cp collector.pl configurator.pl dominator.pl /etc/uwsgi/
+```
 
 Configuring /etc/uwsgi/local.ini
 --------------------------------
+
+```ini
+[uwsgi]
+public_ip = x.x.x.x
+api_domain = example.com
+; additional options
+env = LANG=en_US.UTF-8
+```
+
+Building uWSGI
+--------------
+
+
 
 The first distro
 ----------------
