@@ -3,6 +3,8 @@ Step by step guide for installing a uwsgi.it node
 
 This procedure assumes an x86_64 Ubuntu 13.10 server (ubuntu-minimal) with ext4 filesystem.
 
+Note: you can set /etc/hostname to whatever you want, each container will have its own...
+
 /etc/default/grub
 -----------------
 
@@ -89,6 +91,12 @@ Finally turn off X11Forwarding
 X11Forwarding no
 ```
 
+Optional (for better user experience):
+
+```sh
+ClientAliveInterval 30
+```
+
 Now be ABSOLUTELY sure to set your .ssh/authorized_keys in the account you are currently using to log-in (otherwise you will not be able to log-in back via ssh).
 
 test if you can login with your key and then restart your ssh service:
@@ -101,7 +109,7 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev
+apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl
 ```
 
 As we are going to use secured subscription subsystem (that includes anti-replay-attacks mesaures) we need synchronized-clocks (that is why ntp daemon is installed)
@@ -164,6 +172,8 @@ mkdir /containers
 mkdir /distros
 # fake mountpoint for namespaces
 mkdir /ns
+# directory for subscription sockets
+mkdir /subscribe
 # uwsgi tree
 mkdir -p /opt/unbit/uwsgi/plugins
 # uwsgi configuration
@@ -171,21 +181,49 @@ mkdir /etc/uwsgi
 mkdir /etc/uwsgi/vassals
 mkdir /etc/uwsgi/domains
 mkdir /etc/uwsgi/ssl
+
+# for logging
+mkdir /var/log/uwsgi
+```
+
+Building uwsgi.it
+-----------------
+
+```sh
+git clone https://github.com/unbit/uwsgi.it
+cd uwsgi.it
+cp emperor.conf /etc/init
+cp emperor.ini /etc/uwsgi
+cp -R services /etc/uwsgi
+cp collector.pl configurator.pl dominator.pl /etc/uwsgi/
+```
+
+Configuring /etc/uwsgi/local.ini
+--------------------------------
+
+```ini
+[uwsgi]
+public_ip = x.x.x.x
+api_domain = example.com
+api_client_key_file = /etc/uwsgi/ssl/client.key
+api_client_cert_file = /etc/uwsgi/ssl/client.crt
+; additional options
+env = LANG=en_US.UTF-8
+```
+
+Building uWSGI
+--------------
+
+```sh
+bash -x build_uwsgi.sh
 ```
 
 SSL certificates
 ----------------
 
-We will generate SSL certificates in the /etc/uwsgi/ssl directory
+We will generate SSL certificates in the /etc/uwsgi/ssl directory, if you already have a valid key and a cert, copy the in /etc/uwsgi/ssl as uwsgi.it.key and uwsgi.it.crt
 
-Building uWSGI
---------------
-
-Building uwsgi.it
------------------
-
-Configuring /etc/uwsgi/local.ini
---------------------------------
+Then you need a key/cert pair for authenticating with the api server.
 
 The first distro
 ----------------
@@ -234,6 +272,8 @@ The API server runs in a container as all of the other apps. It is a simple djan
 Data of customers and containers (as well as servers and their topology) can be stored in a SQL database. (we strongly suggest postgresql for it).
 
 You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
+
+
 
 
 Clustering
