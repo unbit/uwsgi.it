@@ -109,7 +109,7 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota
+apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl
 ```
 
 As we are going to use secured subscription subsystem (that includes anti-replay-attacks mesaures) we need synchronized-clocks (that is why ntp daemon is installed)
@@ -172,6 +172,8 @@ mkdir /containers
 mkdir /distros
 # fake mountpoint for namespaces
 mkdir /ns
+# directory for subscription sockets
+mkdir /subscribe
 # uwsgi tree
 mkdir -p /opt/unbit/uwsgi/plugins
 # uwsgi configuration
@@ -187,11 +189,37 @@ mkdir /var/log/uwsgi
 Building uwsgi.it
 -----------------
 
-Building uWSGI
---------------
+```sh
+git clone https://github.com/unbit/uwsgi.it
+cd uwsgi.it
+cp emperor.conf /etc/init
+cp emperor.ini /etc/uwsgi
+cp -R services /etc/uwsgi
+cp collector.pl configurator.pl dominator.pl /etc/uwsgi/
+```
 
 Configuring /etc/uwsgi/local.ini
 --------------------------------
+
+```ini
+[uwsgi]
+public_ip = x.x.x.x
+api_domain = example.com
+; additional options
+env = LANG=en_US.UTF-8
+```
+
+Building uWSGI
+--------------
+
+```sh
+bash -x build_uwsgi.sh
+```
+
+SSL certificates
+----------------
+
+We will generate SSL certificates in the /etc/uwsgi/ssl directory, if you already have a valid key and a cert, copy the in /etc/uwsgi/ssl as uwsgi.it.key and uwsgi.it.crt
 
 The first distro
 ----------------
@@ -241,10 +269,7 @@ Data of customers and containers (as well as servers and their topology) can be 
 
 You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
 
-SSL certificates
-----------------
 
-We will generate SSL certificates in the /etc/uwsgi/ssl directory
 
 
 Clustering
