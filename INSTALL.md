@@ -179,18 +179,16 @@ mkdir /etc/uwsgi
 mkdir /etc/uwsgi/vassals
 mkdir /etc/uwsgi/domains
 mkdir /etc/uwsgi/ssl
+
+# for logging
+mkdir /var/log/uwsgi
 ```
-
-SSL certificates
-----------------
-
-We will generate SSL certificates in the /etc/uwsgi/ssl directory
-
-Building uWSGI
---------------
 
 Building uwsgi.it
 -----------------
+
+Building uWSGI
+--------------
 
 Configuring /etc/uwsgi/local.ini
 --------------------------------
@@ -242,6 +240,11 @@ The API server runs in a container as all of the other apps. It is a simple djan
 Data of customers and containers (as well as servers and their topology) can be stored in a SQL database. (we strongly suggest postgresql for it).
 
 You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
+
+SSL certificates
+----------------
+
+We will generate SSL certificates in the /etc/uwsgi/ssl directory
 
 
 Clustering
