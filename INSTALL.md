@@ -109,7 +109,7 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota
+apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev
 ```
 
 As we are going to use secured subscription subsystem (that includes anti-replay-attacks mesaures) we need synchronized-clocks (that is why ntp daemon is installed)
@@ -209,7 +209,14 @@ env = LANG=en_US.UTF-8
 Building uWSGI
 --------------
 
+```sh
+bash -x build_uwsgi.sh
+```
 
+SSL certificates
+----------------
+
+We will generate SSL certificates in the /etc/uwsgi/ssl directory, if you already have a valid key and a cert, copy the in /etc/uwsgi/ssl as uwsgi.it.key and uwsgi.it.crt
 
 The first distro
 ----------------
@@ -259,10 +266,7 @@ Data of customers and containers (as well as servers and their topology) can be 
 
 You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
 
-SSL certificates
-----------------
 
-We will generate SSL certificates in the /etc/uwsgi/ssl directory
 
 
 Clustering
