@@ -91,6 +91,12 @@ Finally turn off X11Forwarding
 X11Forwarding no
 ```
 
+Optional (for better user experience):
+
+```sh
+ClientAliveInterval 30
+```
+
 Now be ABSOLUTELY sure to set your .ssh/authorized_keys in the account you are currently using to log-in (otherwise you will not be able to log-in back via ssh).
 
 test if you can login with your key and then restart your ssh service:
