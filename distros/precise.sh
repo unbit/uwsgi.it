@@ -1,6 +1,6 @@
 set -u
 set -e
-debootstrap --components=main,universe,multiverse --include=vim,build-essential,git,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby,wget,ruby-dev,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,libjansson-dev,quota precise /distros/precise
+debootstrap --components=main,universe,multiverse --include=vim,build-essential,git,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby,wget,ruby-dev,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,libjansson-dev,quota,ruby1.9.1-dev precise /distros/precise
 chroot /distros/precise /bin/bash -x <<'EOF'
 set -u
 set -e
@@ -32,5 +32,9 @@ cp rack_plugin.so /opt/unbit/uwsgi/plugins
 cp router_redirect_plugin.so /opt/unbit/uwsgi/plugins
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/gevent
 cp gevent_plugin.so /opt/unbit/uwsgi/plugins/
+UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin "plugins/rack rack2"
+UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/fiber
+UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/rbthreads
+cp rack2_plugin.so fiber_plugin.so rbthreads_plugin.so /opt/unbit/uwsgi/plugins/
 EOF
 cp nsswitch.conf /distros/precise/etc/nsswitch.conf
