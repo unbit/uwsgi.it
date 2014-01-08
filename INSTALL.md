@@ -3,6 +3,8 @@ Step by step guide for installing a uwsgi.it node
 
 This procedure assumes an x86_64 Ubuntu 13.10 server (ubuntu-minimal) with ext4 filesystem.
 
+Note: you can set /etc/hostname to whatever you want, each container will have its own...
+
 /etc/default/grub
 -----------------
 
