@@ -8,6 +8,9 @@ mkdir /.old_root
 mkdir /containers
 mkdir -p /opt/unbit/uwsgi/plugins
 cp shortcuts.ini /opt/unbit/uwsgi/shortcuts.ini
+rm /etc/hosts /etc/hostname
+ln -s /run/resolvconf/hostname /etc/hostname
+ln -s /run/resolvconf/hosts /etc/hosts
 cd /root
 git clone https://github.com/unbit/uwsgi
 cd uwsgi
@@ -21,4 +24,7 @@ cp python3_plugin.so /opt/unbit/uwsgi/plugins
 cp psgi_plugin.so /opt/unbit/uwsgi/plugins
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/rack
 cp rack_plugin.so /opt/unbit/uwsgi/plugins
+/opt/unbit/uwsgi/uwsgi --build-plugin plugins/router_redirect
+cp router_redirect_plugin.so /opt/unbit/uwsgi/plugins
 EOF
+cp nsswitch.conf /distros/precise/etc/nsswitch.conf
