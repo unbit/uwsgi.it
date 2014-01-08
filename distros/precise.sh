@@ -12,6 +12,10 @@ rm /etc/hosts /etc/hostname
 ln -s /run/resolvconf/hostname /etc/hostname
 ln -s /run/resolvconf/hosts /etc/hosts
 cd /root
+git clone https://github.com/unbit/nss-unbit
+cd nss-unbit
+make
+cd ..
 git clone https://github.com/unbit/uwsgi
 cd uwsgi
 make uwsgi.it
@@ -26,5 +30,7 @@ cp psgi_plugin.so /opt/unbit/uwsgi/plugins
 cp rack_plugin.so /opt/unbit/uwsgi/plugins
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/router_redirect
 cp router_redirect_plugin.so /opt/unbit/uwsgi/plugins
+/opt/unbit/uwsgi/uwsgi --build-plugin plugins/gevent
+cp gevent_plugin.so /opt/unbit/uwsgi/plugins/
 EOF
 cp nsswitch.conf /distros/precise/etc/nsswitch.conf
