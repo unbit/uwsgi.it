@@ -205,6 +205,8 @@ Configuring /etc/uwsgi/local.ini
 [uwsgi]
 public_ip = x.x.x.x
 api_domain = example.com
+api_client_key_file = /etc/uwsgi/ssl/client.key
+api_client_cert_file = /etc/uwsgi/ssl/client.crt
 ; additional options
 env = LANG=en_US.UTF-8
 ```
@@ -220,6 +222,8 @@ SSL certificates
 ----------------
 
 We will generate SSL certificates in the /etc/uwsgi/ssl directory, if you already have a valid key and a cert, copy the in /etc/uwsgi/ssl as uwsgi.it.key and uwsgi.it.crt
+
+Then you need a key/cert pair for authenticating with the api server.
 
 The first distro
 ----------------
