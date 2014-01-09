@@ -34,6 +34,7 @@ admin.site.register(Customer)
 admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
 admin.site.register(Cluster, ClusterAdmin)
+admin.site.register(ContainerLink)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
 admin.site.register(NetworkTXContainerMetric,ContainerMetricAdmin)

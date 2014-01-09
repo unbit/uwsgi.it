@@ -131,6 +131,7 @@ class Distro(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class Container(models.Model):
     name = models.CharField(max_length=255)
     ssh_keys_raw = models.TextField("SSH keys", blank=True,null=True)
@@ -206,6 +207,30 @@ class Container(models.Model):
     @property
     def memory_limit_in_bytes(self):
         return self.memory * (1024*1024)
+
+    @property
+    def links(self):
+        l = []
+        for link in self.containerlink_set.all():
+            direction_in = {'direction': 'in', 'src': link.to.ip, 'src_mask': 32, 'dst': link.container.ip, 'dst_mask': 32, 'action': 'allow', 'target': ''}
+            direction_out = {'direction': 'out','src': link.container.ip, 'src_mask': 32, 'dst': link.to.ip, 'dst_mask': 32, 'action': 'allow', 'target': ''}
+            if link.container.server != link.to.server:
+                direction_in['action'] = 'gateway'
+                direction_in['target'] = "%s:999" % link.to.server.address
+            l.append(direction_in)
+            l.append(direction_out)
+        return l
+                
+
+class ContainerLink(models.Model):
+    container = models.ForeignKey(Container)
+    to = models.ForeignKey(Container,related_name='+')
+
+    def __unicode__(self):
+        return "%s --> %s" % (self.container, self.to)
+   
+    class Meta:
+        unique_together = ( 'container', 'to')
 
 """
 domains are mapped to customers, each container of the customer
