@@ -1,6 +1,6 @@
 set -u
 set -e
-debootstrap --components=main,universe,multiverse --include=vim,build-essential,git,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby2.0,ruby2.0-dev,wget,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,libjansson-dev,quota,gawk,libreadline6-dev,libyaml-dev,libsqlite3-dev,sqlite3,autoconf,libgdbm-dev,libncurses5-dev,automake,libtool,bison,libffi-dev,libphp5-embed,php5-memcached,php5-memcache,php5-json,php5-mysql,php5-gd,php5-pgsql,php5-dev,libxml2-dev,libdb-dev,libbz2-dev saucy /distros/saucy
+debootstrap --components=main,universe,multiverse --include=vim,build-essential,git,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby2.0,ruby2.0-dev,wget,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,libjansson-dev,quota,gawk,libreadline6-dev,libyaml-dev,libsqlite3-dev,sqlite3,autoconf,libgdbm-dev,libncurses5-dev,automake,libtool,bison,libffi-dev,libphp5-embed,php5-memcached,php5-memcache,php5-json,php5-mysql,php5-gd,php5-pgsql,php5-dev,libxml2-dev,libdb-dev,libbz2-dev,libjpeg-dev,libpng12-dev saucy /distros/saucy
 chroot /distros/saucy /bin/bash -x <<'EOF'
 set -u
 set -e
