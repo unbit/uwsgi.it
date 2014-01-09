@@ -35,6 +35,8 @@ UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin "p
 UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/fiber
 UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/rbthreads
 cp rack2_plugin.so fiber_plugin.so rbthreads_plugin.so /opt/unbit/uwsgi/plugins/
+/opt/unbit/uwsgi/uwsgi --build-plugin plugins/router_basicauth
+cp router_basicauth_plugin.so /opt/unbit/uwsgi/plugins
 EOF
 cp nsswitch.conf /distros/precise/etc/nsswitch.conf
 cp shortcuts.ini /distros/precise/opt/unbit/uwsgi/shortcuts.ini

@@ -35,7 +35,12 @@ cp gevent_plugin.so /opt/unbit/uwsgi/plugins/
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/rbthreads
 cp fiber_plugin.so rbthreads_plugin.so /opt/unbit/uwsgi/plugins/
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/php
-cp php_plugin.so rbthreads_plugin.so /opt/unbit/uwsgi/plugins/
+cp php_plugin.so /opt/unbit/uwsgi/plugins/
+/opt/unbit/uwsgi/uwsgi --build-plugin plugins/router_basicauth
+cp router_basicauth_plugin.so /opt/unbit/uwsgi/plugins/
+git clone https://github.com/unbit/uwsgi-netlink
+/opt/unbit/uwsgi/uwsgi --build-plugin uwsgi-netlink
+cp netlink_plugin.so /opt/unbit/uwsgi/plugins/
 EOF
 cp nsswitch.conf /distros/saucy/etc/nsswitch.conf
 cp shortcuts.ini /distros/saucy/opt/unbit/uwsgi/shortcuts.ini
