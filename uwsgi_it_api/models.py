@@ -215,8 +215,8 @@ class Container(models.Model):
             direction_in = {'direction': 'in', 'src': link.to.ip, 'src_mask': 32, 'dst': link.container.ip, 'dst_mask': 32, 'action': 'allow', 'target': ''}
             direction_out = {'direction': 'out','src': link.container.ip, 'src_mask': 32, 'dst': link.to.ip, 'dst_mask': 32, 'action': 'allow', 'target': ''}
             if link.container.server != link.to.server:
-                direction_in['action'] = 'gateway'
-                direction_in['target'] = "%s:999" % link.to.server.address
+                direction_out['action'] = 'gateway'
+                direction_out['target'] = "%s:999" % link.to.server.address
             l.append(direction_in)
             l.append(direction_out)
         return l
