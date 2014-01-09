@@ -4,7 +4,45 @@ The uwsgi.it API
 Public api (requires basic auth)
 --------------------------------
 
-GET /containers/<id>
+GET /me/
+--------
+
+returns the Customer's data:
+
+```js
+{
+  "company": "Foobar S.r.l.", 
+  "containers": [30005, 30003, 30002],
+  "uuid": "xxxxxxxx-yyyy-zzzz-uuuu-aabbccddeeff",
+  "vat": "11111111111"
+}
+```
+
+containers is the list of containers id/uid
+
+GET /me/containers/
+-------------------
+
+returns the list of containers
+
+```js
+{
+  [
+    {"uid": 30005, 
+    "ip": "10.0.0.7",
+    "name": "example",
+    "uuid": "xxxxxxxx-yyyy-vvvv-ffff-cccccccccccc",
+    "server_address": "1.2.3.4",
+    "hostname": "example",
+    "storage": 20000,
+    "server": "server0002",
+    "distro_name": "Saucy Salamander - Ubuntu 13.10 (64 bit)",
+    "memory": 2000,
+    "distro": 2
+    }
+  ]
+}
+```
 
 get informations about a customer's container
 
