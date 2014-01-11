@@ -30,6 +30,18 @@ and run (as root)
 dpkg-reconfigure grub-pc
 ```
 
+If you do not plan to use ipv6, it is better to fully disable it
+
+```sh
+GRUB_CMDLINE_LINUX_DEFAULT="nomodeset elevator=cfq ipv6.disable=1"
+```
+
+and re-run
+
+```sh
+dpkg-reconfigure grub-pc
+```
+
 /etc/fstab
 ----------
 
