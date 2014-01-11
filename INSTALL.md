@@ -186,6 +186,7 @@ mkdir /distros
 mkdir /ns
 # directory for subscription sockets
 mkdir /subscribe
+chown www-data:www-data /subscribe
 # uwsgi tree
 mkdir -p /opt/unbit/uwsgi/plugins
 # uwsgi configuration
