@@ -72,12 +72,31 @@ for(;;) {
 	if (-f $etc_uwsgi_legion_nodes) {
 		my @st = stat($etc_uwsgi_legion_nodes);
 		if ($_->{unix} > $st[9]) {
-			update_legion_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
+			update_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
 		}
 	}
 	else {
-		update_legion_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
+		update_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
 	}
+
+
+	$response =  $ua->get($base_url.'/nodes/');
+        if ($response->is_error or $response->code != 200 ) {
+                print date().' oops: '.$response->code.' '.$response->message."\n";
+                exit;
+        }
+
+        my $nodes = decode_json($response->decoded_content);
+        my $etc_uwsgi_nodes = '/etc/uwsgi/nodes';
+        if (-f $etc_uwsgi_nodes) {
+                my @st = stat($etc_uwsgi_nodes);
+                if ($_->{unix} > $st[9]) {
+                        update_nodes($etc_uwsgi_nodes, $nodes->{'nodes'});
+                }
+        }
+        else {
+                update_nodes($etc_uwsgi_nodes, $nodes->{'nodes'});
+        }
 
 	sleep(30);
 }
@@ -112,7 +131,7 @@ sub date {
 	return strftime "%Y-%m-%d %H:%M:%S", localtime;
 }
 
-sub update_legion_nodes {
+sub update_nodes {
 	my ($filename, $nodes) = @_;
 	open LN,'>'.$filename;
 	foreach(@{$nodes}) {
