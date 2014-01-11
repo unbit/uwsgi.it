@@ -121,7 +121,7 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl
+apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl telnet
 ```
 
 As we are going to use secured subscription subsystem (that includes anti-replay-attacks mesaures) we need synchronized-clocks (that is why ntp daemon is installed)
@@ -186,16 +186,20 @@ mkdir /distros
 mkdir /ns
 # directory for subscription sockets
 mkdir /subscribe
+chown www-data:www-data /subscribe
 # uwsgi tree
 mkdir -p /opt/unbit/uwsgi/plugins
 # uwsgi configuration
 mkdir /etc/uwsgi
 mkdir /etc/uwsgi/vassals
 mkdir /etc/uwsgi/domains
+chown www-data:www-data /etc/uwsgi/domains
 mkdir /etc/uwsgi/ssl
 
 # for logging
 mkdir /var/log/uwsgi
+chown root:www-data /var/log/uwsgi
+chmod 770 /var/log/uwsgi
 ```
 
 Building uwsgi.it

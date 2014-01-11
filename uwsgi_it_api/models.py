@@ -61,6 +61,10 @@ class Server(models.Model):
     etc_resolv_conf = models.TextField("/etc/resolv.conf", default='',blank=True)
     etc_hosts = models.TextField("/etc/hosts", default='',blank=True)
 
+    weight = models.PositiveIntegerField(default=9999)
+
+    legion = models.ForeignKey('Legion',null=True,blank=True)
+
     note = models.TextField(blank=True,null=True)
 
     @property
@@ -94,7 +98,7 @@ class Server(models.Model):
     def etc_hosts_lines(self):
         return self.etc_hosts.replace('\r', '\n').replace('\n\n', '\n').split('\n')
 
-class Cluster(models.Model):
+class Legion(models.Model):
     name = models.CharField(max_length=255,unique=True)
     address = models.GenericIPAddressField()
     
@@ -105,18 +109,8 @@ class Cluster(models.Model):
 
     note = models.TextField(blank=True,null=True)
 
-    nodes = models.ManyToManyField(Server, through='ClusterNode')
-
     def __unicode__(self):
         return "%s - %s " % (self.name, self.address)
-
-class ClusterNode(models.Model):
-    cluster = models.ForeignKey(Cluster)
-    server = models.ForeignKey(Server)
-    weight = models.PositiveIntegerField()
-
-    def __unicode__(self):
-        return self.server.name
 
 class Distro(models.Model):
     name = models.CharField(max_length=255,unique=True)
