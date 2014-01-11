@@ -61,6 +61,24 @@ for(;;) {
 		}
 	}
 
+	$response =  $ua->get($base_url.'/legion/nodes/');
+	if ($response->is_error or $response->code != 200 ) {
+                print date().' oops: '.$response->code.' '.$response->message."\n";
+                exit;
+        }
+
+	my $legion_nodes = decode_json($response->decoded_content);
+	my $etc_uwsgi_legion_nodes = '/etc/uwsgi/legion_nodes';
+	if (-f $etc_uwsgi_legion_nodes) {
+		my @st = stat($etc_uwsgi_legion_nodes);
+		if ($_->{unix} > $st[9]) {
+			update_legion_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
+		}
+	}
+	else {
+		update_legion_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
+	}
+
 	sleep(30);
 }
 
@@ -92,4 +110,13 @@ sub get_ini {
 
 sub date {
 	return strftime "%Y-%m-%d %H:%M:%S", localtime;
+}
+
+sub update_legion_nodes {
+	my ($filename, $nodes) = @_;
+	open LN,'>'.$filename;
+	foreach(@{$nodes}) {
+		print LN $_."\n";
+	}
+	close(LN);
 }
