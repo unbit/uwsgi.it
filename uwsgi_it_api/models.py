@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 import string
 from Crypto.PublicKey import RSA
 from uwsgi_it_api.config import UWSGI_IT_BASE_UID
+import random
 
 
 # Create your models here.
@@ -167,6 +168,9 @@ class Container(models.Model):
         if current_memory+self.memory > self.server.memory:
             raise ValidationError('the requested memory size is not available on the specified server')
         
+    @property
+    def rand_pid(self):
+        return random.randrange(1, 32768)
 
     @property
     def uid(self):
