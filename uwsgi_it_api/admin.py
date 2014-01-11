@@ -8,7 +8,8 @@ class ServerAdmin(admin.ModelAdmin):
         return "available:%d used:%d free:%d" % (self.memory, self.used_memory, self.free_memory)
     def storage_status(self):
         return "available:%d used:%d free:%d" % (self.storage, self.used_storage, self.free_storage)
-    list_display = ('__unicode__', memory_status, storage_status)
+    list_display = ('__unicode__', memory_status, storage_status, 'legion')
+    list_filter = ('legion',)
 
 class ContainerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage')
@@ -22,18 +23,12 @@ class ContainerMetricAdmin(admin.ModelAdmin):
     list_display = ('container', 'unix', 'value')
     list_filter = ('container',)
 
-class ClusterNodeInline(admin.TabularInline):
-    model = Cluster.nodes.through
-
-class ClusterAdmin(admin.ModelAdmin):
-    inlines = [ ClusterNodeInline, ]
-
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer)
 admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
-admin.site.register(Cluster, ClusterAdmin)
+admin.site.register(Legion)
 admin.site.register(ContainerLink)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
