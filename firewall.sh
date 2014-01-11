@@ -5,8 +5,8 @@ NODES=/etc/uwsgi/nodes
 iptables -F tuntap
 while read line
 do
-	iptables -A tuntap -s $line --sport 999 -j ACCEPT
-done
+	iptables -A tuntap -s $line -p udp --sport 999 -j ACCEPT
+done < $NODES
 iptables -A tuntap -j DROP
 
 #while read line

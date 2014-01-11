@@ -73,7 +73,7 @@ for(;;) {
 	my $etc_uwsgi_legion_nodes = '/etc/uwsgi/legion_nodes';
 	if (-f $etc_uwsgi_legion_nodes) {
 		my @st = stat($etc_uwsgi_legion_nodes);
-		if ($_->{unix} > $st[9]) {
+		if ($legion_nodes->{unix} > $st[9]) {
 			update_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
 			$reconfigure_firewall = 1;
 		}
@@ -94,7 +94,7 @@ for(;;) {
         my $etc_uwsgi_nodes = '/etc/uwsgi/nodes';
         if (-f $etc_uwsgi_nodes) {
                 my @st = stat($etc_uwsgi_nodes);
-                if ($_->{unix} > $st[9]) {
+                if ($nodes->{unix} > $st[9]) {
                         update_nodes($etc_uwsgi_nodes, $nodes->{'nodes'});
 			$reconfigure_firewall = 1;
                 }
