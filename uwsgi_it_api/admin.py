@@ -8,7 +8,7 @@ class ServerAdmin(admin.ModelAdmin):
         return "available:%d used:%d free:%d" % (self.memory, self.used_memory, self.free_memory)
     def storage_status(self):
         return "available:%d used:%d free:%d" % (self.storage, self.used_storage, self.free_storage)
-    list_display = ('__unicode__', memory_status, storage_status, 'legion')
+    list_display = ('__unicode__', memory_status, storage_status, 'legion', 'weight')
     list_filter = ('legion',)
 
 class ContainerAdmin(admin.ModelAdmin):
