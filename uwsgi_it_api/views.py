@@ -88,6 +88,35 @@ def container_ini(request, id):
         return HttpResponseForbidden('Forbidden\n')    
 
 @need_certificate
+def legion_nodes(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        nodes = [] 
+        unix = server.munix
+        for node in server.legion.server_set.all():
+            if node.address != server.address:
+                if node.munix > unix: unix = node.munix
+                nodes.append(node.address)
+        return HttpResponse(json.dumps({'unix': unix, 'nodes':nodes}), content_type="text/plain")
+    except:
+        return HttpResponseForbidden('Forbidden\n')    
+
+@need_certificate
+def nodes(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        nodes = []
+        unix = server.munix
+        for node in Server.objects.all():
+            if node.address != server.address:
+                if node.munix > unix: unix = node.munix
+                nodes.append(node.address)
+        return HttpResponse(json.dumps({'unix': unix, 'nodes':nodes}), content_type="text/plain")
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    
+
+@need_certificate
 def domains_rsa(request):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
     server_customers = Customer.objects.filter(container__server=server)

@@ -98,6 +98,10 @@ class Server(models.Model):
     def etc_hosts_lines(self):
         return self.etc_hosts.replace('\r', '\n').replace('\n\n', '\n').split('\n')
 
+    @property
+    def munix(self):
+        return calendar.timegm(self.mtime.utctimetuple())
+
 class Legion(models.Model):
     name = models.CharField(max_length=255,unique=True)
     address = models.GenericIPAddressField()
