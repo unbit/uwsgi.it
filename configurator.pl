@@ -61,6 +61,8 @@ for(;;) {
 		}
 	}
 
+	my $reconfigure_firewall = 0;
+
 	$response =  $ua->get($base_url.'/legion/nodes/');
 	if ($response->is_error or $response->code != 200 ) {
                 print date().' oops: '.$response->code.' '.$response->message."\n";
@@ -73,10 +75,12 @@ for(;;) {
 		my @st = stat($etc_uwsgi_legion_nodes);
 		if ($_->{unix} > $st[9]) {
 			update_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
+			$reconfigure_firewall = 1;
 		}
 	}
 	else {
 		update_nodes($etc_uwsgi_legion_nodes, $legion_nodes->{'nodes'});
+		$reconfigure_firewall = 1;
 	}
 
 
@@ -92,11 +96,17 @@ for(;;) {
                 my @st = stat($etc_uwsgi_nodes);
                 if ($_->{unix} > $st[9]) {
                         update_nodes($etc_uwsgi_nodes, $nodes->{'nodes'});
+			$reconfigure_firewall = 1;
                 }
         }
         else {
                 update_nodes($etc_uwsgi_nodes, $nodes->{'nodes'});
+		$reconfigure_firewall = 1;
         }
+
+	if ($reconfigure_firewall) {
+		system("sh /etc/uwsgi/firewall.sh");
+	}
 
 	sleep(30);
 }
