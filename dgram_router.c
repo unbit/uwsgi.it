@@ -30,6 +30,78 @@ static struct uwsgi_option uwsgi_dgram_router_options[] = {
 
 static void uwsgi_dgram_router_loop(int id, void *arg) {
 
+	char *colon = strchr(dgr.addr, ':');
+        if (colon) {
+                dgr.fd = bind_to_udp(dgr.addr, 0, 0);
+        }
+        else {
+                dgr.fd = bind_to_unix_dgram(dgr.addr);
+        }
+
+        uwsgi_socket_nb(dgr.fd);
+
+        dgr.bind_fd = -1;
+
+        if (dgr.bind) {
+                colon = strchr(dgr.bind, ':');
+                if (colon) {
+                        dgr.bind_fd = bind_to_udp(dgr.bind, 0, 0);
+                }
+                else {
+                        dgr.bind_fd = bind_to_unix_dgram(dgr.bind);
+                }
+                uwsgi_socket_nb(dgr.bind_fd);
+        }
+
+        // prepare sockets and addresses
+        struct uwsgi_string_list *usl;
+        uwsgi_foreach(usl, dgr.to) {
+                char *udp_port = strchr(usl->value, ':');
+                if (udp_port) {
+                        *udp_port = 0;
+                        struct sockaddr_in *udp_addr = uwsgi_calloc(sizeof(struct sockaddr_in));
+                        udp_addr->sin_family = AF_INET;
+                        udp_addr->sin_port = htons(atoi(udp_port + 1));
+                        udp_addr->sin_addr.s_addr = inet_addr(usl->value);
+                        *udp_port = ':';
+                        if (dgr.bind_fd > -1) {
+                                usl->custom = (uint64_t) dgr.bind_fd;
+                        }
+                        else {
+                                int bfd = socket(AF_INET, SOCK_DGRAM, 0);
+                                if (bfd < 0) {
+                                        uwsgi_error("uwsgi_dgram_router_init()/socket()");
+                                        exit(1);
+                                }
+                                uwsgi_socket_nb(bfd);
+                                usl->custom = (uint64_t) bfd;
+                        }
+                        usl->custom_ptr = udp_addr;
+                        usl->custom2 = sizeof(struct sockaddr_in);
+                }
+                else {
+                        struct sockaddr_un *un_addr = uwsgi_calloc(sizeof(struct sockaddr_un));
+                        un_addr->sun_family = AF_UNIX;
+                        // use 102 as the magic number
+                        strncat(un_addr->sun_path, usl->value, 102);
+                        if (dgr.bind_fd > -1) {
+                                usl->custom = (uint64_t) dgr.bind_fd;
+                        }
+                        else {
+                                int bfd = socket(AF_UNIX, SOCK_DGRAM, 0);
+                                if (bfd < 0) {
+                                        uwsgi_error("uwsgi_dgram_router_init()/socket()");
+                                        exit(1);
+                                }
+                                uwsgi_socket_nb(bfd);
+                                usl->custom = (uint64_t) bfd;
+                        }
+                        usl->custom_ptr = un_addr;
+                        usl->custom2 = sizeof(struct sockaddr_un);
+                }
+        }
+
+
 	dgr.queue = event_queue_init();
 
 	void *events = event_queue_alloc(64);
@@ -67,77 +139,6 @@ static void uwsgi_dgram_router_loop(int id, void *arg) {
 static int uwsgi_dgram_router_init() {
 
 	if (!dgr.addr) return 0;
-
-	char *colon = strchr(dgr.addr, ':');
-	if (colon) {
-		dgr.fd = bind_to_udp(dgr.addr, 0, 0);
-	}
-	else {
-		dgr.fd = bind_to_unix_dgram(dgr.addr);
-	}
-
-	uwsgi_socket_nb(dgr.fd);
-
-	dgr.bind_fd = -1;
-
-	if (dgr.bind) {
-		colon = strchr(dgr.bind, ':');
-		if (colon) {
-			dgr.bind_fd = bind_to_udp(dgr.bind, 0, 0);
-        	}
-        	else {
-                	dgr.bind_fd = bind_to_unix_dgram(dgr.bind);
-        	}
-		uwsgi_socket_nb(dgr.bind_fd);
-	}
-
-	// prepare sockets and addresses
-	struct uwsgi_string_list *usl;
-        uwsgi_foreach(usl, dgr.to) {
-		char *udp_port = strchr(usl->value, ':');
-		if (udp_port) {
-			*udp_port = 0;
-			struct sockaddr_in *udp_addr = uwsgi_calloc(sizeof(struct sockaddr_in));
-               		udp_addr->sin_family = AF_INET;
-               		udp_addr->sin_port = htons(atoi(udp_port + 1));
-               		udp_addr->sin_addr.s_addr = inet_addr(usl->value);
-               		*udp_port = ':';
-			if (dgr.bind_fd > -1) {
-				usl->custom = (uint64_t) dgr.bind_fd;
-			}
-			else {
-				int bfd = socket(AF_INET, SOCK_DGRAM, 0);
-				if (bfd < 0) {
-					uwsgi_error("uwsgi_dgram_router_init()/socket()");
-					exit(1);
-				}
-				uwsgi_socket_nb(bfd);
-				usl->custom = (uint64_t) bfd;
-			}
-			usl->custom_ptr = udp_addr;
-			usl->custom2 = sizeof(struct sockaddr_in);
-        	}
-        	else {
-			struct sockaddr_un *un_addr = uwsgi_calloc(sizeof(struct sockaddr_un));
-               		un_addr->sun_family = AF_UNIX;
-               		// use 102 as the magic number
-               		strncat(un_addr->sun_path, usl->value, 102);
-			if (dgr.bind_fd > -1) {
-                        	usl->custom = (uint64_t) dgr.bind_fd;
-                	}
-                	else {
-                        	int bfd = socket(AF_UNIX, SOCK_DGRAM, 0);
-                        	if (bfd < 0) {
-                                	uwsgi_error("uwsgi_dgram_router_init()/socket()");
-                                	exit(1);
-                        	}
-				uwsgi_socket_nb(bfd);
-                        	usl->custom = (uint64_t) bfd;
-                	}
-                	usl->custom_ptr = un_addr;
-                	usl->custom2 = sizeof(struct sockaddr_un);
-		}
-	}
 
 	if (register_gateway("uWSGI dgram router", uwsgi_dgram_router_loop, NULL) == NULL) {
 		uwsgi_log("unable to register the dgram router gateway\n");
