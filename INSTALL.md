@@ -193,7 +193,7 @@ mkdir -p /opt/unbit/uwsgi/plugins
 mkdir /etc/uwsgi
 mkdir /etc/uwsgi/vassals
 mkdir /etc/uwsgi/domains
-chown www-data /ets/uwsgi/domains
+chown www-data:www-data /etc/uwsgi/domains
 mkdir /etc/uwsgi/ssl
 
 # for logging
