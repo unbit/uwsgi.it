@@ -146,6 +146,12 @@ class Container(models.Model):
 
     uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
 
+    jid = models.CharField(max_length=255,blank=True,null=True)
+    jid_secret = models.CharField(max_length=255,blank=True,null=True)
+    jid_destinations = models.CharField(max_length=255,blank=True,null=True)
+
+    quota_threshold = models.PositiveIntegerField("Quota threshold", default=90)
+
     note = models.TextField(blank=True,null=True)
 
     def __unicode__(self):
