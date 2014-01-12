@@ -17,6 +17,14 @@ if [ ! -f $LEGION_NODES ]; then
 exit 0
 fi
 
+# legion firewall
+iptables -F legion
+while read line
+do
+        iptables -A legion -s $line -p udp --sport 2000 -j ACCEPT
+done < $NODES
+iptables -A legion -j DROP
+
 #while read line
 #do
 #	echo "$line"
