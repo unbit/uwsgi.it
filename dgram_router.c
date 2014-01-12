@@ -37,7 +37,6 @@ static struct uwsgi_option uwsgi_dgram_router_options[] = {
 };
 
 static const EVP_CIPHER *setup_secret_and_iv(char *arg, char **secret, char **iv) {
-	if (!uwsgi.ssl_initialized) uwsgi_ssl_init();	
 
 	char *colon = strchr(arg, ':');
 	if (!colon) {
@@ -68,7 +67,7 @@ static const EVP_CIPHER *setup_secret_and_iv(char *arg, char **secret, char **iv
         size_t s_len = strlen(*secret);
         if ((unsigned int) cipher_len > s_len) {
                 char *secret_tmp = uwsgi_malloc(cipher_len);
-                memcpy(secret_tmp, secret, s_len);
+                memcpy(secret_tmp, *secret, s_len);
                 memset(secret_tmp + s_len, 0, cipher_len - s_len);
                 *secret = secret_tmp;
         }
@@ -76,13 +75,13 @@ static const EVP_CIPHER *setup_secret_and_iv(char *arg, char **secret, char **iv
         int iv_len = EVP_CIPHER_iv_length(cipher);
         size_t s_iv_len = 0;
 
-        if (iv) {
+        if (*iv) {
                 s_iv_len = strlen(*iv);
         }
 
         if ((unsigned int) iv_len > s_iv_len) {
                 char *secret_tmp = uwsgi_malloc(iv_len);
-                memcpy(secret_tmp, iv, s_iv_len);
+                memcpy(secret_tmp, *iv, s_iv_len);
                 memset(secret_tmp + s_iv_len, '0', iv_len - s_iv_len);
                 *iv = secret_tmp;
         }
@@ -117,19 +116,19 @@ static ssize_t encrypt_packet(char *buf, size_t len) {
 static ssize_t decrypt_packet(char *buf, size_t len) {
 
         if (EVP_DecryptInit_ex(dgr.decrypt_ctx, NULL, NULL, NULL, NULL) <= 0) {
-                uwsgi_error("EVP_EncryptInit_ex()");
+                uwsgi_error("EVP_DecryptInit_ex()");
                 return -1;
         }
 
         int d_len = 0;
         if (EVP_DecryptUpdate(dgr.decrypt_ctx, (unsigned char *)dgr.decrypt_buf, &d_len, (unsigned char *) buf, len) <= 0) {
-                uwsgi_error("EVP_EncryptUpdate()");
+                uwsgi_error("EVP_DecryptUpdate()");
                 return -1;
         }
 
         int tmplen = 0;
         if (EVP_DecryptFinal_ex(dgr.decrypt_ctx, (unsigned char *) (dgr.decrypt_buf + d_len), &tmplen) <= 0) {
-                uwsgi_error("EVP_EncryptFinal_ex()");
+                uwsgi_error("EVP_DecryptFinal_ex()");
                 return -1;
         }
 
@@ -264,6 +263,7 @@ static int uwsgi_dgram_router_init() {
 	if (!dgr.addr) return 0;
 
 	if (dgr.psk_in) {
+		if (!uwsgi.ssl_initialized) uwsgi_ssl_init();	
 		char *secret = NULL;
 		char *iv = NULL;
 		dgr.decrypt_ctx = uwsgi_malloc(sizeof(EVP_CIPHER_CTX));
@@ -277,6 +277,7 @@ static int uwsgi_dgram_router_init() {
 	}
 
 	if (dgr.psk_out) {
+		if (!uwsgi.ssl_initialized) uwsgi_ssl_init();	
 		char *secret = NULL;
 		char *iv = NULL;
                 dgr.encrypt_ctx = uwsgi_malloc(sizeof(EVP_CIPHER_CTX));
