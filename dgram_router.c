@@ -283,6 +283,7 @@ static int uwsgi_dgram_router_init() {
                 dgr.encrypt_ctx = uwsgi_malloc(sizeof(EVP_CIPHER_CTX));
                 EVP_CIPHER_CTX_init(dgr.encrypt_ctx);
                 const EVP_CIPHER *cipher = setup_secret_and_iv(dgr.psk_out, &secret, &iv);
+		uwsgi_log("%p %s %s\n", cipher, secret, iv);
                 if (EVP_EncryptInit_ex(dgr.encrypt_ctx, cipher, NULL, (const unsigned char *) secret, (const unsigned char *) iv) <= 0) {
                         uwsgi_error("EVP_EncryptInit_ex()");
                         exit(1);
