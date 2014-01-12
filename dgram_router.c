@@ -19,14 +19,123 @@ static struct dgram_router {
 	int fd;
 	int bind_fd;
 	int queue;
+	char *psk_in;
+	char *psk_out;
+	EVP_CIPHER_CTX *encrypt_ctx;
+	EVP_CIPHER_CTX *decrypt_ctx;
+	char *encrypt_buf;
+	char *decrypt_buf;
 } dgr;
 
 static struct uwsgi_option uwsgi_dgram_router_options[] = {
 	{"dgram-router", required_argument, 0, "run the dgram router on the specified address", uwsgi_opt_set_str, &dgr.addr, 0},
 	{"dgram-router-to", required_argument, 0, "forward each received dgram packet to the specified peer", uwsgi_opt_add_string_list, &dgr.to, 0},
 	{"dgram-router-bind", required_argument, 0, "bind to the specified address when forwrding dgram packets", uwsgi_opt_set_str, &dgr.bind, 0},
+	{"dgram-router-psk-in", required_argument, 0, "set a preshared key for decrypting incoming traffic (syntax: algo:secret [iv])", uwsgi_opt_set_str, &dgr.psk_in, 0},
+	{"dgram-router-psk-out", required_argument, 0, "set a preshared key for encrypting outgoing traffic (syntax: algo:secret [iv])", uwsgi_opt_set_str, &dgr.psk_out, 0},
 	UWSGI_END_OF_OPTIONS
 };
+
+static const EVP_CIPHER *setup_secret_and_iv(char *arg, char **secret, char **iv) {
+	if (!uwsgi.ssl_initialized) uwsgi_ssl_init();	
+
+	char *colon = strchr(arg, ':');
+	if (!colon) {
+		uwsgi_log("invalid dgram-router psk syntax, must be: <algo>:<secret> [iv]\n");
+		exit(1);
+	}
+
+	*colon = 0;
+
+	const EVP_CIPHER *cipher = EVP_get_cipherbyname(arg);
+        if (!cipher) {
+                uwsgi_log("unable to find algorithm/cipher %s\n", arg);
+                exit(1);
+        }
+
+	*colon = ':';
+
+	*secret = colon+1;
+	*iv = NULL;
+
+	char *space = strchr(colon+1, ' ');
+	if (space) {
+		*space = 0;
+		*iv = space+1;
+	}
+
+	int cipher_len = EVP_CIPHER_key_length(cipher);
+        size_t s_len = strlen(*secret);
+        if ((unsigned int) cipher_len > s_len) {
+                char *secret_tmp = uwsgi_malloc(cipher_len);
+                memcpy(secret_tmp, secret, s_len);
+                memset(secret_tmp + s_len, 0, cipher_len - s_len);
+                *secret = secret_tmp;
+        }
+
+        int iv_len = EVP_CIPHER_iv_length(cipher);
+        size_t s_iv_len = 0;
+
+        if (iv) {
+                s_iv_len = strlen(*iv);
+        }
+
+        if ((unsigned int) iv_len > s_iv_len) {
+                char *secret_tmp = uwsgi_malloc(iv_len);
+                memcpy(secret_tmp, iv, s_iv_len);
+                memset(secret_tmp + s_iv_len, '0', iv_len - s_iv_len);
+                *iv = secret_tmp;
+        }
+
+	if (space) *space = ' ';
+
+	return cipher;
+}
+
+static ssize_t encrypt_packet(char *buf, size_t len) {
+
+        if (EVP_EncryptInit_ex(dgr.encrypt_ctx, NULL, NULL, NULL, NULL) <= 0) {
+                uwsgi_error("EVP_EncryptInit_ex()");
+		return -1;
+        }
+
+        int e_len = 0;
+        if (EVP_EncryptUpdate(dgr.encrypt_ctx, (unsigned char *) dgr.encrypt_buf, &e_len, (unsigned char *) buf, len) <= 0) {
+                uwsgi_error("EVP_EncryptUpdate()");
+		return -1;
+        }
+
+        int tmplen = 0;
+        if (EVP_EncryptFinal_ex(dgr.encrypt_ctx, (unsigned char *) (dgr.encrypt_buf + e_len), &tmplen) <= 0) {
+                uwsgi_error("EVP_EncryptFinal_ex()");
+		return -1;
+        }
+
+	return e_len + tmplen;
+}
+
+static ssize_t decrypt_packet(char *buf, size_t len) {
+
+        if (EVP_DecryptInit_ex(dgr.decrypt_ctx, NULL, NULL, NULL, NULL) <= 0) {
+                uwsgi_error("EVP_EncryptInit_ex()");
+                return -1;
+        }
+
+        int d_len = 0;
+        if (EVP_DecryptUpdate(dgr.decrypt_ctx, (unsigned char *)dgr.decrypt_buf, &d_len, (unsigned char *) buf, len) <= 0) {
+                uwsgi_error("EVP_EncryptUpdate()");
+                return -1;
+        }
+
+        int tmplen = 0;
+        if (EVP_DecryptFinal_ex(dgr.decrypt_ctx, (unsigned char *) (dgr.decrypt_buf + d_len), &tmplen) <= 0) {
+                uwsgi_error("EVP_EncryptFinal_ex()");
+                return -1;
+        }
+
+        return d_len + tmplen;
+}
+
 
 static void uwsgi_dgram_router_loop(int id, void *arg) {
 
@@ -122,10 +231,24 @@ static void uwsgi_dgram_router_loop(int id, void *arg) {
 					exit(1);
 				}
 
+				char *buf2 = buf;
+
+				if (dgr.psk_in) {
+					rlen = decrypt_packet(buf, rlen);
+					if (rlen < 0) continue;
+					buf2 = dgr.decrypt_buf;
+				}
+
+				if (dgr.psk_out) {
+					rlen = encrypt_packet(buf2, rlen);
+					if (rlen < 0) continue;
+					buf2 = dgr.encrypt_buf;	
+				}
+
 				if (rlen > 0) {
 					struct uwsgi_string_list *usl;
 					uwsgi_foreach(usl, dgr.to) {
-						if (sendto((int) usl->custom, buf, rlen, 0, (const struct sockaddr *) usl->custom_ptr, (socklen_t) usl->custom2) < 0) {
+						if (sendto((int) usl->custom, buf2, rlen, 0, (const struct sockaddr *) usl->custom_ptr, (socklen_t) usl->custom2) < 0) {
 							uwsgi_error("uwsgi_dgram_router_loop()/sendto()");
 						}
 					}
@@ -139,6 +262,32 @@ static void uwsgi_dgram_router_loop(int id, void *arg) {
 static int uwsgi_dgram_router_init() {
 
 	if (!dgr.addr) return 0;
+
+	if (dgr.psk_in) {
+		char *secret = NULL;
+		char *iv = NULL;
+		dgr.decrypt_ctx = uwsgi_malloc(sizeof(EVP_CIPHER_CTX));
+		EVP_CIPHER_CTX_init(dgr.decrypt_ctx);
+		const EVP_CIPHER *cipher = setup_secret_and_iv(dgr.psk_in, &secret, &iv);
+		if (EVP_DecryptInit_ex(dgr.decrypt_ctx, cipher, NULL, (const unsigned char *) secret, (const unsigned char *) iv) <= 0) {
+                	uwsgi_error("EVP_DecryptInit_ex()");
+                	exit(1);
+        	}
+		dgr.decrypt_buf = uwsgi_malloc(8192 + EVP_MAX_BLOCK_LENGTH);
+	}
+
+	if (dgr.psk_out) {
+		char *secret = NULL;
+		char *iv = NULL;
+                dgr.encrypt_ctx = uwsgi_malloc(sizeof(EVP_CIPHER_CTX));
+                EVP_CIPHER_CTX_init(dgr.encrypt_ctx);
+                const EVP_CIPHER *cipher = setup_secret_and_iv(dgr.psk_out, &secret, &iv);
+                if (EVP_EncryptInit_ex(dgr.encrypt_ctx, cipher, NULL, (const unsigned char *) secret, (const unsigned char *) iv) <= 0) {
+                        uwsgi_error("EVP_EncryptInit_ex()");
+                        exit(1);
+                }
+		dgr.encrypt_buf = uwsgi_malloc(8192 + EVP_MAX_BLOCK_LENGTH);
+        }
 
 	if (register_gateway("uWSGI dgram router", uwsgi_dgram_router_loop, NULL) == NULL) {
 		uwsgi_log("unable to register the dgram router gateway\n");
