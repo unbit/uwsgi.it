@@ -121,7 +121,7 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl telnet
+apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl telnet automake
 ```
 
 As we are going to use secured subscription subsystem (that includes anti-replay-attacks mesaures) we need synchronized-clocks (that is why ntp daemon is installed)
