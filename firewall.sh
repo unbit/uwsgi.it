@@ -1,6 +1,8 @@
 LEGION_NODES=/etc/uwsgi/legion_nodes
 NODES=/etc/uwsgi/nodes
 
+# nodes based rules
+
 if [ ! -f $NODES ]; then
 exit 0
 fi
@@ -13,6 +15,17 @@ do
 done < $NODES
 iptables -A tuntap -j DROP
 
+# fastrouter_out firewall
+iptables -F fastrouter_out
+while read line
+do
+        iptables -A fastrouter_in -d $line -p tcp -j DROP
+done < $NODES
+iptables -A fastrouter_out -j ACCEPT
+
+
+# legion based rules
+
 if [ ! -f $LEGION_NODES ]; then
 exit 0
 fi
@@ -22,11 +35,22 @@ iptables -F legion
 while read line
 do
         iptables -A legion -s $line -p udp --sport 2000 -j ACCEPT
-done < $NODES
+done < $LEGION_NODES
 iptables -A legion -j DROP
 
-#while read line
-#do
-#	echo "$line"
-#	echo "$line"
-#done < $LEGION_NODES
+
+# fastrouter_in firewall
+iptables -F fastrouter_in
+while read line
+do
+        iptables -A fastrouter_in -s $line -p tcp -j ACCEPT
+done < $LEGION_NODES
+iptables -A fastrouter_in -j DROP
+
+# subscription firewall
+iptables -F subscription
+while read line
+do
+        iptables -A subscription -s $line -p udp --sport 3026 -j ACCEPT
+done < $LEGION_NODES
+iptables -A subscription -j DROP
