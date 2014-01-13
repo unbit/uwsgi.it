@@ -229,11 +229,15 @@ def me_containers(request):
             'memory': container.memory,
             'storage': container.storage,
             'uuid': container.uuid,
-            'distro': container.distro.pk,
-            'distro_name': container.distro.name,
+            'distro': None,
+            'distro_name': None,
             'server': container.server.name,
             'server_address': container.server.address,
         })
+        if container.distro:
+            c['distro'] = container.distro.pk
+            c['distro_name'] = container.distro.name
+        
 
     return HttpResponse(json.dumps(c), content_type="application/json")
 
