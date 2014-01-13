@@ -84,6 +84,7 @@ curl https://kratos:deimos17@foobar.com/api/containers/30009
   "distro": null,
   "ssh_keys": [],
   "name": "changeme",
+  "linked_to": [],
   "jid": "",
   "jid_destinations": ""
 }
@@ -336,6 +337,42 @@ cluster-domain = mydomain.it
 
 Linking containers
 ------------------
+
+Every container has 2 network interfaces: lo and uwsgi0
+
+lo is the classic loopback interface while uwsgi0 is mapped to a 10.0.0.0/8 class.
+
+uwsgi0 is used for inter-container communication.
+
+By default containers are isolated (even containers of the same customer cannot exchange data), but you can link them to other containers (even owned by different customers)
+
+Linking is a 2-step operations, both containers involved need to agree on it. (if only one peer configure linking it will not work until the other will link too).
+
+Supposing 2 containers:
+
+30009 with ip 10.0.0.11
+
+30008 with ip 10.0.0.10
+
+we want them to communicate each other on the 10.0.0.0/8 network
+
+```
+curl -X POST '{"link": 30008}' https://kratos:deimos17@foobar.com/api/containers/30009
+```
+
+and
+
+```
+curl -X POST '{"link": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
+```
+
+to unlink a container just run
+
+```
+curl -X POST '{"unlink": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
+```
+
+the links of a container are showed in the "linked_to" attribute of the container api
 
 Rebooting containers
 --------------------
