@@ -156,6 +156,14 @@ def container(request, id):
                 response = HttpResponse('Conflict\n')
                 response.status_code = 409
                 return response
+        if 'unlink' in j:
+            try:
+                link = container.containerlink_set.get(to=(int(j['unlink'])-UWSGI_IT_BASE_UID))
+                link.delete()
+            except:
+                response = HttpResponse('Conflict\n')
+                response.status_code = 409
+                return response
         container.save()
     c = {
         'uid': container.uid,
