@@ -260,7 +260,9 @@ psgi = $(HOME)/myapp.pl
 domain = mynewdomain.org
 ```
 
-And visit your domain. If all goes well you should see the hello message, otherwise check the logs/ directory (in your home) for errors.
+and visit your domain. 
+
+If all goes well you should see the hello message, otherwise check the logs/ directory (in your home) for errors.
 
 Now let's deploy the python one
 
@@ -274,7 +276,7 @@ domain = mynewdomain.org
 
 and visit your domain multiple times (use curl this time for better experience, will soon discover why...) 
 
-you will not how the previous perl instance will continue to answer in a round robin fashion with your python one.
+you will note how the previous perl instance will continue to answer in a round robin fashion with your python one.
 
 Yes, multiple vassals can serve the same domain and load balancing will be automatically enabled. This allows lot of tricks and (more important) true high availability reloads when updating code !
 
