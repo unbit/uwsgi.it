@@ -166,6 +166,7 @@ You may ask your supplier to map a domain to your account or add by yourself if 
 To get the list of domains mapped to your account:
 
 ```sh
+curl https://kratos:deimos17@foobar.com/api/domains/
 ```
 
 ```json
