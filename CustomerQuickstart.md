@@ -310,11 +310,60 @@ HTTPS/SNI
 Clustering
 ----------
 
+Every server of a uwsgi.it infrastructure is part of a "Legion".
+
+Containers mapped to different servers in the same Legion can build a cluster.
+
+Each Legion has a dedicated ip in failover mode: only a single member of the Legion, named the "Lord" receives requests on that ip. When the Lord dies, a new member takes the ip address and so on.
+
+The Lord load balance requests to the instances subscribed to it.
+
+To enable load balacing for a domain, just DNS map it to the Legion ip.
+
+The legion ip is reported as "legion_ip" in the container api data.
+
+Once the domain is DNS mapped, just change you vassal config from:
+
+```ini
+domain = mydomain.it
+```
+
+to
+
+```ini
+cluster-domain = mydomain.it
+```
+
 Linking containers
 ------------------
+
+Rebooting containers
+--------------------
+
+to reboot a container just send an "empty object" POST request to its api:
+
+```sh
+curl -X POST -d '{}' https://kratos:deimos17@foobar.com/api/containers/30009
+```
+
+technically any update to the container object will trigger a reboot (remember it !!!)
 
 Logging
 -------
 
+The logs/emperor.log file is created as the default logging file (and rotated when it reaches 100M size).
+
+Each vassal con log whatever (and however) it needs
+
 Alarms
 ------
+
+The container Emperor automatically set a series of alarms.
+
+You will get an alarm when your container quota is low (you can set the threshold with the quota_threshold item of the container api), when a OOM (out of memory) is triggered and when it is rebooted.
+
+The alarm is broadcasted to all of the conntected container shells and to an optional jabber/xmpp account.
+
+To enable jabber/xmpp alarm just set "jid", "jid_secret" and "jid_destinations" attributes of the container api.
+
+jid and jid_secret are the credentials the Emperor will use to login to a jabber/xmpp server while jid_destinations is the comma-separated list of jid that will receive the alarms.
