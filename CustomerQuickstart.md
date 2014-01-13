@@ -69,22 +69,22 @@ curl https://kratos:deimos17@foobar.com/api/containers/30009
 
 ```json
 {
-  uid: 30009,
-  ip: "10.0.0.11",
-  server_address: "1.2.3.4",
-  hostname: "changeme",
-  storage: 1000,
-  uuid: "aaaaaaaa-49ff-4349-8d27-705ca239bb95",
-  server: "fooserver",
-  note: "",
-  quota_threshold: 90,
-  distro_name: null,
-  memory: 500,
-  distro: null,
-  ssh_keys: [],
-  name: "changeme",
-  jid: "",
-  jid_destinations: ""
+  "uid": 30009,
+  "ip": "10.0.0.11",
+  "server_address": "1.2.3.4",
+  "hostname": "changeme",
+  "storage": 1000,
+  "uuid": "aaaaaaaa-49ff-4349-8d27-705ca239bb95",
+  "server": "fooserver",
+  "note": "",
+  "quota_threshold": 90,
+  "distro_name": null,
+  "memory": 500,
+  "distro": null,
+  "ssh_keys": [],
+  "name": "changeme",
+  "jid": "",
+  "jid_destinations": ""
 }
 ```
 
@@ -110,12 +110,37 @@ curl https://kratos:deimos17@foobar.com/api/distros/
 ```json
 [
   {
-    id: 1,
-    name: "Precise Pangolin - Ubuntu 12.04 LTS (64 bit)"
+    "id": 1,
+    "name": "Precise Pangolin - Ubuntu 12.04 LTS (64 bit)"
   },
   {
-    id: 2,
-    name: "Saucy Salamander - Ubuntu 13.10 (64 bit)"
+    "id": 2,
+    "name": "Saucy Salamander - Ubuntu 13.10 (64 bit)"
   }
 ]
+```
+
+We want to use Saucy (id 2) so let's assign it to the container 30009:
+
+```sh
+curl -X POST -d '{"distro": 2}' https://kratos:deimos17@foobar.com/api/containers/30009
+```
+
+
+SSH keys
+--------
+
+To access your container you need ssh keys (there is no, and never will be, support for simple password access)
+
+To set ssh public key:
+
+```sh
+curl -X POST -d '{"ssh_keys": ["ssh-rsa ........."]}' https://kratos:deimos17@foobar.com/api/containers/30009
+```
+
+you can assign multiple keys in one shot:
+
+
+```sh
+curl -X POST -d '{"ssh_keys": ["ssh-rsa .........", "ssh-rsa ........."]}' https://kratos:deimos17@foobar.com/api/containers/30009
 ```
