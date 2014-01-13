@@ -144,3 +144,15 @@ you can assign multiple keys in one shot:
 ```sh
 curl -X POST -d '{"ssh_keys": ["ssh-rsa .........", "ssh-rsa ........."]}' https://kratos:deimos17@foobar.com/api/containers/30009
 ```
+
+after a bunch of seconds your instance will start and you will be abble to ssh into it:
+
+```sh
+ssh 30009@server_address
+```
+
+'server_address' is the value returned by your request for container data, in our case will be 1.2.3.4
+
+
+Domains
+-------
