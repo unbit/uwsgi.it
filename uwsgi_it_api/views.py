@@ -221,7 +221,7 @@ def me(request):
 def me_containers(request):
     c = []
     for container in request.user.customer.container_set.all():
-        c.append({
+        cc = {
             'uid': container.uid,
             'name': container.name,
             'hostname': container.hostname,
@@ -233,10 +233,11 @@ def me_containers(request):
             'distro_name': None,
             'server': container.server.name,
             'server_address': container.server.address,
-        })
+        }
         if container.distro:
-            c['distro'] = container.distro.pk
-            c['distro_name'] = container.distro.name
+            cc['distro'] = container.distro.pk
+            cc['distro_name'] = container.distro.name
+        c.append(cc)
         
 
     return HttpResponse(json.dumps(c), content_type="application/json")
