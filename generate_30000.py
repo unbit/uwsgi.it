@@ -45,6 +45,7 @@ container = {
     'quota': 20 * 1024 * 1024 * 1024, 
     'memory_limit_in_bytes': 1024 * 1024 * 1024,
     'distro': {'path': 'precise'},
+    'quota_threshold': 90,
     'ssh_keys': c.get('uwsgi','api_ssh_key'),
     'customer': {
         'rsa_key_lines': rsa_key.split('\n'),
