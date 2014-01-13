@@ -157,6 +157,60 @@ ssh 30009@server_address
 Domains
 -------
 
+Every web application need a domain to be accessed.
+
+Domains are mapped to a customer, so multiple containers can use them (to implement clustering, load balancing or high availability)
+
+You may ask your supplier to map a domain to your account or add by yourself if you have access to its dns zone.
+
+To get the list of domains mapped to your account:
+
+```sh
+```
+
+```json
+[
+  {
+    "uuid": "00000000-8c29-4290-babd-b24d1100e006",
+    "id": 1,
+    "name": "mydomain.it"
+  },
+  {
+    "uuid": "00000000-72a7-4e53-8939-d9ca4a748bef",
+    "id": 15,
+    "name": "mydomain.com"
+  }
+]
+```
+
+If you have write access to your domain DNS zone you can add it to your account.
+
+Just get the 'uuid' of your account (we have seen it in the first api call example) and a TXT record to your zone in the form of
+
+```sh
+TXT        uwsgi:aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
+```
+
+To check your zone correctness:
+
+```sh
+host -t TXT mynewdomain.org
+```
+
+once the zone is updated you can try adding the domain to your account:
+
+```sh
+curl -X POST -d '{"name":"mynewdomain.org"}' https://kratos:deimos17@foobar.com/api/domains/
+```
+
+if successfull you will get a 202 (Created) response
+
+You can even delete a domain from your account:
+
+```sh
+curl -X DELETE -d '{"name":"mynewdomain.org"}' https://kratos:deimos17@foobar.com/api/domains/
+```
+
 The first deploy
 ----------------
 
