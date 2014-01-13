@@ -308,6 +308,8 @@ The custom options are all defined in the /opt/unbit/uwsgi/shortcuts.ini file (i
 HTTPS/SNI
 ---------
 
+WORK IN PROGRESS
+
 Clustering
 ----------
 
