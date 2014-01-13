@@ -72,7 +72,7 @@ def dns_check(name, uuid):
 def containers(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
-        j = [{'uid':container.uid, 'mtime': container.munix } for container in server.container_set.all()]
+        j = [{'uid':container.uid, 'mtime': container.munix } for container in server.container_set.exclude(distro__isnull=True).exclude(ssh_keys_raw__exact='').exclude(ssh_keys_raw__isnull=True)]
         return HttpResponse(json.dumps(j), content_type="application/json")
     except:
         return HttpResponseForbidden('Forbidden\n')
@@ -82,6 +82,7 @@ def container_ini(request, id):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+        if not container.distro or not container.ssh_keys_raw: raise Exception("invalid container")
         j = render_to_string('vassal.ini', {'container': container})
         return HttpResponse(j, content_type="text/plain")
     except:
@@ -135,7 +136,7 @@ def container(request, id):
     if request.method == 'POST':
         response = check_body(request)
         if response: return response
-        allowed_keys = ('name', 'note')
+        allowed_keys = ('name', 'note','quota_threshold', 'jid', 'jid_secret', 'jid_destinations')
         j = json.loads(request.read())
         for key in j:
             if key in allowed_keys:
@@ -153,13 +154,19 @@ def container(request, id):
         'memory': container.memory,
         'storage': container.storage,
         'uuid': container.uuid,
-        'distro': container.distro.pk,
-        'distro_name': container.distro.name,
+        'distro': None,
+        'distro_name': None,
         'server': container.server.name,
         'server_address': container.server.address,
+        'jid': container.jid,
+        'jid_destinations': container.jid_destinations,
+        'quota_threshold': container.quota_threshold,
         'note': container.note,
         'ssh_keys': container.ssh_keys,
     }
+    if container.distro:
+        c['distro'] = container.distro.pk
+        c['distro_name'] = container.distro.name
     return HttpResponse(json.dumps(c), content_type="application/json")
 
 @need_basicauth
@@ -174,6 +181,9 @@ def me(request):
         for key in j:
             if key in allowed_keys:
                 setattr(customer, key, j[key])
+        if 'password' in j:
+            customer.user.set_password(j['password'])
+            customer.user.save()
         customer.save()
     c = {
         'vat': customer.vat,

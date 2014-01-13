@@ -134,7 +134,7 @@ class Distro(models.Model):
 class Container(models.Model):
     name = models.CharField(max_length=255)
     ssh_keys_raw = models.TextField("SSH keys", blank=True,null=True)
-    distro = models.ForeignKey(Distro)
+    distro = models.ForeignKey(Distro,null=True,blank=True)
     server = models.ForeignKey(Server)
     # in megabytes
     memory = models.PositiveIntegerField("Memory MB")
@@ -159,6 +159,11 @@ class Container(models.Model):
 
     # do not allow over-allocate memory or storage
     def clean(self):
+        # hack for empty server value
+        try:
+            if self.server is None: return
+        except:
+            return
         current_storage = self.server.container_set.all().aggregate(models.Sum('storage'))['storage__sum']
         current_memory = self.server.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
         if not current_storage: current_storage = 0
@@ -205,6 +210,7 @@ class Container(models.Model):
     @property
     def ssh_keys(self):
         # try to generate a clean list of ssh keys
+        if not self.ssh_keys_raw: return []
         cleaned = self.ssh_keys_raw.replace('\r', '\n').replace('\n\n', '\n')
         return self.ssh_keys_raw.split('\n')
 
