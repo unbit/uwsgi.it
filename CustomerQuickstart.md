@@ -320,7 +320,7 @@ The Lord load balance requests to the instances subscribed to it.
 
 To enable load balacing for a domain, just DNS map it to the Legion ip.
 
-The legion ip is reported as "legion_ip" in the container api data. If there is no legion_ip attribute in your responses, it means your server is not part of a Legion (ask your supplier for an upgrade)
+The legion ip is reported as "legion_address" in the container api data. If there is no legion_address attribute in your responses, it means your server is not part of a Legion (ask your supplier for an upgrade)
 
 Once the domain is DNS mapped, just change you vassal config from:
 
