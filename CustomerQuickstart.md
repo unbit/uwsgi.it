@@ -187,7 +187,7 @@ curl https://kratos:deimos17@foobar.com/api/domains/
 
 If you have write access to your domain DNS zone you can add it to your account.
 
-Just get the 'uuid' of your account (we have seen it in the first api call example) and a TXT record to your zone in the form of
+Just get the 'uuid' of your account (we have seen it in the first api call example) and add a TXT record to your zone in the form of
 
 ```sh
 TXT        uwsgi:aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
