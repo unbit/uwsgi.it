@@ -11,8 +11,7 @@ an api password: like deimos
 
 With those parameters you will be able o configure your services using the HTTP api.
 
-In this quickstart we will use the 'curl' command, but your supplier could give a you a more user-friendly interface (like a web-based one)
-based on it.
+In this quickstart we will use the 'curl' command, but your supplier could give a you a more user-friendly interface (like a web-based one) build over the api
 
 Let's start: get your personal data
 -----------------------------------
