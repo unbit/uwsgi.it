@@ -9,7 +9,7 @@ an api username: like kratos
 
 an api password: like deimos
 
-With those parameters you will be able o configure your services using the HTTP api.
+With those parameters you will be able to configure your services using the HTTP api.
 
 In this quickstart we will use the 'curl' command, but your supplier could give a you a more user-friendly interface (like a web-based one) build over the api
 
@@ -307,6 +307,8 @@ The custom options are all defined in the /opt/unbit/uwsgi/shortcuts.ini file (i
 
 HTTPS/SNI
 ---------
+
+WORK IN PROGRESS
 
 Clustering
 ----------
