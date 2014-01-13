@@ -214,6 +214,67 @@ curl -X DELETE -d '{"name":"mynewdomain.org"}' https://kratos:deimos17@foobar.co
 The first deploy
 ----------------
 
+Currently (January 2014) the uwsgi.it platform supports python, perl and ruby applications.
+
+We will try to deploy each of them
+
+From the ssh shell, let's create 3 files (in the home):
+
+myapp.py
+```python
+def application(environ, start_response):
+    start_response('200 OK', [('Content-Type','text/plain')])
+    return ["Hello i am python"]
+```
+
+myapp.pl
+```perl
+my $app = sub {
+    my ($env) = @_;
+    return [200, ['Content-Type' => 'text/plain'], ["Hello i am perl"]];
+};
+```
+
+myapp.ru
+```ruby
+class MyApp
+  def call(env)
+    [200, {'Content-Type' => 'text/plain'}, ["Hello i am ruby"]]
+  end
+end
+```
+
+Once a container is spawned, a dedicated Emperor will start monitoring the "vassals" directory for uWSGI config files.
+
+Let's deploy the perl one:
+
+vassals/perlapp.ini
+```ini
+[uwsgi]
+plugin = 0:psgi
+psgi = $(HOME)/myapp.pl
+domain = mynewdomain.org
+```
+
+And visit your domain. If all goes well you should see the hello message, otherwise check the logs/ directory (in your home) for errors.
+
+Now let's deploy the python one
+
+vassals/pythonapp.ini
+```ini
+[uwsgi]
+plugin = 0:python
+wsgi-file = $(HOME)/myapp.py
+domain = mynewdomain.org
+```
+
+and visit your domain multiple times (use curl this time for better experience, will soon discover why...) 
+
+you will not how the previous perl instance will continue to answer in a round robin fashion with your python one.
+
+Yes, multiple vassals can serve the same domain and load balancing will be automatically enabled. This allows lot of tricks and (more important) true high availability reloads when updating code
+
+
 HTTPS/SNI
 ---------
 
@@ -222,3 +283,9 @@ Clustering
 
 Linking containers
 ------------------
+
+Logging
+-------
+
+Alarms
+------
