@@ -22,5 +22,10 @@ curl https://kratos:deimos@foobar.com/api/me/
 ```
 
 ```json
-{"company": "God of war S.r.l.", "containers": [30001, 30004, 30007, 30008], "uuid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "vat": "01234567890"}
+{
+  "company": "God of war S.r.l.",
+  "containers": [30001, 30004, 30007, 30008],
+  "uuid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "vat": "01234567890"
+}
 ```
