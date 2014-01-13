@@ -19,6 +19,9 @@ cp calc_ip_plugin.so /opt/unbit/uwsgi/plugins
 /opt/unbit/uwsgi/uwsgi --build-plugin ../dgram_router.c
 cp dgram_router_plugin.so /opt/unbit/uwsgi/plugins
 
+/opt/unbit/uwsgi/uwsgi --build-plugin ../rand_pid.c
+cp rand_pid_plugin.so /opt/unbit/uwsgi/plugins
+
 git clone https://github.com/unbit/uwsgi-alarm-chain
 /opt/unbit/uwsgi/uwsgi --build-plugin uwsgi-alarm-chain
 cp alarm_chain_plugin.so /opt/unbit/uwsgi/plugins
@@ -38,3 +41,7 @@ cp hetzner_plugin.so /opt/unbit/uwsgi/plugins
 git clone https://github.com/unbit/uwsgi-quota
 /opt/unbit/uwsgi/uwsgi --build-plugin uwsgi-quota
 cp quota_plugin.so /opt/unbit/uwsgi/plugins
+
+git clone https://github.com/unbit/uwsgi-strophe
+/opt/unbit/uwsgi/uwsgi --build-plugin uwsgi-strophe
+cp strophe_plugin.so /opt/unbit/uwsgi/plugins
