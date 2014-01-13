@@ -145,6 +145,17 @@ def container(request, id):
             container.ssh_keys_raw = '\n'.join(j['ssh_keys'])
         if 'distro' in j:
             container.distro = Distro.objects.get(pk=j['distro'])
+        if 'link' in j:
+            try:
+                link = ContainerLink()
+                link.container = container
+                link.to = Container.objects.get(pk=(int(j['link'])-UWSGI_IT_BASE_UID))
+                link.full_clean()
+                link.save()
+            except:
+                response = HttpResponse('Conflict\n')
+                response.status_code = 409
+                return response
         container.save()
     c = {
         'uid': container.uid,

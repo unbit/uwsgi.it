@@ -237,7 +237,7 @@ class Container(models.Model):
 
     @property
     def linked_to(self):
-        return [l.container.uid for l in self.containerlink_set.all()]
+        return [l.to.uid for l in self.containerlink_set.all()]
                 
 
 class ContainerLink(models.Model):
@@ -249,6 +249,10 @@ class ContainerLink(models.Model):
    
     class Meta:
         unique_together = ( 'container', 'to')
+
+    def clean(self):
+        if self.container == self.to:
+            raise ValidationError("cannot link with myself")
 
 """
 domains are mapped to customers, each container of the customer
