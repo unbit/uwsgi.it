@@ -234,6 +234,10 @@ class Container(models.Model):
             l.append(direction_in)
             l.append(direction_out)
         return l
+
+    @property
+    def linked_to(self):
+        return [l.container.uid for l in self.containerlink_set.all()]
                 
 
 class ContainerLink(models.Model):

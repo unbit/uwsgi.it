@@ -158,15 +158,19 @@ def container(request, id):
         'distro_name': None,
         'server': container.server.name,
         'server_address': container.server.address,
+        'legion_address': None,
         'jid': container.jid,
         'jid_destinations': container.jid_destinations,
         'quota_threshold': container.quota_threshold,
         'note': container.note,
+        'linked_to': container.linked_to,
         'ssh_keys': container.ssh_keys,
     }
     if container.distro:
         c['distro'] = container.distro.pk
         c['distro_name'] = container.distro.name
+    if container.server.legion:
+        c['legion_address'] = container.server.legion.address
     return HttpResponse(json.dumps(c), content_type="application/json")
 
 @need_basicauth
