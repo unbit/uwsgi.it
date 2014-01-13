@@ -4,7 +4,9 @@ Using uwsgi.it as a customer
 When you buy/activate an account on a uwsgi.it-compliant service you will get:
 
 an api base url: like https://foobar.com/api
+
 an api username: like kratos
+
 an api password: like deimos
 
 With those parameters you will be able o configure your services using the HTTP api.
