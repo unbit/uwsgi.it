@@ -146,7 +146,7 @@ you can assign multiple keys in one shot:
 curl -X POST -d '{"ssh_keys": ["ssh-rsa .........", "ssh-rsa ........."]}' https://kratos:deimos17@foobar.com/api/containers/30009
 ```
 
-after a bunch of seconds your instance will start and you will be abble to ssh into it:
+after a bunch of seconds your instance will start and you will be able to ssh into it:
 
 ```sh
 ssh 30009@server_address
