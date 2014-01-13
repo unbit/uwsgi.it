@@ -195,6 +195,10 @@ mkdir /etc/uwsgi/vassals
 mkdir /etc/uwsgi/domains
 chown www-data:www-data /etc/uwsgi/domains
 mkdir /etc/uwsgi/ssl
+# temprary store for dynamic ssl certificates
+mkdir /etc/uwsgi/tmp_ssl
+chown www-data:www-data /etc/uwsgi/tmp_ssl
+chmod 700 /etc/uwsgi/tmp_ssl
 
 # for logging
 mkdir /var/log/uwsgi
@@ -211,7 +215,7 @@ cd uwsgi.it
 cp emperor.conf /etc/init
 cp emperor.ini /etc/uwsgi
 cp -R services /etc/uwsgi
-cp collector.pl configurator.pl dominator.pl /etc/uwsgi/
+cp firewall.sh collector.pl configurator.pl dominator.pl /etc/uwsgi/
 ```
 
 Configuring /etc/uwsgi/local.ini
@@ -223,6 +227,10 @@ public_ip = x.x.x.x
 api_domain = example.com
 api_client_key_file = /etc/uwsgi/ssl/client.key
 api_client_cert_file = /etc/uwsgi/ssl/client.crt
+
+legion_key = XXXX
+node_weight = 9999
+
 ; additional options
 env = LANG=en_US.UTF-8
 ```
@@ -250,35 +258,9 @@ The first vassal
 The firewall
 ------------
 
-udp port 999 is the tuntap remote gateway, its access must be allowed only from the infrastrcture nodes and from port 999 (it is a privileged port so it should be a pretty good protection)
+the firewall.sh script is automatically executes whenever a changes involving network security is made
 
-node1 = 1.1.1.1
-node2 = 2.2.2.2
-node3 = 3.3.3.3
-
-on node1:
-
-```sh
-iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 --sport 999 -s 2.2.2.2 -J ACCEPT
-iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 --sport 999 -s 3.3.3.3 -J ACCEPT
-iptables -A INPUT -d 1.1.1.1 -p udp --dport 999 -J DROP
-```
-
-ports 22, 80 and 443 are for public access, there is no need to protect them in a particular way
-
-port udp 123 is for ntp services, default ubuntu policies already protect them at the application level.
-
-port 998 is the fastrouter one it binds itself to udp port 2000 for forwarding subscription to the legion-based http routers (for clustering). As for the tuntp router we can protect legion's subscription server to accept requests only from source port 2000.
-
-The legion subsystem is used for clustering, as tuntap and subscriptions we only need to ensure that udp packets have source port == to the destination one (each legion should get a port >= 2100)
-
-Last port to protect is 998 TCP used by the fastrouter. This things are a bit more complex:
-
-we need to avoid containers to access it
-
-we need to avoid external networks to access it
-
-we need to allow ONLY legion-based http routers to access it
+Check the PORTS.md file to understand which ports are opened to the world and how they are proctected
 
 Install the api server - Only for the API node -
 ------------------------------------------------
@@ -288,8 +270,6 @@ The API server runs in a container as all of the other apps. It is a simple djan
 Data of customers and containers (as well as servers and their topology) can be stored in a SQL database. (we strongly suggest postgresql for it).
 
 You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
-
-
 
 
 Clustering
