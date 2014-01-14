@@ -406,3 +406,10 @@ The alarm is broadcasted to all of the conntected container shells and to an opt
 To enable jabber/xmpp alarm just set "jid", "jid_secret" and "jid_destinations" attributes of the container api.
 
 jid and jid_secret are the credentials the Emperor will use to login to a jabber/xmpp server while jid_destinations is the comma-separated list of jid that will receive the alarms.
+
+Snippets
+--------
+
+You will find deployment snippets for various technologies (like SQL/NOSQL servers, cache daemons and other tools) on
+
+https://github.com/unbit/uwsgi.it/tree/master/snippets
