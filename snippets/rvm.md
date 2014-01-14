@@ -56,4 +56,4 @@ domain = uwsgi.org
 
 Notes:
 
-you only need to build a uwsgi plugin for every different ruby version, not gemsets !!!
+you only need to build a uwsgi plugin for every different ruby version, not gemset !!!
