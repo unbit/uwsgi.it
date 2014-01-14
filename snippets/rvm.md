@@ -35,3 +35,25 @@ gemset = ruby-2.1.0
 rack = $(HOME)/myapp.ru
 domain = uwsgi.org
 ```
+
+to use another gemset:
+
+```sh
+rvm gemset create foobar
+rvm gemset use foobar
+gem install rack
+```
+
+and change vassal file to
+
+```ini
+[uwsgi]
+plugin = 0:../rvm_21
+gemset = ruby-2.1.0@foobar
+rack = $(HOME)/myapp.ru
+domain = uwsgi.org
+```
+
+Notes:
+
+you only need to build a uwsgi plugin for every different ruby version, not gemsets !!!
