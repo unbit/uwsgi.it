@@ -48,7 +48,10 @@ def dns_check(name, uuid):
     resolver = dns.resolver.Resolver()
     resolver.timeout = 3
     # get nameservers list (max 4)
-    ns_list = resolver.query(name, 'NS')
+    try:
+        ns_list = resolver.query(name, 'NS')
+    except:
+        ns_list = []
     if len(ns_list) > 4:
         ns_list = ns_list[0:4]
     servers = []
