@@ -20,6 +20,8 @@ and build the related uwsgi plugin:
 /opt/unbit/uwsgi/uwsgi --build-plugin "/opt/unbit/uwsgi/src/plugins/rack rvm_21"
 ```
 
+(the rvm_21 is the name of the plugin that will be generated, call it how you want/need but do use only letters, numbers and underscores)
+
 install the rack gem
 
 ```sh
