@@ -163,7 +163,7 @@ Every web application need a domain to be accessed.
 
 Domains are mapped to a customer, so multiple containers can use them (to implement clustering, load balancing or high availability)
 
-You may ask your supplier to map a domain to your account or add by yourself if you have access to its dns zone.
+You may ask your supplier to map a domain to your account or add by yourself if you have access to its dns zone. In both cases you need to map the A record of the domain to the container server address.
 
 To get the list of domains mapped to your account:
 
@@ -213,6 +213,8 @@ You can even delete a domain from your account:
 ```sh
 curl -X DELETE -d '{"name":"mynewdomain.org"}' https://kratos:deimos17@foobar.com/api/domains/
 ```
+
+Remember that www.mynewdomain.org and mynewdomain.org are two different objects, so if you need your app to respond to both, you need to add both.
 
 The first deploy
 ----------------
