@@ -20,6 +20,8 @@ and build the related uwsgi plugin:
 /opt/unbit/uwsgi/uwsgi --build-plugin "/opt/unbit/uwsgi/src/plugins/rack rvm_21"
 ```
 
+(the rvm_21 is the name of the plugin that will be generated, call it how you want/need but do use only letters, numbers and underscores)
+
 install the rack gem
 
 ```sh
@@ -57,3 +59,31 @@ domain = uwsgi.org
 Notes:
 
 you only need to build a uwsgi plugin for every different ruby version, not gemset !!!
+
+Running old rails 2.x on ruby 1.8.7
+-----------------------------------
+
+```sh
+rvm install 1.8.7
+```
+
+```sh
+/opt/unbit/uwsgi/uwsgi --build-plugin "/opt/unbit/uwsgi/src/plugins/rack rvm_187"
+```
+
+```
+gem install rails -v 2.3.18
+gem install rack
+gem install thin
+gem update --system 1.8.25
+```
+
+```ini
+[uwsgi]
+plugin = 0:../rvm_187
+gemset = ruby-1.8.7-p374
+rails = <path_to_rails_app_directory>
+domain = uwsgi.org
+```
+
+the only difference is the usage of 'rails' option instead of 'rack'

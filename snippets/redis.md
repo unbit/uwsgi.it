@@ -27,7 +27,7 @@ Create vassals/redis.ini
 
 ```ini
 [uwsgi]
-smart-attach-daemon = %(HOME)/run/redis-server.pid /usr/bin/redis-server $(HOME)/etc/redis.conf
+smart-attach-daemon = $(HOME)/run/redis-server.pid /usr/bin/redis-server $(HOME)/etc/redis.conf
 ```
 
 check logs/emperor.log, if all goes well your redis instance should be started and you can use it normally
