@@ -135,7 +135,10 @@ def domains_rsa(request):
 @need_basicauth
 @csrf_exempt
 def container(request, id):
-    container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    try:
+        container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
     if request.method == 'POST':
         response = check_body(request)
         if response: return response
