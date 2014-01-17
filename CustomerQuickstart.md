@@ -159,7 +159,7 @@ ssh 30009@server_address
 Domains
 -------
 
-Every web application need a domain to be accessed.
+Every web application needs a domain to be accessed.
 
 Domains are mapped to a customer, so multiple containers can use them (to implement clustering, load balancing or high availability)
 
