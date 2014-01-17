@@ -62,7 +62,10 @@ def dns_check(name, uuid):
     if servers:
         resolver.nameservers = servers
 
-    txt_list = resolver.query(name, 'TXT') 
+    try:
+        txt_list = resolver.query(name, 'TXT') 
+    except:
+        return False
 
     for txt in txt_list:
         if 'uwsgi:%s' % uuid in str(txt):
