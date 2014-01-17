@@ -396,6 +396,31 @@ The logs/emperor.log file is created as the default logging file (and rotated wh
 
 Each vassal con log whatever (and however) it needs
 
+
+Resources
+---------
+
+Each container runs in a limited environment. Keeping an eye on such limit avoid problems in the long term (albeit an alarm system, see below, warns you when dangerous situations are near).
+
+To check your diskspace:
+
+```sh
+quota -s
+```
+
+To check used memory (in bytes):
+
+```sh
+cat /run/cgroup/memory.usage_in_bytes 
+```
+
+To check max memory (in bytes, maps to the container api memory attribute)
+
+```sh
+cat /run/cgroup/memory.limit_in_bytes 
+```
+
+
 Alarms
 ------
 
