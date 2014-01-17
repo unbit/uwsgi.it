@@ -53,17 +53,17 @@ First step is finding the line on which the rootfs (or more general where /conta
 
 ```sh
 ...
-/dev/md/2 / ext4 defaults,usrjquota=aquota.user,jqfmt=vfsv1 0 0
+/dev/md/2 / ext4 defaults,noatime,usrjquota=aquota.user,jqfmt=vfsv1 0 0
 ...
 ```
 
-in this example /dev/md2 will store customer's file so we add `usrjquota=aquota.user,jqfmt=vfsv1` to its options
+in this example /dev/md2 will store customer's file so we add `noatime,usrjquota=aquota.user,jqfmt=vfsv1` to its options
 
 Finally the cgroup line:
 
 ```sh
 ...
-/dev/md/2 / ext4 defaults,usrjquota=aquota.user,jqfmt=vfsv1 0 0
+/dev/md/2 / ext4 defaults,noatime,usrjquota=aquota.user,jqfmt=vfsv1 0 0
 none /sys/fs/cgroup cgroup blkio,cpuacct,cpu,memory,devices 0 0
 ...
 ```
