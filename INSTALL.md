@@ -103,6 +103,12 @@ Finally turn off X11Forwarding
 X11Forwarding no
 ```
 
+and PrintLastLog (it will be managed via pam)
+
+```
+PrintLastLog no
+```
+
 Optional (for better user experience):
 
 ```sh
@@ -158,19 +164,36 @@ cd pam-unbit
 make
 ```
 
-then edit /etc/pam.d/sshd and below the
+then edit /etc/pam.d/sshd and below the line
+
+```sh
+session [success=ok ignore=ignore module_unknown=ignore default=bad]        pam_selinux.so close
+```
+
+add
+
+
+```sh
+session    requisite     pam_unbit.so
+```
+
+and comment (prefixing with a sharp) this three lines
+
+```sh
+session    optional     pam_motd.so  motd=/run/motd.dynamic noupdate
+```
+
+and
+
+```sh
+session    optional     pam_mail.so standard noenv # [1]
+```
+
+and
 
 ```sh
 session    required     pam_env.so user_readenv=1 envfile=/etc/default/locale
 ```
-
-line, add
-
-
-```sh
-session    required     pam_unbit.so
-```
-
 
 Preparing the filesystem
 ------------------------
