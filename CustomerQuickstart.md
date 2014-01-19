@@ -327,6 +327,15 @@ now you can instruct the http router to load it using ssl-domain instead of doma
 ssl-domain = mynewdomain.org $(HOME)/foobar.key $(HOME)/foobar.crt
 ```
 
+The HTTPS request var is set to 'on' if a specific requests is over SSL. You can use it to force HTTPS for a domain:
+
+```ini
+[uwsgi]
+ssl-domain = mynewdomain.org $(HOME)/foobar.key $(HOME)/foobar.crt
+plugin = router_redirect
+route-if-not = equal:${HTTPS};on redirect-permanent:https://${HTTP_HOST}${REQUEST_URI}
+```
+
 Clustering
 ----------
 
