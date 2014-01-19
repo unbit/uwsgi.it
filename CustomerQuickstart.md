@@ -310,7 +310,22 @@ The custom options are all defined in the /opt/unbit/uwsgi/shortcuts.ini file (i
 HTTPS/SNI
 ---------
 
-WORK IN PROGRESS
+HTTPS support is totally customer-governed via SNI. Subscription packets inform the HTTP router on how to configure SNI contexts.
+
+let's create a self-signed certificate:
+
+```sh
+openssl genrsa -out foobar.key 2048
+openssl req -new -key foobar.key -out foobar.csr
+openssl x509 -req -days 365 -in foobar.csr -signkey foobar.key -out foobar.crt
+```
+
+now you can instruct the http router to load it using ssl-domain instead of domain:
+
+```ini
+[uwsgi]
+ssl-domain = mynewdomain.org $(HOME)/foobar.key $(HOME)/foobar.crt
+```
 
 Clustering
 ----------
