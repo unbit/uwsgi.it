@@ -379,6 +379,8 @@ to
 cluster-domain = mydomain.it
 ```
 
+HTTPS/SNI over clustering is a bit complex as the http router could not have access to the certificate files. For such a reason the subscription packet includes the certificate/key blobs. While it currently works, the key embedded in the subscription packet should be encrypted and it is currently not supported (we are already working on it)
+
 Linking containers
 ------------------
 
