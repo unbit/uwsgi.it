@@ -307,6 +307,20 @@ pretty complex as it need to configure the secured subscription system and deal 
 
 The custom options are all defined in the /opt/unbit/uwsgi/shortcuts.ini file (it is automatically merged with your config)
 
+Wildcard domains
+----------------
+
+You can subscribe your vassal to a wildcard domain (like *.mynewdomain.org) using the dotsplit syntax:
+
+```ini
+[uwsgi]
+domain = .mynewdomain.org
+```
+
+to support it you need to add the .mynewdomain.org to your account.
+
+If you subscribe to a specific domain, it will win over the wildcard one (and you do not need to add it to your account)
+
 HTTPS/SNI
 ---------
 
@@ -335,6 +349,8 @@ ssl-domain = mynewdomain.org $(HOME)/foobar.key $(HOME)/foobar.crt
 plugin = router_redirect
 route-if-not = equal:${HTTPS};on redirect-permanent:https://${HTTP_HOST}${REQUEST_URI}
 ```
+
+wildcard/dotsplit SNI subscriptions are supported too
 
 Clustering
 ----------
