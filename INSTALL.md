@@ -103,12 +103,6 @@ Finally turn off X11Forwarding
 X11Forwarding no
 ```
 
-and PrintLastLog (it will be managed via pam)
-
-```
-PrintLastLog no
-```
-
 Optional (for better user experience):
 
 ```sh
