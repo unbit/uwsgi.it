@@ -4,7 +4,7 @@ rm -rf uwsgi
 git clone https://github.com/unbit/uwsgi
 cd uwsgi
 make uwsgi.it
-cp uwsgi /opt/unbit/uwsgi/uwsgi
+cp -f uwsgi /opt/unbit/uwsgi/uwsgi
 
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/corerouter
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/http
