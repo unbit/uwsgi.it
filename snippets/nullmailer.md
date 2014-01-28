@@ -1,0 +1,3 @@
+Running the nullmailer spooler
+------------------------------
+
