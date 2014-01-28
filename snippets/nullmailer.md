@@ -29,6 +29,8 @@ The first one contains the address of the smtp server that will send the enqueue
 
 The second one is the default hostname to use when sending unqualified mail with sendmail
 
+Take in account that /etc/nullmailer is a bind-mountpoint from $(HOME)/etc/nullmailer
+
 
 /etc/nullmailer/remotes
 ```sh
