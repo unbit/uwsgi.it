@@ -48,6 +48,8 @@ Finally start the daemon in dumb mode dropping a file named nullmailer.ini in th
 [uwsgi]
 attach-daemon = /usr/sbin/nullmailer-send
 logto = $(HOME)/logs/mail.log
+; at 03:59 every day, remove failed mails older than 48 hours
+cron = 59 3 -1 -1 -1 find /var/spool/nullmailer/queue/ -type f -ctime +2 -print0 | xargs -0 -r rm
 ```
 
 Bonus: 20tab-nullmailer
