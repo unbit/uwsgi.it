@@ -56,3 +56,10 @@ Bonus: 20tab-nullmailer
 nullmailer does not offer you a local smtp service to enqueue email. You can use a simple module developed by 20Tab S.r.l. to have a local smtp service using nullmailer spool system: 
 
 https://github.com/20tab/20tab-nullmailer
+
+Django Bonus: django-nullmailer
+-------------------------------
+
+Another module by 20tab, this is a simple EMAIL_BACKEND for django (way simpler, cheaper and faster than 20tab-nullmailer approach):
+
+https://github.com/20tab/django-nullmailer/
