@@ -47,6 +47,7 @@ Finally start the daemon in dumb mode dropping a file named nullmailer.ini in th
 ```ini
 [uwsgi]
 attach-daemon = /usr/sbin/nullmailer-send
+logto = $(HOME)/logs/mail.log
 ```
 
 Bonus: 20tab-nullmailer
