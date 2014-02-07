@@ -26,6 +26,8 @@ udp public_ip:3026 the dgram router accepts requests on this address from fastro
 
 127.0.0.1:5005 -> legion stats server
 
+127.0.0.1:5006 -> custom services Emperor stats
+
 udp public_ip:2000 legion packets (requires firewall protection)
 
 udp public_ip:999 tuntap router (requires firewall protection)
