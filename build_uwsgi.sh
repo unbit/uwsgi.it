@@ -9,9 +9,11 @@ cp -f uwsgi /opt/unbit/uwsgi/uwsgi
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/corerouter
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/http
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/fastrouter
+/opt/unbit/uwsgi/uwsgi --build-plugin plugins/rawrouter
+/opt/unbit/uwsgi/uwsgi --build-plugin plugins/sslrouter
 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/tuntap
 
-cp corerouter_plugin.so http_plugin.so fastrouter_plugin.so tuntap_plugin.so /opt/unbit/uwsgi/plugins
+cp corerouter_plugin.so http_plugin.so fastrouter_plugin.so rawrouter_plugin.so sslrouter_plugin.so tuntap_plugin.so /opt/unbit/uwsgi/plugins
 
 /opt/unbit/uwsgi/uwsgi --build-plugin ../calc_ip.c
 cp calc_ip_plugin.so /opt/unbit/uwsgi/plugins

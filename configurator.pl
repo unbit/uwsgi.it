@@ -104,6 +104,43 @@ for(;;) {
 		$reconfigure_firewall = 1;
         }
 
+	# get the list of custom services (if any...)
+	$response =  $ua->get($base_url.'/custom_services/');
+	if ($response->is_error or $response->code != 200 ) {
+                print date().' oops: '.$response->code.' '.$response->message."\n";
+                exit;
+        }
+	my $services = decode_json($response->decoded_content);
+	my %available_custom_services = {};
+	foreach(@{$services}) {
+		my $vassal = '/etc/uwsgi/custom_services/'.$_->{customer}.'_'.$_->{id}.'.ini';
+                if (-f $vassal) {
+                        my @st = stat($vassal);
+                        if ($_->{mtime} > $st[9]) {
+                                write_ini($vassal, $_->{config});
+                        }
+                }
+                else {
+			write_ini($vassal, $_->{config});
+                }
+                $available_custom_services{$_->{customer}.'_'.$_->{id}.'.ini'} = $_->{id}
+	}
+	opendir DIR,'/etc/uwsgi/custom_services';
+        @files = readdir(DIR);
+        closedir(DIR);
+
+        foreach(@files) {
+                next if /^\./;
+                next unless /\d+_\d+\.ini$/;
+                unless(exists($available_custom_services{$_})) {
+                        unlink '/etc/uwsgi/custom_services/'.$_;
+                        print date().' '.$_." removed\n";
+                }
+        }
+
+	
+	
+
 	if ($reconfigure_firewall) {
 		system("sh /etc/uwsgi/firewall.sh");
 	}
@@ -148,4 +185,13 @@ sub update_nodes {
 		print LN $_."\n";
 	}
 	close(LN);
+}
+
+sub write_ini {
+	my ($vassal, $ini) = @_;
+	open INI,'>'.$vassal;
+        print INI $ini;
+        close(INI);
+
+        print date().' '.$vassal." updated\n";
 }
