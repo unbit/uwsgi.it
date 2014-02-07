@@ -232,6 +232,7 @@ cd uwsgi.it
 cp emperor.conf /etc/init
 cp emperor.ini /etc/uwsgi
 cp -R services /etc/uwsgi
+mkdir /etc/uwsgi/custom_services
 cp firewall.sh collector.pl configurator.pl dominator.pl /etc/uwsgi/
 ```
 
