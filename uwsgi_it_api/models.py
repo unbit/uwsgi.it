@@ -288,6 +288,23 @@ class Domain(models.Model):
         return calendar.timegm(self.mtime.utctimetuple())
 
 """
+Pretty low level model for storing customer configurations out of
+the container concept (like rawrouter services or https non-sni proxies)
+"""
+class CustomService(models.Model):
+    name = models.CharField(max_length=255,unique=True)
+    customer = models.ForeignKey(Customer)
+    server = models.ForeignKey(Server)
+
+    config = models.TextField()
+
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
+
+"""
 each metric is stored in a different table
 """
 class ContainerMetric(models.Model):

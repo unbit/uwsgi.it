@@ -31,6 +31,7 @@ admin.site.register(Domain, DomainAdmin)
 admin.site.register(Legion)
 admin.site.register(ContainerLink)
 admin.site.register(Datacenter)
+admin.site.register(CustomService)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
 admin.site.register(NetworkTXContainerMetric,ContainerMetricAdmin)
