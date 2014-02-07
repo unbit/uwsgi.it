@@ -9,7 +9,7 @@ class ServerAdmin(admin.ModelAdmin):
     def storage_status(self):
         return "available:%d used:%d free:%d" % (self.storage, self.used_storage, self.free_storage)
     list_display = ('__unicode__', memory_status, storage_status, 'legion', 'weight')
-    list_filter = ('legion',)
+    list_filter = ('legion', 'datacenter')
 
 class ContainerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage')
@@ -30,6 +30,7 @@ admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
 admin.site.register(Legion)
 admin.site.register(ContainerLink)
+admin.site.register(Datacenter)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
 admin.site.register(NetworkTXContainerMetric,ContainerMetricAdmin)

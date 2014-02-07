@@ -44,6 +44,17 @@ class Customer(models.Model):
     def __unicode__(self):
         return self.user.username
 
+class Datacenter(models.Model):
+    name = models.CharField(max_length=255,unique=True)
+    description = models.TextField(blank=True,null=True)
+    note = models.TextField(blank=True,null=True)
+
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
+
 class Server(models.Model):
     name = models.CharField(max_length=255,unique=True)
     address = models.GenericIPAddressField()
@@ -64,6 +75,8 @@ class Server(models.Model):
     weight = models.PositiveIntegerField(default=9999)
 
     legion = models.ForeignKey('Legion',null=True,blank=True)
+
+    datacenter = models.ForeignKey('Datacenter',null=True,blank=True)
 
     note = models.TextField(blank=True,null=True)
 
