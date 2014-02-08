@@ -79,6 +79,15 @@ def dns_check(name, uuid):
 
 # Create your views here.
 @need_certificate
+def custom_services(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        j = [{'customer':service.customer.pk, 'config': service.config, 'mtime': service.munix, 'id': service.pk } for service in server.customservice_set.all()]
+        return HttpResponse(json.dumps(j), content_type="application/json")
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+
+@need_certificate
 def containers(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])

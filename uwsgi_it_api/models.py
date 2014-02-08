@@ -304,6 +304,10 @@ class CustomService(models.Model):
     def __unicode__(self):
         return self.name
 
+    @property
+    def munix(self):
+        return calendar.timegm(self.mtime.utctimetuple())
+
 """
 each metric is stored in a different table
 """
