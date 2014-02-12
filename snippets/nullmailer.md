@@ -37,6 +37,9 @@ Take in account that /etc/nullmailer is a bind-mountpoint from $(HOME)/etc/nullm
 smtp.example.com smtp
 ```
 
+:Note: for other settings use ``--port=`` ``--user=`` ``--pass=``
+
+
 /etc/nullmailer/defaulthost
 ```sh
 example.com
