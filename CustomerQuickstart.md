@@ -476,6 +476,8 @@ To enable jabber/xmpp alarm just set "jid", "jid_secret" and "jid_destinations" 
 
 jid and jid_secret are the credentials the Emperor will use to login to a jabber/xmpp server while jid_destinations is the comma-separated list of jid that will receive the alarms.
 
+:Note: for trouble with google account check your gmail account and visit this link http://support.google.com/mail?p=client_login
+
 Snippets
 --------
 
