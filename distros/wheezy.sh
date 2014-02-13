@@ -11,7 +11,7 @@ rm /etc/hosts /etc/hostname
 ln -s /run/resolvconf/hostname /etc/hostname
 ln -s /run/resolvconf/hosts /etc/hosts
 cd /root
-GIT_SSL_NO_VERIFY git clone https://github.com/unbit/nss-unbit
+GIT_SSL_NO_VERIFY=1 git clone https://github.com/unbit/nss-unbit
 cd nss-unbit
 make
 cd ..
