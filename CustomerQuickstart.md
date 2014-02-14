@@ -403,19 +403,19 @@ Supposing 2 containers:
 we want them to communicate each other on the 10.0.0.0/8 network
 
 ```
-curl -X POST '{"link": 30008}' https://kratos:deimos17@foobar.com/api/containers/30009
+curl -X POST -d '{"link": 30008}' https://kratos:deimos17@foobar.com/api/containers/30009
 ```
 
 and
 
 ```
-curl -X POST '{"link": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
+curl -X POST -d '{"link": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
 ```
 
 to unlink a container just run
 
 ```
-curl -X POST '{"unlink": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
+curl -X POST -d '{"unlink": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
 ```
 
 the links of a container are showed in the "linked_to" attribute of the container api
