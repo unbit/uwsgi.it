@@ -35,6 +35,7 @@ Goals
 - Websockets support (in the routers/proxy) is enabled by default
 - Simple clustering and load-balancing
 - Sending emails is not part of the infrastructure (read:no SMTP services), but each container has transparent support for the nullmailer spool service (so you can use it to asynchronously send mails to external smtp services like mandrill and sendgrid)
+- /usr/local must be user-writable to allows custom installation/compilation (is bind-mounted to the container's home)
 
 
 Status
