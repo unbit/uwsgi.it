@@ -194,6 +194,9 @@ Just get the 'uuid' of your account (we have seen it in the first api call examp
 TXT        uwsgi:aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
 ```
 
+IMPORTANT !!! the uuid is the one of your account, NOT the container one. A domain can be used by multiple containers that is why it is more logic to pair it with the account.
+
+
 To check your zone correctness:
 
 ```sh
