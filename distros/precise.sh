@@ -1,6 +1,6 @@
 set -u
 set -e
-debootstrap --components=main,universe,multiverse --include=vim,build-essential,git,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby,wget,ruby-dev,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,libjansson-dev,quota,ruby1.9.1-dev,rubygems,ruby-bundler,libjpeg-dev,libpng12-dev,nullmailer,nano,htop,emacs,libxml2-dev,libxslt-dev precise /distros/precise
+debootstrap --components=main,universe,multiverse --include=vim,build-essential,git,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby,wget,ruby-dev,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,libjansson-dev,quota,ruby1.9.1-dev,rubygems,ruby-bundler,libjpeg-dev,libpng12-dev,nullmailer,nano,htop,emacs,libxml2-dev,libxslt-dev,mercurial precise /distros/precise
 chroot /distros/precise /bin/bash -x <<'EOF'
 set -u
 set -e
