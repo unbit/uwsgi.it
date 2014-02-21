@@ -439,7 +439,7 @@ Logging
 
 The logs/emperor.log file is created as the default logging file (and rotated when it reaches 100M size).
 
-Each vassal con log whatever (and however) it needs
+Each vassal can log whatever (and however) it needs
 
 
 Resources
