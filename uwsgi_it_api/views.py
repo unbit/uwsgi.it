@@ -160,6 +160,7 @@ def container(request, id):
         if response: return response
         allowed_keys = ('name', 'note','quota_threshold', 'jid', 'jid_secret', 'jid_destinations')
         j = json.loads(request.read())
+        if not j: return HttpResponseForbidden('Forbidden\n')
         for key in j:
             if key in allowed_keys:
                 setattr(container, key, j[key])
