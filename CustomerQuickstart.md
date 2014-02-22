@@ -426,10 +426,10 @@ the links of a container are showed in the "linked_to" attribute of the containe
 Rebooting containers
 --------------------
 
-to reboot a container just send an "empty object" POST request to its api:
+to reboot a container without making any change to it, just pass "reboot":1
 
 ```sh
-curl -X POST -d '{}' https://kratos:deimos17@foobar.com/api/containers/30009
+curl -X POST -d '{"reboot":1}' https://kratos:deimos17@foobar.com/api/containers/30009
 ```
 
 technically any update to the container object will trigger a reboot (remember it !!!)
