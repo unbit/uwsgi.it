@@ -18,6 +18,8 @@ class ContainerAdmin(admin.ModelAdmin):
 
 class DomainAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'customer')
+    list_filter = ('customer',)
+    search_fields = ('name',)
 
 class ContainerMetricAdmin(admin.ModelAdmin):
     list_display = ('container', 'unix', 'value')
