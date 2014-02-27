@@ -25,12 +25,15 @@ class ContainerMetricAdmin(admin.ModelAdmin):
     list_display = ('container', 'unix', 'value')
     list_filter = ('container',)
 
+class LegionAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'note')
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer)
 admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
-admin.site.register(Legion)
+admin.site.register(Legion, LegionAdmin)
 admin.site.register(ContainerLink)
 admin.site.register(Datacenter)
 admin.site.register(CustomService)
