@@ -28,6 +28,13 @@ def need_certificate(func):
 def need_basicauth(func, realm='uwsgi.it api'):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
+        # first check for crossdomain
+        if request.method == 'OPTIONS':
+            response = HttpResponse()
+            response['Access-Control-Allow-Origin']  = '*'
+            response['Access-Control-Allow-Methods']  = 'GET,POST,DELETE,OPTIONS'
+            response['Access-Control-Allow-Headers']  = 'X-uwsgi-it-username,X-uwsgi-it-password'
+            return response
         if request.META.has_key('HTTP_AUTHORIZATION'):
             auth = request.META['HTTP_AUTHORIZATION'].split()
             if len(auth) == 2:
@@ -45,7 +52,10 @@ def need_basicauth(func, realm='uwsgi.it api'):
             if user and user.is_active:
                 login(request, user)
                 request.user = user
-                return func(request, *args, **kwargs)
+                response = func(request, *args, **kwargs)
+                response['Access-Control-Allow-Origin']  = '*'
+                return response
+                
             
         response = HttpResponse('Unathorized\n')
         response.status_code = 401
