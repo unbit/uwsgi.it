@@ -355,6 +355,8 @@ route-if-not = equal:${HTTPS};on redirect-permanent:https://${HTTP_HOST}${REQUES
 
 wildcard/dotsplit SNI subscriptions are supported too
 
+IMPORTANT: mixing `ssl-domain` with `domain` for the same name, must be avoided. `ssl-domain` automatically register non-ssl record too
+
 Clustering
 ----------
 
