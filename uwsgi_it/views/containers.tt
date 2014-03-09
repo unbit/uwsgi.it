@@ -1,3 +1,0 @@
-<% FOREACH container IN containers %>
-	<a href="/containers/<% container.uid %>"><% container.name %></a><% container.hostname %> <% container.ip %> <% container.server_address %> <% container.distro_name %> <% container.uuid %>
-<% END %>
