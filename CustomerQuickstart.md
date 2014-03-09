@@ -59,7 +59,7 @@ This array is the list of containers mapped to our account. Containers are the "
 We can get a more verbose list of our containers with:
 
 ```sh
-curl https://kratos:deimos17@foobar.com/api/me/containers/
+curl https://kratos:deimos17@foobar.com/api/containers/
 ```
 
 But most of the time you just want to view a single one:
