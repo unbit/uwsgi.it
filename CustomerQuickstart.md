@@ -436,6 +436,61 @@ curl -X POST -d '{"reboot":1}' https://kratos:deimos17@foobar.com/api/containers
 
 technically any update to the container object will trigger a reboot (remember it !!!)
 
+Tagging
+-------
+
+You can assign tags (or 'labels' if you tend to use 'tag' as a social thing) to containers and domains.
+
+Tagging is a handy way to "group" your items. For example you may want to group containers and domains related to the same sub-customer or project.
+
+Tags are related to uwsgi.it customers, so every customer will have its distinct set.
+
+To get the list of currently defined tags run
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/tags/
+```
+
+To create a tag
+
+```sh
+curl -X POST -d '{"name":"foobar"}' https://kratos:deimos17@foobar.com/api/tags/
+```
+
+To delete a tag (ID is the id of the tag as returned by the previous calls)
+
+```sh
+curl -X DELETE https://kratos:deimos17@foobar.com/api/tags/ID
+```
+
+Once you have your set of tags you can start mapping them to containers or domains using the 'tags' (array) attribute:
+
+```sh
+curl -X POST -d '{"tags":["foobar"]}' https://kratos:deimos17@foobar.com/api/containers/30009
+```
+
+or 
+
+```sh
+curl -X POST -d '{"tags":["foobar"]}' https://kratos:deimos17@foobar.com/api/domains/17
+```
+
+Now you can filter conatainers and domains by-tag, using the 'tags' QUERY_STRING attribute:
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/containers/?tags=foobar,zeus
+```
+
+the call will returns ONLY containers tagged with 'foobar' or 'zeus'
+
+as well as
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/domains/?tags=foobar
+```
+
+will returns domains tagged with 'foobar'
+
 Logging
 -------
 
