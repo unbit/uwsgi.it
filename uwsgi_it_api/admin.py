@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.forms import ModelForm
 
 # Register your models here.
 from uwsgi_it_api.models import *
@@ -16,10 +17,18 @@ class ContainerAdmin(admin.ModelAdmin):
     list_filter = ('server', 'distro')
     search_fields = ('name',)
 
+class DomainAdminForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(DomainAdminForm, self).__init__(*args, **kwargs)
+        self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+        
+
 class DomainAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'customer')
     list_filter = ('customer',)
     search_fields = ('name',)
+
+    form = DomainAdminForm
 
 class ContainerMetricAdmin(admin.ModelAdmin):
     list_display = ('container', 'unix', 'value')
@@ -36,6 +45,7 @@ admin.site.register(Domain, DomainAdmin)
 admin.site.register(Legion, LegionAdmin)
 admin.site.register(ContainerLink)
 admin.site.register(Datacenter)
+admin.site.register(Tag)
 admin.site.register(CustomService)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)

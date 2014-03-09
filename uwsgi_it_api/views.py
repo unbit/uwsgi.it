@@ -330,6 +330,17 @@ def domains(request):
     response.status_code = 405
     return response
 
+@need_basicauth
+@csrf_exempt
+def tags(request):
+    customer = request.user.customer
+    if request.method == 'GET':
+        j = [{'id':t.pk, 'name':t.name, 'note': t.note} for t in Tag.objects.filter(customer=customer)]
+        return HttpResponse(json.dumps(j), content_type="application/json")
+    response = HttpResponse('Method not allowed\n')
+    response.status_code = 405
+    return response
+
 
 @need_basicauth
 @csrf_exempt

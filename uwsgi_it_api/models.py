@@ -280,12 +280,31 @@ class Domain(models.Model):
 
     uuid = models.CharField(max_length=36, default=generate_uuid,unique=True)
 
+    note = models.TextField(blank=True,null=True)
+
+    tags = models.ManyToManyField('Tag')
+
     def __unicode__(self):
         return self.name
 
     @property
     def munix(self):
         return calendar.timegm(self.mtime.utctimetuple())
+
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+    customer = models.ForeignKey(Customer)
+
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    note = models.TextField(blank=True,null=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        unique_together = ('name', 'customer')
 
 """
 Pretty low level model for storing customer configurations out of
