@@ -475,7 +475,7 @@ or
 curl -X POST -d '{"tags":["foobar"]}' https://kratos:deimos17@foobar.com/api/domains/17
 ```
 
-Now you can filter conatainers and domains by-tag, using the 'tags' QUERY_STRING attribute:
+Now you can filter containers and domains by-tag, using the 'tags' QUERY_STRING attribute:
 
 ```sh
 curl https://kratos:deimos17@foobar.com/api/containers/?tags=foobar,zeus
