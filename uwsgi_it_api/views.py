@@ -99,7 +99,7 @@ def dns_check(name, uuid):
 
 # Create your views here.
 @need_certificate
-def custom_services(request):
+def private_custom_services(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         j = [{'customer':service.customer.pk, 'config': service.config, 'mtime': service.munix, 'id': service.pk } for service in server.customservice_set.all()]
@@ -108,7 +108,7 @@ def custom_services(request):
         return HttpResponseForbidden('Forbidden\n')
 
 @need_certificate
-def containers(request):
+def private_containers(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         j = [{'uid':container.uid, 'mtime': container.munix } for container in server.container_set.exclude(distro__isnull=True).exclude(ssh_keys_raw__exact='').exclude(ssh_keys_raw__isnull=True)]
@@ -117,7 +117,7 @@ def containers(request):
         return HttpResponseForbidden('Forbidden\n')
 
 @need_certificate
-def container_ini(request, id):
+def private_container_ini(request, id):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
@@ -128,7 +128,7 @@ def container_ini(request, id):
         return HttpResponseForbidden('Forbidden\n')    
 
 @need_certificate
-def legion_nodes(request):
+def private_legion_nodes(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         nodes = [] 
@@ -142,7 +142,7 @@ def legion_nodes(request):
         return HttpResponseForbidden('Forbidden\n')    
 
 @need_certificate
-def nodes(request):
+def private_nodes(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         nodes = []
@@ -157,7 +157,7 @@ def nodes(request):
     
 
 @need_certificate
-def domains_rsa(request):
+def private_domains_rsa(request):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
     server_customers = Customer.objects.filter(container__server=server)
     j = []
@@ -261,7 +261,7 @@ def me(request):
 
 @need_basicauth
 @csrf_exempt
-def me_containers(request):
+def containers(request):
     c = []
     for container in request.user.customer.container_set.all():
         cc = {
@@ -363,7 +363,7 @@ def domain(request, id):
     return response
 
 @need_basicauth
-def container_metrics_cpu(request, id):
+def server_container_metrics_cpu(request, id):
     container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     j = [[m.unix, m.value] for m in container.cpucontainermetric_set.all()]
     return HttpResponse(json.dumps(j), content_type="application/json")
@@ -386,49 +386,49 @@ def metrics_container_do(request, id, func):
 
 @csrf_exempt
 @need_certificate
-def metrics_container_mem(request, id):
+def private_metrics_container_mem(request, id):
     def do(container, unix, value):
         container.memorycontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
-def metrics_container_cpu(request, id):
+def private_metrics_container_cpu(request, id):
     def do(container, unix, value):
         container.cpucontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
-def metrics_container_io_read(request, id):
+def private_metrics_container_io_read(request, id):
     def do(container, unix, value):
         container.ioreadcontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
-def metrics_container_io_write(request, id):
+def private_metrics_container_io_write(request, id):
     def do(container, unix, value):
         container.iowritecontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
-def metrics_container_net_rx(request, id):
+def private_metrics_container_net_rx(request, id):
     def do(container, unix, value):
         container.networkrxcontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
-def metrics_container_net_tx(request, id):
+def private_metrics_container_net_tx(request, id):
     def do(container, unix, value):
         container.networktxcontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
-def metrics_container_quota(request, id):
+def private_metrics_container_quota(request, id):
     def do(container, unix, value):
         container.quotacontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
