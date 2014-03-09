@@ -323,7 +323,10 @@ def domains(request):
         return HttpResponse('Ok\n')
 
     elif request.method == 'GET':
-        j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid} for d in customer.domain_set.all()]
+        if 'tags' in request.GET:
+            j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in customer.domain_set.filter(tags__name__in=request.GET['tags'].split(','))]
+        else:
+            j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in customer.domain_set.all()]
         return HttpResponse(json.dumps(j), content_type="application/json")
 
     response = HttpResponse('Method not allowed\n')
