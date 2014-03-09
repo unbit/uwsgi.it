@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from uwsgi_it_api.models import *
 from uwsgi_it_api.config import UWSGI_IT_BASE_UID
-from django.http import HttpResponse,HttpResponseForbidden
+from django.http import HttpResponse,HttpResponseForbidden,HttpResponseNotFound
 from django.template.loader import render_to_string
 import json
 from functools import wraps
@@ -337,19 +337,75 @@ def domains(request):
 @csrf_exempt
 def tags(request):
     customer = request.user.customer
-    if request.method == 'GET':
-        j = [{'id':t.pk, 'name':t.name, 'note': t.note} for t in Tag.objects.filter(customer=customer)]
+    allowed_keys = ('name', 'note')
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        tag = Tag(customer=customer)
+        for key in allowed_keys:
+            if key in j:
+                setattr(tag, key, j[key])
+        try:
+            tag.save()
+            response = HttpResponse('Created\n')
+            response.status_code = 201
+        except:
+            response = HttpResponse('Conflict\n')
+            response.status_code = 409
+        return response
+        
+    elif request.method == 'GET':
+        j = [{'id':t.pk, 'name':t.name} for t in Tag.objects.filter(customer=customer)]
         return HttpResponse(json.dumps(j), content_type="application/json")
     response = HttpResponse('Method not allowed\n')
     response.status_code = 405
     return response
 
+@need_basicauth
+@csrf_exempt
+def tag(request, id):
+    customer = request.user.customer
+    try:
+        t = Tag.objects.get(customer=customer, pk=id)
+    except:
+        return HttpResponseNotFound('Not Found\n')        
+
+    allowed_keys = ('name', 'note')
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        for key in allowed_keys:
+            if key in j:
+                setattr(t, key, j[key])
+        try:
+            t.save()
+            j = {'id':t.pk, 'name':t.name, 'note':t.note}
+            return HttpResponse(json.dumps(j), content_type="application/json")       
+        except:
+            response = HttpResponse('Conflict\n')
+            response.status_code = 409
+        return response
+    elif request.method == 'GET':
+        j = {'id':t.pk, 'name':t.name, 'note':t.note}
+        return HttpResponse(json.dumps(j), content_type="application/json")
+    elif request.method == 'DELETE':
+        t.delete()
+        return HttpResponse('Ok\n')
+    allowed_keys = ('name', 'note')
+    response = HttpResponse('Method not allowed\n')
+    response.status_code = 405
+    return response
 
 @need_basicauth
 @csrf_exempt
 def domain(request, id):
     customer = request.user.customer
-    domain = customer.domain_set.get(pk=id)
+    try:
+        domain = customer.domain_set.get(pk=id)
+    except:
+        return HttpResponseNotFound('Not Found\n') 
     if request.method == 'DELETE':
         domain.delete()
         return HttpResponse('Ok\n')
@@ -363,7 +419,7 @@ def domain(request, id):
     return response
 
 @need_basicauth
-def server_container_metrics_cpu(request, id):
+def container_metrics_cpu(request, id):
     container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     j = [[m.unix, m.value] for m in container.cpucontainermetric_set.all()]
     return HttpResponse(json.dumps(j), content_type="application/json")
