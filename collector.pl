@@ -13,7 +13,7 @@ $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}=0;
 
 my $cfg = Config::IniFiles->new( -file => "/etc/uwsgi/local.ini" );
 
-my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api';
+my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api/private';
 my $ssl_key = $cfg->val('uwsgi', 'api_client_key_file');
 my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
 
