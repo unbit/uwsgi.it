@@ -171,8 +171,9 @@ def private_domains_rsa(request):
 @need_basicauth
 @csrf_exempt
 def container(request, id):
+    customer = request.user.customer
     try:
-        container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
     if request.method == 'POST':
@@ -188,6 +189,14 @@ def container(request, id):
             container.ssh_keys_raw = '\n'.join(j['ssh_keys'])
         if 'distro' in j:
             container.distro = Distro.objects.get(pk=j['distro'])
+        if 'tags' in j:
+            new_tags = []
+            for tag in j['tags']:
+                try:
+                    new_tags.append(Tag.objects.get(customer=customer,name=tag))
+                except:
+                    pass
+            container.tags = new_tags
         if 'link' in j:
             try:
                 link = ContainerLink()
@@ -227,6 +236,7 @@ def container(request, id):
         'note': container.note,
         'linked_to': container.linked_to,
         'ssh_keys': container.ssh_keys,
+        'tags': [t.name for t in container.tags.all()]
     }
     if container.distro:
         c['distro'] = container.distro.pk
@@ -276,6 +286,7 @@ def containers(request):
             'distro_name': None,
             'server': container.server.name,
             'server_address': container.server.address,
+            'tags': [t.name for t in container.tags.all()]
         }
         if container.distro:
             cc['distro'] = container.distro.pk
@@ -406,12 +417,36 @@ def domain(request, id):
         domain = customer.domain_set.get(pk=id)
     except:
         return HttpResponseNotFound('Not Found\n') 
-    if request.method == 'DELETE':
+    allowed_keys = ('note',)
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        for key in allowed_keys:
+            if key in j:
+                setattr(domain, key, j[key])
+        if 'tags' in j:
+            new_tags = []
+            for tag in j['tags']:
+                try:
+                    new_tags.append(Tag.objects.get(customer=customer,name=tag))
+                except:
+                    pass
+            domain.tags = new_tags
+        try:
+            domain.save()
+            j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()], 'note':domain.note}
+            return HttpResponse(json.dumps(j), content_type="application/json")
+        except:
+            response = HttpResponse('Conflict\n')
+            response.status_code = 409
+        return response
+    elif request.method == 'DELETE':
         domain.delete()
         return HttpResponse('Ok\n')
 
     elif request.method == 'GET':
-        j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid}
+        j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()], 'note':domain.note}
         return HttpResponse(json.dumps(j), content_type="application/json")
 
     response = HttpResponse('Method not allowed\n')

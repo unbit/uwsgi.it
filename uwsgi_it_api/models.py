@@ -165,6 +165,8 @@ class Container(models.Model):
 
     quota_threshold = models.PositiveIntegerField("Quota threshold", default=90)
 
+    tags = models.ManyToManyField('Tag')
+
     note = models.TextField(blank=True,null=True)
 
     def __unicode__(self):

@@ -12,10 +12,17 @@ class ServerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', memory_status, storage_status, 'legion', 'weight')
     list_filter = ('legion', 'datacenter')
 
+class ContainerAdminForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ContainerAdminForm, self).__init__(*args, **kwargs)
+        self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+
 class ContainerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage')
     list_filter = ('server', 'distro')
-    search_fields = ('name',)
+    search_fields = ('name', 'customer__user__username', 'tags__name')
+
+    form = ContainerAdminForm
 
 class DomainAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -37,6 +44,11 @@ class ContainerMetricAdmin(admin.ModelAdmin):
 class LegionAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'note')
 
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'customer')
+    list_filter = ('customer',)
+    search_fields = ('name',) 
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer)
@@ -45,7 +57,7 @@ admin.site.register(Domain, DomainAdmin)
 admin.site.register(Legion, LegionAdmin)
 admin.site.register(ContainerLink)
 admin.site.register(Datacenter)
-admin.site.register(Tag)
+admin.site.register(Tag, TagAdmin)
 admin.site.register(CustomService)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
