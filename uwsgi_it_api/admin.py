@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.forms import ModelForm
+from django.forms import ModelForm,HiddenInput
 
 # Register your models here.
 from uwsgi_it_api.models import *
@@ -15,7 +15,10 @@ class ServerAdmin(admin.ModelAdmin):
 class ContainerAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContainerAdminForm, self).__init__(*args, **kwargs)
-        self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+        if self.instance and self.instance.pk:
+            self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+        else:
+            self.fields['tags'].widget = HiddenInput()
 
 class ContainerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage')
@@ -27,7 +30,10 @@ class ContainerAdmin(admin.ModelAdmin):
 class DomainAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(DomainAdminForm, self).__init__(*args, **kwargs)
-        self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+        if self.instance and self.instance.pk:
+            self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+        else:
+            self.fields['tags'].widget = HiddenInput()
         
 
 class DomainAdmin(admin.ModelAdmin):
