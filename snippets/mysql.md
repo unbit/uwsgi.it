@@ -21,6 +21,12 @@ run
 mysql_install_db --defaults-file=.my.cnf
 ```
 
+and (for allowing transparent compatibility with debian/ubuntu mysql environment)
+
+```
+ln -s $HOME/db.mysql /var/run/mysqld
+```
+
 create vassals/mysql.ini
 
 ```ini
@@ -29,3 +35,53 @@ smart-attach-daemon = $(HOME)/db.mysql/mysqld.pid mysqld --defaults-file=$(HOME)
 ```
 
 Check logs/emperor.log, if all goes well you can start using mysql normally (remember to assign a root password)
+
+Backup
+******
+
+```pl
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use DBI ;
+use DateTime ;
+
+######### Configure here
+#
+my %cfg = (
+        username  => 'root',                             # user (generally 'root')
+        password  => 'XXXX',                  # Password
+        backupDir => $ENV{HOME}.'/backup_mysql',        # where to store backups
+);
+
+######### DO NOT CHANGE BELOW !!!
+
+umask 0027;
+
+mkdir $cfg{'backupDir'} unless -d $cfg{'backupDir'};
+
+my $dbh = DBI->connect( "dbi:mysql:database=mysql", $cfg{'username'}, $cfg{'password'} );
+my $sth = $dbh->prepare( "SHOW DATABASES" );
+
+if ( $sth->execute >=1 ) {
+        my $dt = DateTime->now;
+        my $day =  $dt->day_of_month;
+        while( my $row = $sth->fetchrow_hashref ) {
+                my $db = $row->{Database};
+                next if $db eq 'information_schema';
+                next if $db eq 'performance_schema';
+                mkdir $cfg{'backupDir'} . '/' . $db unless -d $cfg{'backupDir'} . '/'. $db;
+                my $cmd = "mysqldump --defaults-file=" .$ENV{HOME}. "/.my.cnf -u " . $cfg{'username'} . " -p". $cfg{'password'} . " " . $db . " | bzip2 -9 > " . $cfg{'backupDir'} . '/'. $db . "/" . $day . ".bz2";
+                system ( $cmd );
+        }
+}
+```
+
+save it as `mysql_backup.pl` and run it via uWSGI cron:
+
+```ini
+[uwsgi]
+smart-attach-daemon = $(HOME)/db.mysql/mysqld.pid mysqld --defaults-file=$(HOME)/.my.cnf
+cron = 59 3 -1 -1 -1 perl $(HOME)/mysql_backup.pl
+```
