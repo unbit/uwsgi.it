@@ -37,7 +37,7 @@ smart-attach-daemon = $(HOME)/db.mysql/mysqld.pid mysqld --defaults-file=$(HOME)
 Check logs/emperor.log, if all goes well you can start using mysql normally (remember to assign a root password)
 
 Backup
-******
+------
 
 ```pl
 #!/usr/bin/env perl
