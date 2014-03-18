@@ -10,6 +10,12 @@ from django.contrib.auth import authenticate, login
 import dns.resolver
 from django.views.decorators.csrf import csrf_exempt
 
+def spit_json(request, j):
+    body = json.dumps(j)
+    if 'HTTP_USER_AGENT' in request.META:
+        if 'curl/' in request.META['HTTP_USER_AGENT']: body += '\n'
+    return HttpResponse(body, content_type="application/json")
+
 def check_body(request):
     if int(request.META['CONTENT_LENGTH']) > 65536:
         response = HttpResponse('Request entity too large\n')
@@ -103,7 +109,7 @@ def private_custom_services(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         j = [{'customer':service.customer.pk, 'config': service.config, 'mtime': service.munix, 'id': service.pk } for service in server.customservice_set.all()]
-        return HttpResponse(json.dumps(j), content_type="application/json")
+        return spit_json(request, j)
     except:
         return HttpResponseForbidden('Forbidden\n')
 
@@ -112,7 +118,7 @@ def private_containers(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         j = [{'uid':container.uid, 'mtime': container.munix } for container in server.container_set.exclude(distro__isnull=True).exclude(ssh_keys_raw__exact='').exclude(ssh_keys_raw__isnull=True)]
-        return HttpResponse(json.dumps(j), content_type="application/json")
+        return spit_json(request, j)
     except:
         return HttpResponseForbidden('Forbidden\n')
 
@@ -166,7 +172,7 @@ def private_domains_rsa(request):
         for domain in customer.domain_set.all():
             domains.append({'name': domain.name, 'mtime': domain.munix})
         j.append({'rsa': customer.rsa_pubkey, 'domains': domains })
-    return HttpResponse(json.dumps(j), content_type="application/json")
+    return spit_json(request, j)
 
 @need_basicauth
 @csrf_exempt
@@ -243,7 +249,7 @@ def container(request, id):
         c['distro_name'] = container.distro.name
     if container.server.legion:
         c['legion_address'] = container.server.legion.address
-    return HttpResponse(json.dumps(c), content_type="application/json")
+    return spit_json(request, c)
 
 @need_basicauth
 @csrf_exempt
@@ -266,8 +272,9 @@ def me(request):
         'company': customer.company,
         'uuid': customer.uuid,
         'containers': [cc.uid for cc in customer.container_set.all()],
+        'servers': [s.address for s in customer.server_set.all()],
     }
-    return HttpResponse(json.dumps(c), content_type="application/json")
+    return spit_json(request, c)
 
 @need_basicauth
 @csrf_exempt
@@ -294,12 +301,12 @@ def containers(request):
         c.append(cc)
         
 
-    return HttpResponse(json.dumps(c), content_type="application/json")
+    return spit_json(request, c)
 
 @need_basicauth
 def distros(request):
     j = [{'id':d.pk, 'name':d.name} for d in Distro.objects.all()]
-    return HttpResponse(json.dumps(j), content_type="application/json")
+    return spit_json(request, j)
 
 @need_basicauth
 @csrf_exempt
@@ -338,7 +345,7 @@ def domains(request):
             j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in customer.domain_set.filter(tags__name__in=request.GET['tags'].split(','))]
         else:
             j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in customer.domain_set.all()]
-        return HttpResponse(json.dumps(j), content_type="application/json")
+        return spit_json(request, j)
 
     response = HttpResponse('Method not allowed\n')
     response.status_code = 405
@@ -368,7 +375,7 @@ def tags(request):
         
     elif request.method == 'GET':
         j = [{'id':t.pk, 'name':t.name} for t in Tag.objects.filter(customer=customer)]
-        return HttpResponse(json.dumps(j), content_type="application/json")
+        return spit_json(request, j)
     response = HttpResponse('Method not allowed\n')
     response.status_code = 405
     return response
@@ -393,14 +400,14 @@ def tag(request, id):
         try:
             t.save()
             j = {'id':t.pk, 'name':t.name, 'note':t.note}
-            return HttpResponse(json.dumps(j), content_type="application/json")       
+            return spit_json(request, j)
         except:
             response = HttpResponse('Conflict\n')
             response.status_code = 409
         return response
     elif request.method == 'GET':
         j = {'id':t.pk, 'name':t.name, 'note':t.note}
-        return HttpResponse(json.dumps(j), content_type="application/json")
+        return spit_json(request, j)
     elif request.method == 'DELETE':
         t.delete()
         return HttpResponse('Ok\n')
@@ -436,7 +443,7 @@ def domain(request, id):
         try:
             domain.save()
             j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()], 'note':domain.note}
-            return HttpResponse(json.dumps(j), content_type="application/json")
+            return spit_json(request, j)
         except:
             response = HttpResponse('Conflict\n')
             response.status_code = 409
@@ -447,7 +454,7 @@ def domain(request, id):
 
     elif request.method == 'GET':
         j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()], 'note':domain.note}
-        return HttpResponse(json.dumps(j), content_type="application/json")
+        return spit_json(request, j)
 
     response = HttpResponse('Method not allowed\n')
     response.status_code = 405
@@ -457,7 +464,7 @@ def domain(request, id):
 def container_metrics_cpu(request, id):
     container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     j = [[m.unix, m.value] for m in container.cpucontainermetric_set.all()]
-    return HttpResponse(json.dumps(j), content_type="application/json")
+    return spit_json(request, j)
 
 def metrics_container_do(request, id, func):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
