@@ -7,7 +7,7 @@ If your uwsgi.it supplier supports mapping customer to one (ore more) server, yo
 
 The system constantly checks that you are not overselling.
 
-You are not supposed to delete containers (you can remap, reconfigure and retag them easily) as it hsould be followed by a complete removal of the container's home from the server, so if you need to destroy a container (for a good reason, contact your supplier).
+You are not supposed to delete containers (you can remap, reconfigure and retag them easily) as a delete should be followed by a complete removal of the container's home from the server, so if you need to destroy a container (for a good reason), contact your supplier.
 
 
 Getting the list of available servers
