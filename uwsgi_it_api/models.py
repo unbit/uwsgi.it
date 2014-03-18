@@ -80,6 +80,8 @@ class Server(models.Model):
 
     note = models.TextField(blank=True,null=True)
 
+    owner = models.ForeignKey(Customer,null=True,blank=True)
+
     @property
     def used_memory(self):
         n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
