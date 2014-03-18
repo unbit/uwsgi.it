@@ -279,6 +279,32 @@ def me(request):
 @need_basicauth
 @csrf_exempt
 def containers(request):
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        needed_keys = ('server', 'name', 'memory', 'storage')
+        for k in needed_keys:
+            if not k in j.keys(): return HttpResponseForbidden('Forbidden\n')
+        try:
+            server = Server.objects.get(address=j['server'])
+            if server.owner != request.user.customer:
+                return HttpResponseForbidden('Forbidden\n') 
+        except:
+            return HttpResponseForbidden('Forbidden\n')
+        try:
+            container = Container(customer=request.user.customer,server=server)
+            container.name = j['name']
+            container.memory = int(j['memory'])
+            container.storage = int(j['storage'])
+            container.save()
+            response = HttpResponse('Created\n')
+            response.status_code = 201
+            return response
+        except:
+            response = HttpResponse('Conflict\n')
+            response.status_code = 409
+            return response 
     c = []
     for container in request.user.customer.container_set.all():
         cc = {
