@@ -5,7 +5,7 @@ Please read the CustomerQuickstart before this !!!
 
 If your uwsgi.it supplier supports mapping customer to one (ore more) server, you are able to create containers on your dedicated machines.
 
-The system checks for you that you are not overselling.
+The system constantly checks that you are not overselling.
 
 You are not supposed to delete containers (you can remap, reconfigure and retag them easily) as it hsould be followed by a complete removal of the container's home from the server, so if you need to destroy a container (for a good reason, contact your supplier).
 
