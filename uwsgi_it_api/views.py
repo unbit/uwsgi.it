@@ -195,6 +195,12 @@ def container(request, id):
             container.ssh_keys_raw = '\n'.join(j['ssh_keys'])
         if 'distro' in j:
             container.distro = Distro.objects.get(pk=j['distro'])
+        if 'memory' in j:
+            if container.server.owner == customer:
+                container.memory = int(j['memory'])
+        if 'storage' in j:
+            if container.server.owner == customer:
+                container.storage = int(j['storage'])
         if 'tags' in j:
             new_tags = []
             for tag in j['tags']:
