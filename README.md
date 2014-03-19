@@ -36,7 +36,8 @@ Goals
 - Simple clustering and load-balancing
 - Sending emails is not part of the infrastructure (read:no SMTP services), but each container has transparent support for the nullmailer spool service (so you can use it to asynchronously send mails to external smtp services like mandrill and sendgrid)
 - /usr/local must be user-writable to allows custom installation/compilation (is bind-mounted to the container's home)
-
+- customers can buy a whole server, and create containers without supplier intervention
+- the unbit nss module exposes a name resolution facility to map `container`.local to the relevant ip
 
 Status
 ------
