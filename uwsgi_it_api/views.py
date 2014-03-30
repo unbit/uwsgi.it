@@ -63,7 +63,7 @@ def need_basicauth(func, realm='uwsgi.it api'):
                 return response
                 
             
-        response = HttpResponse('Unathorized\n')
+        response = HttpResponse('Unauthorized\n')
         response.status_code = 401
         response['Access-Control-Allow-Origin']  = '*'
         response['WWW-Authenticate'] = 'Basic realm="%s"' % realm
