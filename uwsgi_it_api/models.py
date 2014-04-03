@@ -337,7 +337,7 @@ each metric is stored in a different table
 class ContainerMetric(models.Model):
 
     container = models.ForeignKey(Container)
-    # we use a standard number as we will deal with onlu unix timestamp since the epoch
+    # we use a standard number as we will deal with only unix timestamp since the epoch
     unix = models.PositiveIntegerField() 
     # 64bit value
     value = models.BigIntegerField()
@@ -351,7 +351,8 @@ class ContainerMetric(models.Model):
 class DomainMetric(models.Model):
 
     domain = models.ForeignKey(Domain)
-    # we use a standard number as we will deal with onlu unix timestamp since the epoch
+    server = models.ForeignKey(Server)
+    # we use a standard number as we will deal with only unix timestamp since the epoch
     unix = models.PositiveIntegerField()
     # 64bit value
     value = models.BigIntegerField()
@@ -393,3 +394,13 @@ class IOWriteContainerMetric(ContainerMetric):
 # uses perl Quota package
 class QuotaContainerMetric(ContainerMetric):
     pass
+
+class HitsDomainMetric(DomainMetric):
+    pass
+
+class NetworkRXDomainMetric(DomainMetric):
+    pass
+
+class NetworkTXDomainMetric(DomainMetric):
+    pass
+
