@@ -570,18 +570,11 @@ def private_metrics_container_quota(request, id):
         container.quotacontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
 
-
-@need_basicauth
-def metrics_container_cpu(request, id):
+def metrics_container_do(request, container, qs):
     """
     you can ask metrics for a single day of the year (288 metrics is the worst/general case)
     if the day is today, the response is cached for 5 minutes, otherwise it is cached indefinitely
     """
-    customer = request.user.customer
-    try:
-        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
-    except:
-        return HttpResponseForbidden('Forbidden\n')
     today = datetime.datetime.today()
     year = today.year
     month = today.month
@@ -599,8 +592,71 @@ def metrics_container_cpu(request, id):
         cache = get_cache(UWSGI_IT_METRICS_CACHE)
         j = cache.get("%d_%d" % (container.uid, unix))
         if not j:
-            j = [[m.unix,m.value] for m in container.cpucontainermetric_set.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')] 
+            j = [[m.unix,m.value] for m in qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')] 
             cache.set("%d_%d" % (container.uid, unix), j, expires)
     except: 
-        j = [[m.unix,m.value] for m in container.cpucontainermetric_set.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')]
+        j = [[m.unix,m.value] for m in qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')]
     return spit_json(request, j, expires)
+
+@need_basicauth
+def metrics_container_cpu(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.cpucontainermetric_set)
+
+@need_basicauth
+def metrics_container_net_tx(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.networktxcontainermetric_set)
+
+@need_basicauth
+def metrics_container_net_rx(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.networkrxcontainermetric_set)
+
+@need_basicauth
+def metrics_container_io_read(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.ioreadcontainermetric_set)
+
+@need_basicauth
+def metrics_container_io_write(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.ioreadcontainermetric_set)
+
+@need_basicauth
+def metrics_container_mem(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.memorycontainermetric_set)
+
+@need_basicauth
+def metrics_container_quota(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.quotacontainermetric_set)
