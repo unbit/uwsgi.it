@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from uwsgi_it_api.models import *
-from uwsgi_it_api.config import UWSGI_IT_BASE_UID
+from uwsgi_it_api.config import UWSGI_IT_BASE_UID,UWSGI_IT_METRICS_CACHE
 from django.http import HttpResponse,HttpResponseForbidden,HttpResponseNotFound
 from django.template.loader import render_to_string
 import json
@@ -11,12 +11,17 @@ import dns.resolver
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 import time
+from django.utils.http import http_date
+from django.core.cache import get_cache
 
-def spit_json(request, j):
+def spit_json(request, j, expires=0):
     body = json.dumps(j)
     if 'HTTP_USER_AGENT' in request.META:
         if 'curl/' in request.META['HTTP_USER_AGENT']: body += '\n'
-    return HttpResponse(body, content_type="application/json")
+    response = HttpResponse(body, content_type="application/json")
+    if expires > 0:
+        response['Expires'] = http_date(time.time() + expires)
+    return response
 
 def check_body(request):
     if int(request.META['CONTENT_LENGTH']) > 65536:
@@ -586,5 +591,16 @@ def metrics_container_cpu(request, id):
     if 'day' in request.GET: day = int(request.GET['day'])
     dt = datetime.date(year=year,month=month,day=day)
     unix = int(time.mktime(dt.timetuple()))
-    j = [[m.unix,m.value] for m in container.cpucontainermetric_set.filter(unix__gte=unix,unix__lte=(unix+86400))]
-    return spit_json(request, j)
+    expires = 86400
+    if day != today.day or month != today.month or year != today.year: expires = 300
+    try:
+        # this will trigger the db query
+        if not UWSGI_IT_METRICS_CACHE: raise
+        cache = get_cache(UWSGI_IT_METRICS_CACHE)
+        j = cache.get("%d_%d" % (container.uid, unix))
+        if not j:
+            j = [[m.unix,m.value] for m in container.cpucontainermetric_set.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')] 
+            cache.set("%d_%d" % (container.uid, unix), j, expires)
+    except: 
+        j = [[m.unix,m.value] for m in container.cpucontainermetric_set.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')]
+    return spit_json(request, j, expires)
