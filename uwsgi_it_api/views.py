@@ -9,6 +9,8 @@ import base64
 from django.contrib.auth import authenticate, login
 import dns.resolver
 from django.views.decorators.csrf import csrf_exempt
+import datetime
+import time
 
 def spit_json(request, j):
     body = json.dumps(j)
@@ -562,3 +564,27 @@ def private_metrics_container_quota(request, id):
     def do(container, unix, value):
         container.quotacontainermetric_set.create(unix=unix,value=value)
     return metrics_container_do(request, id, do)
+
+
+@need_basicauth
+def metrics_container_cpu(request, id):
+    """
+    you can ask metrics for a single day of the year (288 metrics is the worst/general case)
+    if the day is today, the response is cached for 5 minutes, otherwise it is cached indefinitely
+    """
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    today = datetime.datetime.today()
+    year = today.year
+    month = today.month
+    day = today.day
+    if 'year' in request.GET:year = int(request.GET['year'])
+    if 'month' in request.GET: month = int(request.GET['month'])
+    if 'day' in request.GET: day = int(request.GET['day'])
+    dt = datetime.date(year=year,month=month,day=day)
+    unix = int(time.mktime(dt.timetuple()))
+    j = [[m.unix,m.value] for m in container.cpucontainermetric_set.filter(unix__gte=unix,unix__lte=(unix+86400))]
+    return spit_json(request, j)
