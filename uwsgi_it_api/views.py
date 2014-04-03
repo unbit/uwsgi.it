@@ -505,7 +505,7 @@ def container_metrics_cpu(request, id):
     j = [[m.unix, m.value] for m in container.cpucontainermetric_set.all()]
     return spit_json(request, j)
 
-def metrics_container_do(request, id, func):
+def private_metrics_container_do(request, id, func):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
     container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
 
@@ -526,51 +526,51 @@ def metrics_container_do(request, id, func):
 def private_metrics_container_mem(request, id):
     def do(container, unix, value):
         container.memorycontainermetric_set.create(unix=unix,value=value)
-    return metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_cpu(request, id):
     def do(container, unix, value):
         container.cpucontainermetric_set.create(unix=unix,value=value)
-    return metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_io_read(request, id):
     def do(container, unix, value):
         container.ioreadcontainermetric_set.create(unix=unix,value=value)
-    return metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_io_write(request, id):
     def do(container, unix, value):
         container.iowritecontainermetric_set.create(unix=unix,value=value)
-    return metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_net_rx(request, id):
     def do(container, unix, value):
         container.networkrxcontainermetric_set.create(unix=unix,value=value)
-    return metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_net_tx(request, id):
     def do(container, unix, value):
         container.networktxcontainermetric_set.create(unix=unix,value=value)
-    return metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, do)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_quota(request, id):
     def do(container, unix, value):
         container.quotacontainermetric_set.create(unix=unix,value=value)
-    return metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, do)
 
-def metrics_container_do(request, container, qs):
+def metrics_container_do(request, container, qs, prefix):
     """
     you can ask metrics for a single day of the year (288 metrics is the worst/general case)
     if the day is today, the response is cached for 5 minutes, otherwise it is cached indefinitely
@@ -590,11 +590,16 @@ def metrics_container_do(request, container, qs):
         # this will trigger the db query
         if not UWSGI_IT_METRICS_CACHE: raise
         cache = get_cache(UWSGI_IT_METRICS_CACHE)
-        j = cache.get("%d_%d" % (container.uid, unix))
+        j = cache.get("%s_%d_%d" % (prefix, container.uid, unix))
+        print "J", j
         if not j:
+            print qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')
             j = [[m.unix,m.value] for m in qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')] 
-            cache.set("%d_%d" % (container.uid, unix), j, expires)
+            print j
+            cache.set("%s_%d_%d" % (prefix, container.uid, unix), j, expires)
     except: 
+        import sys
+        print sys.exc_info()
         j = [[m.unix,m.value] for m in qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')]
     return spit_json(request, j, expires)
 
@@ -605,7 +610,7 @@ def metrics_container_cpu(request, id):
         container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
-    return metrics_container_do(request, container, container.cpucontainermetric_set)
+    return metrics_container_do(request, container, container.cpucontainermetric_set, 'cpu')
 
 @need_basicauth
 def metrics_container_net_tx(request, id):
@@ -614,7 +619,7 @@ def metrics_container_net_tx(request, id):
         container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
-    return metrics_container_do(request, container, container.networktxcontainermetric_set)
+    return metrics_container_do(request, container, container.networktxcontainermetric_set, 'net.tx')
 
 @need_basicauth
 def metrics_container_net_rx(request, id):
@@ -623,7 +628,7 @@ def metrics_container_net_rx(request, id):
         container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
-    return metrics_container_do(request, container, container.networkrxcontainermetric_set)
+    return metrics_container_do(request, container, container.networkrxcontainermetric_set, 'net.rx')
 
 @need_basicauth
 def metrics_container_io_read(request, id):
@@ -632,7 +637,7 @@ def metrics_container_io_read(request, id):
         container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
-    return metrics_container_do(request, container, container.ioreadcontainermetric_set)
+    return metrics_container_do(request, container, container.ioreadcontainermetric_set, 'io.read')
 
 @need_basicauth
 def metrics_container_io_write(request, id):
@@ -641,7 +646,7 @@ def metrics_container_io_write(request, id):
         container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
-    return metrics_container_do(request, container, container.ioreadcontainermetric_set)
+    return metrics_container_do(request, container, container.ioreadcontainermetric_set, 'io.write')
 
 @need_basicauth
 def metrics_container_mem(request, id):
@@ -650,7 +655,7 @@ def metrics_container_mem(request, id):
         container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
-    return metrics_container_do(request, container, container.memorycontainermetric_set)
+    return metrics_container_do(request, container, container.memorycontainermetric_set, 'mem')
 
 @need_basicauth
 def metrics_container_quota(request, id):
@@ -659,4 +664,4 @@ def metrics_container_quota(request, id):
         container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden('Forbidden\n')
-    return metrics_container_do(request, container, container.quotacontainermetric_set)
+    return metrics_container_do(request, container, container.quotacontainermetric_set, 'quota')
