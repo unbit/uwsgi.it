@@ -169,6 +169,8 @@ class Container(models.Model):
 
     tags = models.ManyToManyField('Tag', blank=True)
 
+    nofollow = models.BooleanField(default=False)
+
     note = models.TextField(blank=True,null=True)
 
     def __unicode__(self):

@@ -192,7 +192,7 @@ def container(request, id):
     if request.method == 'POST':
         response = check_body(request)
         if response: return response
-        allowed_keys = ('name', 'note','quota_threshold', 'jid', 'jid_secret', 'jid_destinations')
+        allowed_keys = ('name', 'note','quota_threshold', 'jid', 'jid_secret', 'jid_destinations', 'nofollow')
         j = json.loads(request.read())
         if not j: return HttpResponseForbidden('Forbidden\n')
         for key in j:
@@ -252,6 +252,7 @@ def container(request, id):
         'jid': container.jid,
         'jid_destinations': container.jid_destinations,
         'quota_threshold': container.quota_threshold,
+        'nofollow': container.nofollow,
         'note': container.note,
         'linked_to': container.linked_to,
         'ssh_keys': container.ssh_keys,
