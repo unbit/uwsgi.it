@@ -47,4 +47,4 @@ Common pitfalls
 
 Your configurations like in $HOME/etc/apache2 NOT /etc/apache2 !!! (if you get permission errors, very probably you are in the wrong dir)
 
-
+If you need to install untrusted apps with an high vulnerability potential, consider installing apache instances in dedicated containers linked to the one working as proxy (and registering domains). In such a case you only need to set the http backend address to the 10.x.x.x one
