@@ -11,6 +11,7 @@ Installation
 ```sh
 cp -R /etc/apache2 $HOME/etc
 mkdir /var/log/apache2
+mkdir /var/lock
 ```
 
 Configuration
