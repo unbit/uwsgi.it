@@ -24,7 +24,7 @@ Edit $HOME/etc/apache2/sites-enabled/000-default to set your DocumentRoot
 Running it
 ==========
 
-Use this vassal as your base configuration
+Use this vassal as your base configuration (for precise and wheezy)
 
 ```ini
 [uwsgi]
@@ -42,6 +42,36 @@ route-run = http:127.0.0.1:8080
 smart-attach-daemon = /run/apache2.pid apache2ctl -k start -d $(HOME)/etc/apache2
 ```
 
+and this one for saucy
+
+```ini
+[uwsgi]
+; register the domains you need
+domain = example.com
+domain = example2.com
+domain = .foo.bar
+
+; load the http proxy router
+plugins = router_http
+offload-threads = 2
+; forward requests to apache
+route-run = http:127.0.0.1:8080
+; monitor the apache instance
+env = APACHE_CONFDIR=$(HOME)/etc/apache2
+smart-attach-daemon = /run/apache2.pid apache2ctl -k start
+```
+
+to reload the instance on precise and wheezy
+
+```sh
+apache2ctl -k restart -d $HOME/etc/apache2
+```
+
+on saucy
+
+```sh
+APACHE_CONFDIR=$HOME/etc/apache2 apache2ctl -k restart
+```
 
 Common pitfalls
 ===============
