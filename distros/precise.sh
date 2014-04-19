@@ -14,29 +14,6 @@ cd /root
 git clone https://github.com/unbit/nss-unbit
 cd nss-unbit
 make
-cd ..
-git clone https://github.com/unbit/uwsgi
-cd uwsgi
-make uwsgi.it
-cp uwsgi /opt/unbit/uwsgi/uwsgi
-/opt/unbit/uwsgi/uwsgi --build-plugin plugins/python
-cp python_plugin.so /opt/unbit/uwsgi/plugins
-PYTHON=python3 /opt/unbit/uwsgi/uwsgi --build-plugin "plugins/python python3"
-cp python3_plugin.so /opt/unbit/uwsgi/plugins
-/opt/unbit/uwsgi/uwsgi --build-plugin plugins/psgi
-cp psgi_plugin.so /opt/unbit/uwsgi/plugins
-/opt/unbit/uwsgi/uwsgi --build-plugin plugins/rack
-cp rack_plugin.so /opt/unbit/uwsgi/plugins
-/opt/unbit/uwsgi/uwsgi --build-plugin plugins/router_redirect
-cp router_redirect_plugin.so /opt/unbit/uwsgi/plugins
-/opt/unbit/uwsgi/uwsgi --build-plugin plugins/gevent
-cp gevent_plugin.so /opt/unbit/uwsgi/plugins/
-UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin "plugins/rack rack2"
-UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/fiber
-UWSGICONFIG_RUBYPATH=/usr/bin/ruby1.9.1 /opt/unbit/uwsgi/uwsgi --build-plugin plugins/rbthreads
-cp rack2_plugin.so fiber_plugin.so rbthreads_plugin.so /opt/unbit/uwsgi/plugins/
-/opt/unbit/uwsgi/uwsgi --build-plugin plugins/router_basicauth
-cp router_basicauth_plugin.so /opt/unbit/uwsgi/plugins
 EOF
 cp nsswitch.conf /distros/precise/etc/nsswitch.conf
 cp shortcuts.ini /distros/precise/opt/unbit/uwsgi/shortcuts.ini
