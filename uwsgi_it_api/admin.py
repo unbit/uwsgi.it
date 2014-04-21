@@ -44,8 +44,8 @@ class DomainAdmin(admin.ModelAdmin):
     form = DomainAdminForm
 
 class ContainerMetricAdmin(admin.ModelAdmin):
-    list_display = ('container', 'unix', 'value')
-    list_filter = ('container',)
+    list_display = ('container', 'year', 'month', 'day')
+    list_filter = ('container', 'year', 'month')
 
 class LegionAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'note')

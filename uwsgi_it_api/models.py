@@ -8,6 +8,7 @@ import string
 from Crypto.PublicKey import RSA
 from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 import random
+import datetime
 
 
 # Create your models here.
@@ -339,16 +340,20 @@ each metric is stored in a different table
 class ContainerMetric(models.Model):
 
     container = models.ForeignKey(Container)
-    # we use a standard number as we will deal with only unix timestamp since the epoch
-    unix = models.PositiveIntegerField() 
-    # 64bit value
-    value = models.BigIntegerField()
+
+    year = models.PositiveIntegerField(null=True)
+    month = models.PositiveIntegerField(null=True)
+    day = models.PositiveIntegerField(null=True)
+  
+    # this ia blob containing raw metrics
+    json = models.TextField(null=True)
 
     def __unicode__(self):
-        return str(self.unix)
+        return "%s-%s-%s" % (self.year, self.month, self.day)
 
     class Meta:
         abstract = True
+        unique_together = ('container', 'year', 'month', 'day')
 
 class DomainMetric(models.Model):
 

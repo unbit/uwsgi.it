@@ -14,8 +14,11 @@ import time
 from django.utils.http import http_date
 from django.core.cache import get_cache
 
-def spit_json(request, j, expires=0):
-    body = json.dumps(j)
+def spit_json(request, j, expires=0, raw=False):
+    if raw:
+        body = j
+    else:
+        body = json.dumps(j)
     if 'HTTP_USER_AGENT' in request.META:
         if 'curl/' in request.META['HTTP_USER_AGENT']: body += '\n'
     response = HttpResponse(body, content_type="application/json")
@@ -500,13 +503,7 @@ def domain(request, id):
     response.status_code = 405
     return response
 
-@need_basicauth
-def container_metrics_cpu(request, id):
-    container = request.user.customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
-    j = [[m.unix, m.value] for m in container.cpucontainermetric_set.all()]
-    return spit_json(request, j)
-
-def private_metrics_container_do(request, id, func):
+def private_metrics_container_do(request, id, metric):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
     container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
 
@@ -514,7 +511,15 @@ def private_metrics_container_do(request, id, func):
         response = check_body(request)
         if response: return response
         j = json.loads(request.read())
-        func(container, j['unix'], j['value'])
+        d = datetime.datetime.fromtimestamp(int(j['unix']))
+        try:
+            m = metric.objects.get(container=container,year=d.year,month=d.month,day=d.day)
+        except:
+            m = metric(container=container,year=d.year,month=d.month,day=d.day,json='[]')
+        m_json = json.loads(m.json)
+        m_json.append( [int(j['unix']), long(j['value'])])
+        m.json = json.dumps(m_json)
+        m.save()
         response = HttpResponse('Created\n')
         response.status_code = 201
     else:
@@ -525,51 +530,37 @@ def private_metrics_container_do(request, id, func):
 @csrf_exempt
 @need_certificate
 def private_metrics_container_mem(request, id):
-    def do(container, unix, value):
-        container.memorycontainermetric_set.create(unix=unix,value=value)
-    return private_metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, MemoryContainerMetric)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_cpu(request, id):
-    def do(container, unix, value):
-        container.cpucontainermetric_set.create(unix=unix,value=value)
-    return private_metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, CPUContainerMetric)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_io_read(request, id):
-    def do(container, unix, value):
-        container.ioreadcontainermetric_set.create(unix=unix,value=value)
-    return private_metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, IOReadContainerMetric)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_io_write(request, id):
-    def do(container, unix, value):
-        container.iowritecontainermetric_set.create(unix=unix,value=value)
-    return private_metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, IOWriteContainerMetric)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_net_rx(request, id):
-    def do(container, unix, value):
-        container.networkrxcontainermetric_set.create(unix=unix,value=value)
-    return private_metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, NetworkRXContainerMetric)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_net_tx(request, id):
-    def do(container, unix, value):
-        container.networktxcontainermetric_set.create(unix=unix,value=value)
-    return private_metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, NetworkTXContainerMetric)
 
 @csrf_exempt
 @need_certificate
 def private_metrics_container_quota(request, id):
-    def do(container, unix, value):
-        container.quotacontainermetric_set.create(unix=unix,value=value)
-    return private_metrics_container_do(request, id, do)
+    return private_metrics_container_do(request, id, QuotaContainerMetric)
 
 def metrics_container_do(request, container, qs, prefix):
     """
@@ -583,26 +574,24 @@ def metrics_container_do(request, container, qs, prefix):
     if 'year' in request.GET:year = int(request.GET['year'])
     if 'month' in request.GET: month = int(request.GET['month'])
     if 'day' in request.GET: day = int(request.GET['day'])
-    dt = datetime.date(year=year,month=month,day=day)
-    unix = int(time.mktime(dt.timetuple()))
     expires = 86400
     if day != today.day or month != today.month or year != today.year: expires = 300
     try:
         # this will trigger the db query
         if not UWSGI_IT_METRICS_CACHE: raise
         cache = get_cache(UWSGI_IT_METRICS_CACHE)
-        j = cache.get("%s_%d_%d" % (prefix, container.uid, unix))
-        print "J", j
+        j = cache.get("%s_%d_%d_%d_%d" % (prefix, container.uid, year, month, day))
         if not j:
-            print qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')
-            j = [[m.unix,m.value] for m in qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')] 
-            print j
-            cache.set("%s_%d_%d" % (prefix, container.uid, unix), j, expires)
+            j = qs.get(year=year,month=month,day=day).json
+            cache.set("%s_%d_%d_%d_%d" % (prefix, container.uid, year, month, day ), j, expires)
     except: 
         import sys
         print sys.exc_info()
-        j = [[m.unix,m.value] for m in qs.filter(unix__gte=unix,unix__lte=(unix+86400)).order_by('unix')]
-    return spit_json(request, j, expires)
+        try:
+            j = qs.get(year=year,month=month,day=day).json
+        except:
+            j = "[]"
+    return spit_json(request, j, expires, True)
 
 @need_basicauth
 def metrics_container_cpu(request, id):
