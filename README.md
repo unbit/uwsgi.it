@@ -42,9 +42,7 @@ Goals
 Status
 ------
 
-Currently we are in pre-beta status, the api is almost complete, while the example web interface is still in early stage of development.
-
-Beta phase will officially start soon after the installation docs are complete.
+Currently we are in beta status, the api is almost complete, while the example web interface is still in early stage of development.
 
 
 How it works
