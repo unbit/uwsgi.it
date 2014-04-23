@@ -107,7 +107,7 @@ for(;;) {
 
 	my $net_json = undef;
 	# get json stats from the tuntap router
-	my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1:5001');
+	my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1:5002');
 	if ($s) {
 		my $tuntap_json = '';
 		for(;;) {
