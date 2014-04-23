@@ -21,8 +21,8 @@ class ContainerAdminForm(ModelForm):
             self.fields['tags'].widget = HiddenInput()
 
 class ContainerAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage')
-    list_filter = ('server', 'distro')
+    list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', 'accounted')
+    list_filter = ('server', 'distro', 'accounted')
     search_fields = ('name', 'customer__user__username', 'tags__name')
 
     form = ContainerAdminForm

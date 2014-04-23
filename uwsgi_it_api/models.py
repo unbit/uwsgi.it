@@ -183,6 +183,8 @@ class Container(models.Model):
 
     note = models.TextField(blank=True,null=True)
 
+    accounted = models.BooleanField(default=False)
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
