@@ -45,6 +45,15 @@ class Customer(models.Model):
     def __unicode__(self):
         return self.user.username
 
+class CustomerAttribute(models.Model):
+    customer = models.ForeignKey(Customer)
+    namespace = models.CharField(max_length=255)
+    key = models.CharField(max_length=255)
+    value = models.TextField(blank=True)
+
+    class Meta:
+        unique_together = ( 'customer', 'namespace', 'key')
+
 class Datacenter(models.Model):
     name = models.CharField(max_length=255,unique=True)
     description = models.TextField(blank=True,null=True)
@@ -358,17 +367,20 @@ class ContainerMetric(models.Model):
 class DomainMetric(models.Model):
 
     domain = models.ForeignKey(Domain)
-    server = models.ForeignKey(Server)
-    # we use a standard number as we will deal with only unix timestamp since the epoch
-    unix = models.PositiveIntegerField()
-    # 64bit value
-    value = models.BigIntegerField()
+    container = models.ForeignKey(Container)
+    year = models.PositiveIntegerField(null=True)
+    month = models.PositiveIntegerField(null=True)
+    day = models.PositiveIntegerField(null=True)
+
+    # this ia blob containing raw metrics
+    json = models.TextField(null=True)
 
     def __unicode__(self):
-        return self.unix
-    
+        return "%s-%s-%s" % (self.year, self.month, self.day)
+
     class Meta:
         abstract = True
+        unique_together = ('domain', 'container', 'year', 'month', 'day')
 
 """
 real metrics now

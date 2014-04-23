@@ -45,7 +45,11 @@ class DomainAdmin(admin.ModelAdmin):
 
 class ContainerMetricAdmin(admin.ModelAdmin):
     list_display = ('container', 'year', 'month', 'day')
-    list_filter = ('container', 'year', 'month')
+    list_filter = ('year', 'month')
+
+class DomainMetricAdmin(admin.ModelAdmin):
+    list_display = ('domain', 'container', 'year', 'month', 'day')
+    list_filter = ('year', 'month')
 
 class LegionAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'note')
@@ -65,6 +69,7 @@ admin.site.register(ContainerLink)
 admin.site.register(Datacenter)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(CustomService)
+admin.site.register(CustomerAttribute)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
 admin.site.register(NetworkTXContainerMetric,ContainerMetricAdmin)
@@ -73,3 +78,7 @@ admin.site.register(MemoryContainerMetric,ContainerMetricAdmin)
 admin.site.register(IOReadContainerMetric,ContainerMetricAdmin)
 admin.site.register(IOWriteContainerMetric,ContainerMetricAdmin)
 admin.site.register(QuotaContainerMetric,ContainerMetricAdmin)
+
+admin.site.register(HitsDomainMetric,DomainMetricAdmin)
+admin.site.register(NetworkRXDomainMetric,DomainMetricAdmin)
+admin.site.register(NetworkTXDomainMetric,DomainMetricAdmin)
