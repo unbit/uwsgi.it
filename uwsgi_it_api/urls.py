@@ -15,6 +15,10 @@ urlpatterns = patterns('uwsgi_it_api.views',
     (r'^private/metrics/container.mem/(\d+)$', 'private_metrics_container_mem'),
     (r'^private/metrics/container.quota/(\d+)$', 'private_metrics_container_quota'),
 
+    (r'^private/metrics/domain.net.rx/(\d+)$', 'private_metrics_domain_net_rx'),
+    (r'^private/metrics/domain.net.tx/(\d+)$', 'private_metrics_domain_net_tx'),
+    (r'^private/metrics/domain.hits/(\d+)$', 'private_metrics_domain_hits'),
+
     (r'^me/?$', 'me'),
     (r'^me/containers/?$', 'containers'),
     (r'^containers/?$', 'containers'),

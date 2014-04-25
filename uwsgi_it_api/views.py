@@ -503,6 +503,46 @@ def domain(request, id):
     response.status_code = 405
     return response
 
+def private_metrics_domain_do(request, id, metric):
+    server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+    container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        d = datetime.datetime.fromtimestamp(int(j['unix']))
+        domain = Domain.objects.get(name=j['domain'],customer=container.customer)
+        try:
+            m = metric.objects.get(domain=domain,container=container,year=d.year,month=d.month,day=d.day)
+        except:
+            m = metric(domain=domain,container=container,year=d.year,month=d.month,day=d.day,json='[]')
+        m_json = json.loads(m.json)
+        m_json.append( [int(j['unix']), long(j['value'])])
+        m.json = json.dumps(m_json)
+        m.save()
+        response = HttpResponse('Created\n')
+        response.status_code = 201
+    else:
+        response = HttpResponse('Method not allowed\n')
+        response.status_code = 405
+    return response
+
+@csrf_exempt
+@need_certificate
+def private_metrics_domain_net_rx(request, id):
+    return private_metrics_domain_do(request, id, NetworkRXDomainMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_domain_net_tx(request, id):
+    return private_metrics_domain_do(request, id, NetworkTXDomainMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_domain_hits(request, id):
+    return private_metrics_domain_do(request, id, HitsDomainMetric)
+
 def private_metrics_container_do(request, id, metric):
     server = Server.objects.get(address=request.META['REMOTE_ADDR'])
     container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
