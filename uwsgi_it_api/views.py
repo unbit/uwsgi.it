@@ -695,3 +695,67 @@ def metrics_container_quota(request, id):
     except:
         return HttpResponseForbidden('Forbidden\n')
     return metrics_container_do(request, container, container.quotacontainermetric_set, 'quota')
+
+def metrics_domain_do(request, domain, qs, prefix):
+    """
+    you can ask metrics for a single day of the year (288 metrics is the worst/general case)
+    if the day is today, the response is cached for 5 minutes, otherwise it is cached indefinitely
+    """
+    today = datetime.datetime.today()
+    year = today.year
+    month = today.month
+    day = today.day
+    if 'year' in request.GET:year = int(request.GET['year'])
+    if 'month' in request.GET: month = int(request.GET['month'])
+    if 'day' in request.GET: day = int(request.GET['day'])
+    expires = 86400
+    if day != today.day or month != today.month or year != today.year: expires = 300
+    try:
+        # this will trigger the db query
+        if not UWSGI_IT_METRICS_CACHE: raise
+        cache = get_cache(UWSGI_IT_METRICS_CACHE)
+        j = cache.get("%s_%d_%d_%d_%d" % (prefix, domain.id, year, month, day))
+        if not j:
+            j_list = []
+            for m in qs.filter(year=year,month=month,day=day):
+                j_list.append('{ "container": %d, "metrics": %s }' % (m.container.uid, m.json))
+            j = '[' + ','.join(j_list) + ']'
+            cache.set("%s_%d_%d_%d_%d" % (prefix, domain.id, year, month, day ), j, expires)
+    except:
+        import sys
+        print sys.exc_info()
+        try:
+            j_list = []
+            for m in qs.filter(year=year,month=month,day=day):
+                j_list.append('{ "container": %d, "metrics": %s }' % (m.container.uid, m.json))
+            j = '[' + ','.join(j_list) + ']'
+        except:
+            j = "[]"
+    return spit_json(request, j, expires, True)
+
+@need_basicauth
+def metrics_domain_net_rx(request, id):
+    customer = request.user.customer
+    try:
+        domain = customer.domain_set.get(pk=id)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_domain_do(request, domain, domain.networkrxdomainmetric_set, 'domain.net.rx')
+
+@need_basicauth
+def metrics_domain_net_tx(request, id):
+    customer = request.user.customer
+    try:
+        domain = customer.domain_set.get(pk=id)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_domain_do(request, domain, domain.networktxdomainmetric_set, 'domain.net.tx')
+
+@need_basicauth
+def metrics_domain_hits(request, id):
+    customer = request.user.customer
+    try:
+        domain = customer.domain_set.get(pk=id)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_domain_do(request, domain, domain.hitsdomainmetric_set, 'domain.hits')
