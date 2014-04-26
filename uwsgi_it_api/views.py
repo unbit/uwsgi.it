@@ -62,8 +62,8 @@ def need_basicauth(func, realm='uwsgi.it api'):
                         request.user = user
                         return func(request, *args, **kwargs)
         elif request.META.has_key('HTTP_X_UWSGI_IT_USERNAME') and request.META.has_key('HTTP_X_UWSGI_IT_PASSWORD'):
-            uname = request.META['HTTP_X_UWSGI_IT_USERNAME']
-            passwd = request.META['HTTP_X_UWSGI_IT_PASSWORD']
+            uname = request.META['HTTP_X_UWSGI_IT_USERNAME'].decode('hex')
+            passwd = request.META['HTTP_X_UWSGI_IT_PASSWORD'].decode('hex')
             user = authenticate(username=uname, password=passwd)
             if user and user.is_active:
                 login(request, user)
