@@ -409,8 +409,10 @@ def tags(request):
                 setattr(tag, key, j[key])
         try:
             tag.save()
-            response = HttpResponse('Created\n')
+            j = {'id':tag.pk, 'name':tag.name, 'note':tag.note}
+            response = spit_json(request, j)
             response.status_code = 201
+            response.reason_phrase = 'Created'
         except:
             response = HttpResponse('Conflict\n')
             response.status_code = 409
