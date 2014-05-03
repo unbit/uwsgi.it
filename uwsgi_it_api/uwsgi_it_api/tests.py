@@ -18,11 +18,29 @@ class FakeSession(SessionBase):
 
 class ViewsTest(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
         self.user = User.objects.create_user(
             username='test', email='test@uwsgi.it', password='top_secret')
         self.basic_auth = 'basic %s' % (base64.b64encode('test:top_secret'))
-        self.customer = Customer(user=self.user).save()
+
+        self.server, _ = Server.objects.get_or_create(
+            name="server",
+            address="10.0.0.1",
+            hd="hd",
+            memory=100,
+            storage=100
+        )
+        self.customer, _ = Customer.objects.get_or_create(user=self.user)
+        self.container, _ = Container.objects.get_or_create(
+            customer=self.customer,
+            server=self.server,
+            memory=10,
+            storage=10,
+            name="container"
+        )
+        self.domain, _ = Domain.objects.get_or_create(customer=self.customer, name="domain")
+        self.tag, _ = Tag.objects.get_or_create(customer=self.customer, name="tag")
+
+        self.factory = RequestFactory()
 
     def logged_get_response_for_view(self, path, view, kwargs=None):
         request = self.factory.get(path, {}, HTTP_AUTHORIZATION=self.basic_auth)
@@ -46,8 +64,9 @@ class ApiTest(ViewsTest):
         self.assertEqual(response.status_code, 200)
 
     def test_container(self):
-        response = self.logged_get_response_for_view('/containers/1', container, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        uid = self.container.uid
+        response = self.logged_get_response_for_view('/containers/1', container, {'id': uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_distros(self):
         response = self.logged_get_response_for_view('/distros', distros)
@@ -58,16 +77,16 @@ class ApiTest(ViewsTest):
         self.assertEqual(response.status_code, 200)
 
     def test_domain(self):
-        response = self.logged_get_response_for_view('/domains/1', domain, {'id': 1})
-        self.assertEqual(response.status_code, 404)
+        response = self.logged_get_response_for_view('/domains/1', domain, {'id': self.domain.pk})
+        self.assertEqual(response.status_code, 200)
 
     def test_tags(self):
         response = self.logged_get_response_for_view('/tags', tags)
         self.assertEqual(response.status_code, 200)
 
     def test_tag(self):
-        response = self.logged_get_response_for_view('/tags/1', tag, {'id': 1})
-        self.assertEqual(response.status_code, 404)
+        response = self.logged_get_response_for_view('/tags/1', tag, {'id': self.tag.pk})
+        self.assertEqual(response.status_code, 200)
 
 class MetricsViewsTest(ViewsTest):
     def test_io_read(self):
@@ -99,16 +118,16 @@ class MetricsViewsTest(ViewsTest):
         self.assertEqual(response.status_code, 403)
 
     def test_domain_net_rx(self):
-        response = self.logged_get_response_for_view('/metrics/domain.net.txt/1', metrics_domain_net_rx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/domain.net.txt/1', metrics_domain_net_rx, {'id': self.domain.pk})
+        self.assertEqual(response.status_code, 200)
 
     def test_domain_net_tx(self):
-        response = self.logged_get_response_for_view('/metrics/domain.net.rx/1', metrics_domain_net_tx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/domain.net.rx/1', metrics_domain_net_tx, {'id': self.domain.pk})
+        self.assertEqual(response.status_code, 200)
 
     def test_domain_hits(self):
-        response = self.logged_get_response_for_view('/metrics/domain.hits/1', metrics_domain_hits, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/domain.hits/1', metrics_domain_hits, {'id': self.domain.pk})
+        self.assertEqual(response.status_code, 200)
 
 class PrivateViewsTest(ViewsTest):
     def test_containers(self):
