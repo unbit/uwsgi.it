@@ -1,0 +1,4 @@
+*.pyc
+*.swp
+uwsgi_it_api/uwsgi_it_api.egg-info/
+uwsgi_it_api/dist

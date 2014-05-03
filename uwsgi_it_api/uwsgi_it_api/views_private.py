@@ -1,0 +1,180 @@
+from django.http import HttpResponse, HttpResponseForbidden
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+
+from uwsgi_it_api.utils import spit_json, check_body
+from uwsgi_it_api.decorators import need_certificate
+from uwsgi_it_api.models import *
+from uwsgi_it_api.config import UWSGI_IT_BASE_UID
+
+import json
+import datetime
+
+@need_certificate
+def private_custom_services(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        j = [{'customer':service.customer.pk, 'config': service.config, 'mtime': service.munix, 'id': service.pk } for service in server.customservice_set.all()]
+        return spit_json(request, j)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+
+@need_certificate
+def private_containers(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        j = [{'uid':container.uid, 'mtime': container.munix } for container in server.container_set.exclude(distro__isnull=True).exclude(ssh_keys_raw__exact='').exclude(ssh_keys_raw__isnull=True)]
+        return spit_json(request, j)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+
+@need_certificate
+def private_container_ini(request, id):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+        if not container.distro or not container.ssh_keys_raw: raise Exception("invalid container")
+        j = render_to_string('vassal.ini', {'container': container})
+        return HttpResponse(j, content_type="text/plain")
+    except:
+        return HttpResponseForbidden('Forbidden\n')    
+
+@need_certificate
+def private_legion_nodes(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        nodes = [] 
+        unix = server.munix
+        for node in server.legion.server_set.all():
+            if node.address != server.address:
+                if node.munix > unix: unix = node.munix
+                nodes.append(node.address)
+        return HttpResponse(json.dumps({'unix': unix, 'nodes':nodes}), content_type="text/plain")
+    except:
+        return HttpResponseForbidden('Forbidden\n')    
+
+@need_certificate
+def private_nodes(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        nodes = []
+        unix = server.munix
+        for node in Server.objects.all():
+            if node.address != server.address:
+                if node.munix > unix: unix = node.munix
+                nodes.append(node.address)
+        return HttpResponse(json.dumps({'unix': unix, 'nodes':nodes}), content_type="text/plain")
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    
+
+@need_certificate
+def private_domains_rsa(request):
+    server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+    server_customers = Customer.objects.filter(container__server=server)
+    j = []
+    for customer in server_customers:
+        domains = []
+        for domain in customer.domain_set.all():
+            domains.append({'name': domain.name, 'mtime': domain.munix})
+        j.append({'rsa': customer.rsa_pubkey, 'domains': domains })
+    return spit_json(request, j)
+
+def private_metrics_domain_do(request, id, metric):
+    server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+    container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        d = datetime.datetime.fromtimestamp(int(j['unix']))
+        domain = Domain.objects.get(name=j['domain'],customer=container.customer)
+        try:
+            m = metric.objects.get(domain=domain,container=container,year=d.year,month=d.month,day=d.day)
+        except:
+            m = metric(domain=domain,container=container,year=d.year,month=d.month,day=d.day,json='[]')
+        m_json = json.loads(m.json)
+        m_json.append( [int(j['unix']), long(j['value'])])
+        m.json = json.dumps(m_json)
+        m.save()
+        response = HttpResponse('Created\n')
+        response.status_code = 201
+    else:
+        response = HttpResponse('Method not allowed\n')
+        response.status_code = 405
+    return response
+
+@csrf_exempt
+@need_certificate
+def private_metrics_domain_net_rx(request, id):
+    return private_metrics_domain_do(request, id, NetworkRXDomainMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_domain_net_tx(request, id):
+    return private_metrics_domain_do(request, id, NetworkTXDomainMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_domain_hits(request, id):
+    return private_metrics_domain_do(request, id, HitsDomainMetric)
+
+def private_metrics_container_do(request, id, metric):
+    server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+    container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+
+    if request.method == 'POST':
+        response = check_body(request)
+        if response: return response
+        j = json.loads(request.read())
+        d = datetime.datetime.fromtimestamp(int(j['unix']))
+        try:
+            m = metric.objects.get(container=container,year=d.year,month=d.month,day=d.day)
+        except:
+            m = metric(container=container,year=d.year,month=d.month,day=d.day,json='[]')
+        m_json = json.loads(m.json)
+        m_json.append( [int(j['unix']), long(j['value'])])
+        m.json = json.dumps(m_json)
+        m.save()
+        response = HttpResponse('Created\n')
+        response.status_code = 201
+    else:
+        response = HttpResponse('Method not allowed\n')
+        response.status_code = 405
+    return response
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_mem(request, id):
+    return private_metrics_container_do(request, id, MemoryContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_cpu(request, id):
+    return private_metrics_container_do(request, id, CPUContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_io_read(request, id):
+    return private_metrics_container_do(request, id, IOReadContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_io_write(request, id):
+    return private_metrics_container_do(request, id, IOWriteContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_net_rx(request, id):
+    return private_metrics_container_do(request, id, NetworkRXContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_net_tx(request, id):
+    return private_metrics_container_do(request, id, NetworkTXContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_quota(request, id):
+    return private_metrics_container_do(request, id, QuotaContainerMetric)
