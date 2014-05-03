@@ -1,7 +1,0 @@
-django
-south
-ipaddress
-psycopg2
-dnspython
-pycrypto
-pylibmc
