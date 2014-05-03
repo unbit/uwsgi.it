@@ -8,6 +8,7 @@ from uwsgi_it_api.views_metrics import *
 from uwsgi_it_api.views_private import *
 
 import base64
+import datetime
 
 class FakeSession(SessionBase):
     def create(self):
@@ -22,6 +23,7 @@ class ViewsTest(TestCase):
             username='test', email='test@uwsgi.it', password='top_secret')
         self.basic_auth = 'basic %s' % (base64.b64encode('test:top_secret'))
 
+        # customer api
         self.server, _ = Server.objects.get_or_create(
             name="server",
             address="10.0.0.1",
@@ -37,8 +39,75 @@ class ViewsTest(TestCase):
             storage=10,
             name="container"
         )
+        self.c_uid = self.container.uid
         self.domain, _ = Domain.objects.get_or_create(customer=self.customer, name="domain")
         self.tag, _ = Tag.objects.get_or_create(customer=self.customer, name="tag")
+
+        # metrics
+        today = datetime.datetime.today()
+        NetworkRXContainerMetric.objects.create(
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        NetworkTXContainerMetric.objects.create(
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        CPUContainerMetric.objects.create(
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        MemoryContainerMetric.objects.create(
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        IOReadContainerMetric.objects.create(
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        IOWriteContainerMetric.objects.create(
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        QuotaContainerMetric.objects.create(
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        HitsDomainMetric.objects.create(
+            domain=self.domain,
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        NetworkRXDomainMetric.objects.create(
+            domain=self.domain,
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
+        NetworkTXDomainMetric.objects.create(
+            domain=self.domain,
+            container=self.container,
+            year=today.year,
+            month=today.month,
+            day=today.day,
+        )
 
         self.factory = RequestFactory()
 
@@ -64,8 +133,7 @@ class ApiTest(ViewsTest):
         self.assertEqual(response.status_code, 200)
 
     def test_container(self):
-        uid = self.container.uid
-        response = self.logged_get_response_for_view('/containers/1', container, {'id': uid})
+        response = self.logged_get_response_for_view('/containers/1', container, {'id': self.c_uid})
         self.assertEqual(response.status_code, 200)
 
     def test_distros(self):
@@ -88,34 +156,32 @@ class ApiTest(ViewsTest):
         response = self.logged_get_response_for_view('/tags/1', tag, {'id': self.tag.pk})
         self.assertEqual(response.status_code, 200)
 
-class MetricsViewsTest(ViewsTest):
-    def test_io_read(self):
-        response = self.logged_get_response_for_view('/metrics/container.io.read/1', metrics_container_io_read, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/container.io.read/1', metrics_container_io_read, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_io_write(self):
-        response = self.logged_get_response_for_view('/metrics/container.io.write/1', metrics_container_io_write, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/container.io.write/1', metrics_container_io_write, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_net_rx(self):
-        response = self.logged_get_response_for_view('/metrics/container.net.rx/1', metrics_container_net_rx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/container.net.rx/1', metrics_container_net_rx, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_net_tx(self):
-        response = self.logged_get_response_for_view('/metrics/container.net.tx/1', metrics_container_net_tx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/container.net.tx/1', metrics_container_net_tx, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_cpu(self):
-        response = self.logged_get_response_for_view('/metrics/container.cpu/1', metrics_container_cpu, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/container.cpu/1', metrics_container_cpu, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_mem(self):
-        response = self.logged_get_response_for_view('/metrics/container.mem/1', metrics_container_mem, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/container.mem/1', metrics_container_mem, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_quota(self):
-        response = self.logged_get_response_for_view('/metrics/container.quota/1', metrics_container_quota, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/metrics/container.quota/1', metrics_container_quota, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 200)
 
     def test_domain_net_rx(self):
         response = self.logged_get_response_for_view('/metrics/domain.net.txt/1', metrics_domain_net_rx, {'id': self.domain.pk})
