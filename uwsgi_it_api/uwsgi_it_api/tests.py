@@ -22,11 +22,12 @@ class ViewsTest(TestCase):
         self.user = User.objects.create_user(
             username='test', email='test@uwsgi.it', password='top_secret')
         self.basic_auth = 'basic %s' % (base64.b64encode('test:top_secret'))
+        self.server_address = "10.0.0.1"
 
         # customer api
         self.server, _ = Server.objects.get_or_create(
             name="server",
-            address="10.0.0.1",
+            address=self.server_address,
             hd="hd",
             memory=100,
             storage=100
@@ -112,7 +113,12 @@ class ViewsTest(TestCase):
         self.factory = RequestFactory()
 
     def logged_get_response_for_view(self, path, view, kwargs=None):
-        request = self.factory.get(path, {}, HTTP_AUTHORIZATION=self.basic_auth)
+        headers = {
+            'HTTP_AUTHORIZATION': self.basic_auth,
+            'HTTPS_DN': 'hithere',
+            'REMOTE_ADDR': self.server_address,
+        }
+        request = self.factory.get(path, {}, **headers)
         request.user = self.user
         request.session = FakeSession()
         if kwargs is None:
@@ -198,7 +204,7 @@ class ApiTest(ViewsTest):
 class PrivateViewsTest(ViewsTest):
     def test_containers(self):
         response = self.logged_get_response_for_view('/private/containers/', private_containers)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def test_container(self):
         response = self.logged_get_response_for_view('/private/containers/1.ini', private_container_ini, {'id': 1})
@@ -210,53 +216,53 @@ class PrivateViewsTest(ViewsTest):
 
     def test_nodes(self):
         response = self.logged_get_response_for_view('/private/nodes', private_nodes)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def test_domains_rsa(self):
         response = self.logged_get_response_for_view('/private/domains/rsa/', private_domains_rsa)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def custom_services(self):
         response = self.logged_get_response_for_view('/private/custom_services/', private_custom_services)
         self.assertEqual(response.status_code, 200)
 
     def test_io_read(self):
-        response = self.logged_get_response_for_view('/private/metrics/container.io.read/1', private_metrics_container_io_read, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/container.io.read/1', private_metrics_container_io_read, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_io_write(self):
-        response = self.logged_get_response_for_view('/private/metrics/container.io.write/1', private_metrics_container_io_write, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/container.io.write/1', private_metrics_container_io_write, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_net_rx(self):
-        response = self.logged_get_response_for_view('/private/metrics/container.net.rx/1', private_metrics_container_net_rx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/container.net.rx/1', private_metrics_container_net_rx, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_net_tx(self):
-        response = self.logged_get_response_for_view('/private/metrics/container.net.tx/1', private_metrics_container_net_tx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/container.net.tx/1', private_metrics_container_net_tx, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_cpu(self):
-        response = self.logged_get_response_for_view('/private/metrics/container.cpu/1', private_metrics_container_cpu, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/container.cpu/1', private_metrics_container_cpu, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_mem(self):
-        response = self.logged_get_response_for_view('/private/metrics/container.mem/1', private_metrics_container_mem, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/container.mem/1', private_metrics_container_mem, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_quota(self):
-        response = self.logged_get_response_for_view('/private/metrics/container.quota/1', private_metrics_container_quota, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/container.quota/1', private_metrics_container_quota, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_domain_net_rx(self):
-        response = self.logged_get_response_for_view('/private/metrics/domain.net.txt/1', private_metrics_domain_net_rx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/domain.net.txt/1', private_metrics_domain_net_rx, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_domain_net_tx(self):
-        response = self.logged_get_response_for_view('/private/metrics/domain.net.rx/1', private_metrics_domain_net_tx, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/domain.net.rx/1', private_metrics_domain_net_tx, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
     def test_domain_hits(self):
-        response = self.logged_get_response_for_view('/private/metrics/domain.hits/1', private_metrics_domain_hits, {'id': 1})
-        self.assertEqual(response.status_code, 403)
+        response = self.logged_get_response_for_view('/private/metrics/domain.hits/1', private_metrics_domain_hits, {'id': self.c_uid})
+        self.assertEqual(response.status_code, 405)
 
