@@ -6,7 +6,7 @@ The next-generation Unbit hosting platform
 Intro
 -----
 
-contrary to the current unbit.it hosting platform, the next generation one will be:
+contrary to the old unbit.it hosting platform, the new one is:
 
 - fully open source (currently at least 60% of the unbit.it kernel patches are not released to the public)
 - can be installed on vanilla kernels
@@ -42,7 +42,9 @@ Goals
 Status
 ------
 
-Currently we are in beta status, the api is almost complete, while the example web interface is still in early stage of development.
+Currently the platform is in-production for unbit.it services, and working on hetzner and ovh hardware.
+
+You still need a bit of work to install on your systems. Contact info@unbit.it for more infos.
 
 
 How it works
@@ -83,8 +85,6 @@ Three perl processes manage the infrastruture configuration:
 - dominator.pl -> manage domains to rsa key mappings
 - collector.pl -> gather statistics from the various exposed metrics
 
-
-A web interface written in perl/Dancer will integrate with the api to give users/customer a user-friendly tool
 
 
 TODO
