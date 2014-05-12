@@ -8,20 +8,23 @@ from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 
 import json
 
+
 @need_basicauth
 @csrf_exempt
 def container(request, id):
     customer = request.user.customer
     try:
-        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+        container = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
     except:
-        return HttpResponseForbidden('Forbidden\n')
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
     if request.method == 'POST':
         response = check_body(request)
-        if response: return response
-        allowed_keys = ('name', 'note','quota_threshold', 'jid', 'jid_secret', 'jid_destinations', 'nofollow')
+        if response:
+            return response
+        allowed_keys = ('name', 'note', 'quota_threshold', 'jid', 'jid_secret', 'jid_destinations', 'nofollow')
         j = json.loads(request.read())
-        if not j: return HttpResponseForbidden('Forbidden\n')
+        if not j:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
         for key in j:
             if key in allowed_keys:
                 setattr(container, key, j[key])
@@ -39,7 +42,7 @@ def container(request, id):
             new_tags = []
             for tag in j['tags']:
                 try:
-                    new_tags.append(Tag.objects.get(customer=customer,name=tag))
+                    new_tags.append(Tag.objects.get(customer=customer, name=tag))
                 except:
                     pass
             container.tags = new_tags
@@ -47,19 +50,19 @@ def container(request, id):
             try:
                 link = ContainerLink()
                 link.container = container
-                link.to = Container.objects.get(pk=(int(j['link'])-UWSGI_IT_BASE_UID))
+                link.to = Container.objects.get(pk=(int(j['link']) - UWSGI_IT_BASE_UID))
                 link.full_clean()
                 link.save()
             except:
-                response = HttpResponse('Conflict\n')
+                response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
                 response.status_code = 409
                 return response
         if 'unlink' in j:
             try:
-                link = container.containerlink_set.get(to=(int(j['unlink'])-UWSGI_IT_BASE_UID))
+                link = container.containerlink_set.get(to=(int(j['unlink']) - UWSGI_IT_BASE_UID))
                 link.delete()
             except:
-                response = HttpResponse('Conflict\n')
+                response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
                 response.status_code = 409
                 return response
         container.save()
@@ -92,13 +95,15 @@ def container(request, id):
         c['legion_address'] = container.server.legion.address
     return spit_json(request, c)
 
+
 @need_basicauth
 @csrf_exempt
 def me(request):
     customer = request.user.customer
     if request.method == 'POST':
         response = check_body(request)
-        if response: return response
+        if response:
+            return response
         allowed_keys = ('vat', 'company')
         j = json.loads(request.read())
         for key in j:
@@ -117,35 +122,38 @@ def me(request):
     }
     return spit_json(request, c)
 
+
 @need_basicauth
 @csrf_exempt
 def containers(request):
     if request.method == 'POST':
         response = check_body(request)
-        if response: return response
+        if response:
+            return response
         j = json.loads(request.read())
         needed_keys = ('server', 'name', 'memory', 'storage')
         for k in needed_keys:
-            if not k in j.keys(): return HttpResponseForbidden('Forbidden\n')
+            if not k in j.keys():
+                return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
         try:
             server = Server.objects.get(address=j['server'])
             if server.owner != request.user.customer:
-                return HttpResponseForbidden('Forbidden\n') 
+                return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
         except:
-            return HttpResponseForbidden('Forbidden\n')
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
         try:
-            container = Container(customer=request.user.customer,server=server)
+            container = Container(customer=request.user.customer, server=server)
             container.name = j['name']
             container.memory = int(j['memory'])
             container.storage = int(j['storage'])
             container.save()
-            response = HttpResponse('Created\n')
+            response = HttpResponse(json.dumps({'message': 'Created'}), content_type="application/json")
             response.status_code = 201
             return response
         except:
-            response = HttpResponse('Conflict\n')
+            response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
             response.status_code = 409
-            return response 
+            return response
     c = []
     for container in request.user.customer.container_set.all():
         cc = {
@@ -166,14 +174,15 @@ def containers(request):
             cc['distro'] = container.distro.pk
             cc['distro_name'] = container.distro.name
         c.append(cc)
-        
 
     return spit_json(request, c)
 
+
 @need_basicauth
 def distros(request):
-    j = [{'id':d.pk, 'name':d.name} for d in Distro.objects.all()]
+    j = [{'id': d.pk, 'name': d.name} for d in Distro.objects.all()]
     return spit_json(request, j)
+
 
 @need_basicauth
 @csrf_exempt
@@ -182,41 +191,46 @@ def domains(request):
 
     if request.method == 'POST':
         response = check_body(request)
-        if response: return response
+        if response:
+            return response
         j = json.loads(request.read())
         if Domain.objects.filter(name=j['name']):
-            response = HttpResponse('Conflict\n')
+            response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
             response.status_code = 409
             return response
         if dns_check(j['name'], customer.uuid):
             try:
                 customer.domain_set.create(name=j['name'])
-                response = HttpResponse('Created\n')
+                response = HttpResponse(json.dumps({'message': 'Created'}), content_type="application/json")
                 response.status_code = 201
             except:
-                response = HttpResponse('Conflict\n')
+                response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
                 response.status_code = 409
             return response
         else:
-            return HttpResponseForbidden('Forbidden\n')
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
 
     elif request.method == 'DELETE':
         response = check_body(request)
-        if response: return response
+        if response:
+            return response
         j = json.loads(request.read())
         customer.domain_set.get(name=j['name']).delete()
-        return HttpResponse('Ok\n')
+        return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
 
     elif request.method == 'GET':
         if 'tags' in request.GET:
-            j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in customer.domain_set.filter(tags__name__in=request.GET['tags'].split(','))]
+            j = [{'id': d.pk, 'name': d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in
+                 customer.domain_set.filter(tags__name__in=request.GET['tags'].split(','))]
         else:
-            j = [{'id':d.pk, 'name':d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in customer.domain_set.all()]
+            j = [{'id': d.pk, 'name': d.name, 'uuid': d.uuid, 'tags': [t.name for t in d.tags.all()]} for d in
+                 customer.domain_set.all()]
         return spit_json(request, j)
 
-    response = HttpResponse('Method not allowed\n')
+    response = HttpResponse(json.dumps({'error': 'Method not allowed'}), content_type="application/json")
     response.status_code = 405
     return response
+
 
 @need_basicauth
 @csrf_exempt
@@ -225,7 +239,8 @@ def tags(request):
     allowed_keys = ('name', 'note')
     if request.method == 'POST':
         response = check_body(request)
-        if response: return response
+        if response:
+            return response
         j = json.loads(request.read())
         tag = Tag(customer=customer)
         for key in allowed_keys:
@@ -233,21 +248,22 @@ def tags(request):
                 setattr(tag, key, j[key])
         try:
             tag.save()
-            j = {'id':tag.pk, 'name':tag.name, 'note':tag.note}
+            j = {'id': tag.pk, 'name': tag.name, 'note': tag.note}
             response = spit_json(request, j)
             response.status_code = 201
             response.reason_phrase = 'Created'
         except:
-            response = HttpResponse('Conflict\n')
+            response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
             response.status_code = 409
         return response
-        
+
     elif request.method == 'GET':
-        j = [{'id':t.pk, 'name':t.name} for t in Tag.objects.filter(customer=customer)]
+        j = [{'id': t.pk, 'name': t.name} for t in Tag.objects.filter(customer=customer)]
         return spit_json(request, j)
-    response = HttpResponse('Method not allowed\n')
+    response = HttpResponse(json.dumps({'error': 'Method not allowed'}), content_type="application/json")
     response.status_code = 405
     return response
+
 
 @need_basicauth
 @csrf_exempt
@@ -256,34 +272,36 @@ def tag(request, id):
     try:
         t = Tag.objects.get(customer=customer, pk=id)
     except:
-        return HttpResponseNotFound('Not Found\n')        
+        return HttpResponseNotFound(json.dumps({'error': 'Not found'}), content_type="application/json")
 
     allowed_keys = ('name', 'note')
     if request.method == 'POST':
         response = check_body(request)
-        if response: return response
+        if response:
+            return response
         j = json.loads(request.read())
         for key in allowed_keys:
             if key in j:
                 setattr(t, key, j[key])
         try:
             t.save()
-            j = {'id':t.pk, 'name':t.name, 'note':t.note}
+            j = {'id': t.pk, 'name': t.name, 'note': t.note}
             return spit_json(request, j)
         except:
-            response = HttpResponse('Conflict\n')
+            response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
             response.status_code = 409
         return response
     elif request.method == 'GET':
-        j = {'id':t.pk, 'name':t.name, 'note':t.note}
+        j = {'id': t.pk, 'name': t.name, 'note': t.note}
         return spit_json(request, j)
     elif request.method == 'DELETE':
         t.delete()
-        return HttpResponse('Ok\n')
+        return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
     allowed_keys = ('name', 'note')
-    response = HttpResponse('Method not allowed\n')
+    response = HttpResponse(json.dumps({'error': 'Method not allowed'}), content_type="application/json")
     response.status_code = 405
     return response
+
 
 @need_basicauth
 @csrf_exempt
@@ -292,11 +310,12 @@ def domain(request, id):
     try:
         domain = customer.domain_set.get(pk=id)
     except:
-        return HttpResponseNotFound('Not Found\n') 
+        return HttpResponseNotFound(json.dumps({'error': 'Not found'}), content_type="application/json")
     allowed_keys = ('note',)
     if request.method == 'POST':
         response = check_body(request)
-        if response: return response
+        if response:
+            return response
         j = json.loads(request.read())
         for key in allowed_keys:
             if key in j:
@@ -305,26 +324,28 @@ def domain(request, id):
             new_tags = []
             for tag in j['tags']:
                 try:
-                    new_tags.append(Tag.objects.get(customer=customer,name=tag))
+                    new_tags.append(Tag.objects.get(customer=customer, name=tag))
                 except:
                     pass
             domain.tags = new_tags
         try:
             domain.save()
-            j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()], 'note':domain.note}
+            j = {'id': domain.pk, 'name': domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()],
+                 'note': domain.note}
             return spit_json(request, j)
         except:
-            response = HttpResponse('Conflict\n')
+            response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
             response.status_code = 409
         return response
     elif request.method == 'DELETE':
         domain.delete()
-        return HttpResponse('Ok\n')
+        return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
 
     elif request.method == 'GET':
-        j = {'id':domain.pk, 'name':domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()], 'note':domain.note}
+        j = {'id': domain.pk, 'name': domain.name, 'uuid': domain.uuid, 'tags': [t.name for t in domain.tags.all()],
+             'note': domain.note}
         return spit_json(request, j)
 
-    response = HttpResponse('Method not allowed\n')
+    response = HttpResponse(json.dumps({'error': 'Method not allowed'}), content_type="application/json")
     response.status_code = 405
     return response
