@@ -2,6 +2,8 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login
 from functools import wraps
 import base64
+import json
+
 
 def need_certificate(func):
     @wraps(func)
@@ -9,8 +11,10 @@ def need_certificate(func):
         if request.META.has_key('HTTPS_DN'):
             return func(request, *args, **kwargs)
         else:
-            return HttpResponseForbidden('Forbidden\n')
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+
     return _decorator
+
 
 def need_basicauth(func, realm='uwsgi.it api'):
     @wraps(func)
@@ -18,9 +22,9 @@ def need_basicauth(func, realm='uwsgi.it api'):
         # first check for crossdomain
         if request.method == 'OPTIONS':
             response = HttpResponse()
-            response['Access-Control-Allow-Origin']  = '*'
-            response['Access-Control-Allow-Methods']  = 'GET,POST,DELETE,OPTIONS'
-            response['Access-Control-Allow-Headers']  = 'X-uwsgi-it-username,X-uwsgi-it-password'
+            response['Access-Control-Allow-Origin'] = '*'
+            response['Access-Control-Allow-Methods'] = 'GET,POST,DELETE,OPTIONS'
+            response['Access-Control-Allow-Headers'] = 'X-uwsgi-it-username,X-uwsgi-it-password'
             return response
         if request.META.has_key('HTTP_AUTHORIZATION'):
             auth = request.META['HTTP_AUTHORIZATION'].split()
@@ -40,12 +44,13 @@ def need_basicauth(func, realm='uwsgi.it api'):
                 login(request, user)
                 request.user = user
                 response = func(request, *args, **kwargs)
-                response['Access-Control-Allow-Origin']  = '*'
+                response['Access-Control-Allow-Origin'] = '*'
                 return response
 
-        response = HttpResponse('Unauthorized\n')
+        response = HttpResponse(json.dumps({'error': 'Unauthorized'}), content_type="application/json")
         response.status_code = 401
-        response['Access-Control-Allow-Origin']  = '*'
+        response['Access-Control-Allow-Origin'] = '*'
         response['WWW-Authenticate'] = 'Basic realm="%s"' % realm
         return response
+
     return _decorator
