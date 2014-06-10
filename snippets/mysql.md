@@ -18,7 +18,7 @@ socket          = /containers/XXXXX/db.mysql/mysqld.sock
 Note: if you need to import dumps with very large column values add the following line in the [mysqld] section:
 
 ```ini
-max_allowed_packet = 128M
+max_allowed_packet = 16M
 ```
 
 run
