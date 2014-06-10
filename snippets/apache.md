@@ -73,6 +73,29 @@ on saucy
 APACHE_CONFDIR=$HOME/etc/apache2 apache2ctl -k restart
 ```
 
+Logrotate
+=========
+
+```sh
+/var/log/apache2/*.log {
+        weekly
+        missingok
+        rotate 52
+        compress
+        delaycompress
+        notifempty
+        create 640
+        sharedscripts
+        postrotate
+                APACHE_CONFDIR=$HOME/etc/apache2 apache2ctl -k restart
+        endscript
+}
+```
+
+```ini
+cron = 59 5 -1 -1 -1 logrotate -s /run/logrotate.state $(HOME)/etc/apache2.logrotate.conf
+```
+
 Common pitfalls
 ===============
 
