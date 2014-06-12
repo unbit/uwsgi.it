@@ -142,6 +142,8 @@ class Legion(models.Model):
 
     nodes = models.ManyToManyField(Server, through='LegionNode')
 
+    quorum = models.PositiveIntegerField(default=0)
+
     def __unicode__(self):
         return "%s - %s " % (self.name, self.address)
 
