@@ -78,7 +78,6 @@ def container(request, id):
         'distro_name': None,
         'server': container.server.name,
         'server_address': container.server.address,
-        'legion_address': None,
         'jid': container.jid,
         'jid_destinations': container.jid_destinations,
         'quota_threshold': container.quota_threshold,
@@ -86,13 +85,12 @@ def container(request, id):
         'note': container.note,
         'linked_to': container.linked_to,
         'ssh_keys': container.ssh_keys,
-        'tags': [t.name for t in container.tags.all()]
+        'tags': [t.name for t in container.tags.all()],
+        'legion_address': [l.address for l in container.server.legion_set.all()]
     }
     if container.distro:
         c['distro'] = container.distro.pk
         c['distro_name'] = container.distro.name
-    if container.server.legion:
-        c['legion_address'] = container.server.legion.address
     return spit_json(request, c)
 
 
