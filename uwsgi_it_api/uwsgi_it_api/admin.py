@@ -52,12 +52,15 @@ class DomainMetricAdmin(admin.ModelAdmin):
     list_filter = ('year', 'month')
 
 class LegionAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'note')
+    list_display = ('__unicode__', 'customer', 'note')
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'customer')
     list_filter = ('customer',)
     search_fields = ('name',) 
+
+class FloatingAddressAdmin(admin.ModelAdmin):
+    list_display = ('address', 'mapped_to_server', 'legion', 'customer', 'note')
 
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
@@ -70,6 +73,8 @@ admin.site.register(Datacenter)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(CustomService)
 admin.site.register(CustomerAttribute)
+
+admin.site.register(FloatingAddress,FloatingAddressAdmin)
 
 admin.site.register(NetworkRXContainerMetric,ContainerMetricAdmin)
 admin.site.register(NetworkTXContainerMetric,ContainerMetricAdmin)

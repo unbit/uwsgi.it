@@ -138,8 +138,25 @@ class Legion(models.Model):
 
     note = models.TextField(blank=True,null=True)
 
+    customer = models.ForeignKey(Customer,null=True)
+
     def __unicode__(self):
         return "%s - %s " % (self.name, self.address)
+
+
+class FloatingAddress(models.Model):
+    address = models.GenericIPAddressField()
+    customer = models.ForeignKey(Customer,null=True)
+    legion = models.ForeignKey(Legion,null=True)
+    mapped_to_server = models.ForeignKey(Server,null=True)
+
+    note = models.TextField(blank=True,null=True)
+
+    def __unicode__(self):
+        return "%s - %s" % (self.address, self.mapped_to_server)
+
+    class Meta:
+        verbose_name_plural = 'Floating Addresses'
 
 class Distro(models.Model):
     name = models.CharField(max_length=255,unique=True)
