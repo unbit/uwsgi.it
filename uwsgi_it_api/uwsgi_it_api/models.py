@@ -84,8 +84,6 @@ class Server(models.Model):
 
     weight = models.PositiveIntegerField(default=9999)
 
-    legion = models.ForeignKey('Legion',null=True,blank=True)
-
     datacenter = models.ForeignKey('Datacenter',null=True,blank=True)
 
     note = models.TextField(blank=True,null=True)
@@ -138,17 +136,28 @@ class Legion(models.Model):
 
     note = models.TextField(blank=True,null=True)
 
-    customer = models.ForeignKey(Customer,null=True)
+    customer = models.ForeignKey(Customer,null=True,blank=True)
+
+    key = models.CharField(max_length=64)
+
+    nodes = models.ManyToManyField(Server, through='LegionNode')
 
     def __unicode__(self):
         return "%s - %s " % (self.name, self.address)
 
+class LegionNode(models.Model):
+    legion = models.ForeignKey(Legion)
+    server = models.ForeignKey(Server)
+    weight = models.PositiveIntegerField(default=9999)
+
+    def __unicode__(self):
+        return "%s on %s " % (self.server, self.legion)
 
 class FloatingAddress(models.Model):
     address = models.GenericIPAddressField()
-    customer = models.ForeignKey(Customer,null=True)
-    legion = models.ForeignKey(Legion,null=True)
-    mapped_to_server = models.ForeignKey(Server,null=True)
+    customer = models.ForeignKey(Customer,null=True,blank=True)
+    legion = models.ForeignKey(Legion,null=True,blank=True)
+    mapped_to_server = models.ForeignKey(Server,null=True,blank=True)
 
     note = models.TextField(blank=True,null=True)
 

@@ -9,8 +9,8 @@ class ServerAdmin(admin.ModelAdmin):
         return "available:%d used:%d free:%d" % (self.memory, self.used_memory, self.free_memory)
     def storage_status(self):
         return "available:%d used:%d free:%d" % (self.storage, self.used_storage, self.free_storage)
-    list_display = ('__unicode__', memory_status, storage_status, 'legion', 'weight', 'owner')
-    list_filter = ('legion', 'datacenter')
+    list_display = ('__unicode__', memory_status, storage_status, 'weight', 'owner')
+    list_filter = ('datacenter',)
 
 class ContainerAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -51,8 +51,15 @@ class DomainMetricAdmin(admin.ModelAdmin):
     list_display = ('domain', 'container', 'year', 'month', 'day')
     list_filter = ('year', 'month')
 
+class LegionNodeInline(admin.TabularInline):
+    model = LegionNode
+
 class LegionAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'customer', 'note')
+    def servers(self, obj):
+        return ','.join([s.name for s in obj.nodes.all()])
+
+    list_display = ('__unicode__', 'customer', 'servers', 'note')
+    inlines = [ LegionNodeInline ]
 
 class TagAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'customer')
