@@ -45,7 +45,7 @@ def private_legion_nodes(request):
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         nodes = [] 
         unix = server.munix
-        for node in server.legion.server_set.all():
+        for node in server.legion_set.first().nodes.all():
             if node.address != server.address:
                 if node.munix > unix: unix = node.munix
                 nodes.append(node.address)
