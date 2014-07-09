@@ -38,6 +38,7 @@ Goals
 - /usr/local must be user-writable to allows custom installation/compilation (is bind-mounted to the container's home)
 - customers can buy a whole server, and create containers without supplier intervention
 - the unbit nss module exposes a name resolution facility to map `container`.local to the relevant ip
+- /run/shm (/dev/shm) is automatically mapped to the whole container memory
 
 Status
 ------
