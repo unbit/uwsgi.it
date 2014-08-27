@@ -8,7 +8,15 @@ For Saucy Salamander:
 mkdir /run/postgresql
 ```
 
-create vassals/pg.ini
+For Trusty:
+
+```sh
+/usr/lib/postgresql/9.3/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
+mkdir /run/postgresql
+```
+
+
+create vassals/pg.ini (change 9.1 to 9.3 on trusty)
 
 ```ini
 [uwsgi]
@@ -24,6 +32,8 @@ Bonus: auto-backup
 use the cron facilities to run automatic dump of your db.
 
 The following example will create a dump every day of the month (be sure to create a backup directory in your home):
+
+(as before, remember to change 9.1 to 9.3 for trusty)
 
 ```ini
 [uwsgi]
