@@ -42,8 +42,11 @@ class ViewsTest(TestCase):
         )
         self.c_uid = self.container.uid
         self.domain, _ = Domain.objects.get_or_create(customer=self.customer, name="domain")
+        self.d_uuid = self.domain.uuid
         self.tag, _ = Tag.objects.get_or_create(customer=self.customer, name="tag")
 
+        self.container.tags.add(self.tag)
+        self.domain.tags.add(self.tag)
         # metrics
         today = datetime.datetime.today()
         NetworkRXContainerMetric.objects.create(
@@ -112,13 +115,13 @@ class ViewsTest(TestCase):
 
         self.factory = RequestFactory()
 
-    def logged_get_response_for_view(self, path, view, kwargs=None):
+    def logged_get_response_for_view(self, path, view, kwargs=None, params={}):
         headers = {
             'HTTP_AUTHORIZATION': self.basic_auth,
             'HTTPS_DN': 'hithere',
             'REMOTE_ADDR': self.server_address,
         }
-        request = self.factory.get(path, {}, **headers)
+        request = self.factory.get(path, params, **headers)
         request.user = self.user
         request.session = FakeSession()
         if kwargs is None:
@@ -138,6 +141,14 @@ class ApiTest(ViewsTest):
         response = self.logged_get_response_for_view('/containers', containers)
         self.assertEqual(response.status_code, 200)
 
+    def test_containers_filters_tags(self):
+        response = self.logged_get_response_for_view('/containers', containers, params={'tags': 'tag'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'uid: {}'.format(self.c_uid))
+        response = self.logged_get_response_for_view('/containers', containers, params={'tags': 'fail'})
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'uid: {}'.format(self.c_uid))
+
     def test_container(self):
         response = self.logged_get_response_for_view('/containers/1', container, {'id': self.c_uid})
         self.assertEqual(response.status_code, 200)
@@ -149,6 +160,14 @@ class ApiTest(ViewsTest):
     def test_domains(self):
         response = self.logged_get_response_for_view('/domains', domains)
         self.assertEqual(response.status_code, 200)
+
+    def test_domains_filters_tags(self):
+        response = self.logged_get_response_for_view('/domains', domains, params={'tags': 'tag'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'uid: {}'.format(self.d_uuid))
+        response = self.logged_get_response_for_view('/domains', domains, params={'tags': 'fail'})
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'uid: {}'.format(self.d_uuid))
 
     def test_domain(self):
         response = self.logged_get_response_for_view('/domains/1', domain, {'id': self.domain.pk})

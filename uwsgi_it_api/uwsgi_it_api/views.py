@@ -152,8 +152,14 @@ def containers(request):
             response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
             response.status_code = 409
             return response
+    elif (request.method == 'GET' and
+         'tags' in request.GET):
+            containers = request.user.customer.container_set.filter(tags__name__in=request.GET['tags'].split(','))
+    else:
+        containers = request.user.customer.container_set.all()
+
     c = []
-    for container in request.user.customer.container_set.all():
+    for container in containers:
         cc = {
             'uid': container.uid,
             'name': container.name,

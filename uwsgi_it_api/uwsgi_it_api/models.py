@@ -128,7 +128,7 @@ class Server(models.Model):
 class Legion(models.Model):
     name = models.CharField(max_length=255,unique=True)
     address = models.GenericIPAddressField()
-    
+
     ctime = models.DateTimeField(auto_now_add=True)
     mtime = models.DateTimeField(auto_now=True)
 
@@ -235,7 +235,7 @@ class Container(models.Model):
             raise ValidationError('the requested storage size is not available on the specified server')
         if current_memory+self.memory > self.server.memory:
             raise ValidationError('the requested memory size is not available on the specified server')
-        
+
     @property
     def rand_pid(self):
         return random.randrange(1, 32768)
@@ -271,7 +271,7 @@ class Container(models.Model):
         # try to generate a clean list of ssh keys
         if not self.ssh_keys_raw: return []
         cleaned = self.ssh_keys_raw.replace('\r', '\n').replace('\n\n', '\n')
-        return self.ssh_keys_raw.split('\n')
+        return cleaned.split('\n')
 
     @property
     def quota(self):
@@ -297,7 +297,7 @@ class Container(models.Model):
     @property
     def linked_to(self):
         return [l.to.uid for l in self.containerlink_set.all()]
-                
+
 
 class ContainerLink(models.Model):
     container = models.ForeignKey(Container)
@@ -305,7 +305,7 @@ class ContainerLink(models.Model):
 
     def __unicode__(self):
         return "%s --> %s" % (self.container, self.to)
-   
+
     class Meta:
         unique_together = ( 'container', 'to')
 
@@ -383,7 +383,7 @@ class ContainerMetric(models.Model):
     year = models.PositiveIntegerField(null=True)
     month = models.PositiveIntegerField(null=True)
     day = models.PositiveIntegerField(null=True)
-  
+
     # this ia blob containing raw metrics
     json = models.TextField(null=True)
 
