@@ -39,6 +39,7 @@ Goals
 - customers can buy a whole server, and create containers without supplier intervention
 - the unbit nss module exposes a name resolution facility to map `container`.local to the relevant ip
 - /run/shm (/dev/shm) is automatically mapped to the whole container memory
+- /var/run/utmp only exports sessions running in a container
 
 Status
 ------
