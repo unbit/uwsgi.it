@@ -184,6 +184,9 @@ class Distro(models.Model):
         return self.name
 
 
+def start_of_epoch():
+    return datetime.datetime.fromtimestamp(1)
+
 class Container(models.Model):
     name = models.CharField(max_length=255)
     ssh_keys_raw = models.TextField("SSH keys", blank=True,null=True)
@@ -213,6 +216,8 @@ class Container(models.Model):
 
     accounted = models.BooleanField(default=False)
 
+    last_reboot = models.DateTimeField(default=start_of_epoch)
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
@@ -235,6 +240,31 @@ class Container(models.Model):
             raise ValidationError('the requested storage size is not available on the specified server')
         if current_memory+self.memory > self.server.memory:
             raise ValidationError('the requested memory size is not available on the specified server')
+
+    # force a reboot if required
+    def save(self, *args, **kwargs):
+        interesting_fields = ('name',
+                              'ssh_keys_raw',
+                              'distro', 
+                              'server', 
+                              'memory', 
+                              'storage', 
+                              'customer', 
+                              'jid', 
+                              'jid_secret', 
+                              'jid_destinations', 
+                              'quota_threshold', 
+                              'nofollow')
+        if self.pk is not None:
+            orig = Container.objects.get(pk=self.pk)
+            set_reboot = False
+            for field in interesting_fields:
+                if getattr(self, field) != getattr(orig, field):
+                    set_reboot = True
+                    break
+            if set_reboot:
+                self.last_reboot = datetime.datetime.now()
+        super(Container, self).save(*args, **kwargs)
 
     @property
     def rand_pid(self):
@@ -264,7 +294,7 @@ class Container(models.Model):
 
     @property
     def munix(self):
-        return calendar.timegm(self.mtime.utctimetuple())
+        return calendar.timegm(self.last_reboot.utctimetuple())
 
     @property
     def ssh_keys(self):

@@ -7,6 +7,7 @@ from uwsgi_it_api.models import *
 from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 
 import json
+import datetime
 
 
 @need_basicauth
@@ -46,6 +47,7 @@ def container(request, id):
                 except:
                     pass
             container.tags = new_tags
+        # linking and unlinking requires reboot
         if 'link' in j:
             try:
                 link = ContainerLink()
@@ -53,6 +55,7 @@ def container(request, id):
                 link.to = Container.objects.get(pk=(int(j['link']) - UWSGI_IT_BASE_UID))
                 link.full_clean()
                 link.save()
+                container.last_reboot = datetime.datetime.now()
             except:
                 response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
                 response.status_code = 409
@@ -61,10 +64,13 @@ def container(request, id):
             try:
                 link = container.containerlink_set.get(to=(int(j['unlink']) - UWSGI_IT_BASE_UID))
                 link.delete()
+                container.last_reboot = datetime.datetime.now()
             except:
                 response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
                 response.status_code = 409
                 return response
+        if 'reboot' in j:
+            container.last_reboot = datetime.datetime.now()
         container.save()
     c = {
         'uid': container.uid,
