@@ -9,6 +9,7 @@ from Crypto.PublicKey import RSA
 from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 import random
 import datetime
+import os.path
 
 
 # Create your models here.
@@ -216,6 +217,8 @@ class Container(models.Model):
 
     accounted = models.BooleanField(default=False)
 
+    stackedfs_dir = models.CharField(max_length=255,blank=True,null=True)
+
     last_reboot = models.DateTimeField(default=start_of_epoch)
 
     def __unicode__(self):
@@ -240,6 +243,9 @@ class Container(models.Model):
             raise ValidationError('the requested storage size is not available on the specified server')
         if current_memory+self.memory > self.server.memory:
             raise ValidationError('the requested memory size is not available on the specified server')
+        if self.stackedfs_dir:
+            if os.path.abspath(os.path.join('/', self.stackedfs_dir)) == '/':
+                raise ValidationError('invalid stackedfs_dir')
 
     # force a reboot if required
     def save(self, *args, **kwargs):
@@ -254,6 +260,7 @@ class Container(models.Model):
                               'jid_secret', 
                               'jid_destinations', 
                               'quota_threshold', 
+                              'stackedfs_dir', 
                               'nofollow')
         if self.pk is not None:
             orig = Container.objects.get(pk=self.pk)
