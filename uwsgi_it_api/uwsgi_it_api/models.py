@@ -389,6 +389,16 @@ class Tag(models.Model):
     class Meta:
         unique_together = ('name', 'customer')
 
+class News(models.Model):
+    content = models.TextField()
+    public = models.BooleanField(default=False)
+    
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-ctime']
+
 """
 Pretty low level model for storing customer configurations out of
 the container concept (like rawrouter services or https non-sni proxies)

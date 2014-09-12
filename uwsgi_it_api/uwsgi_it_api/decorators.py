@@ -15,6 +15,18 @@ def need_certificate(func):
 
     return _decorator
 
+def api_auth(request):
+    if request.META.has_key('HTTP_AUTHORIZATION'):
+            auth = request.META['HTTP_AUTHORIZATION'].split()
+            if len(auth) == 2:
+                if auth[0].lower() == "basic":
+                    uname, passwd = base64.b64decode(auth[1]).split(':')
+                    return authenticate(username=uname, password=passwd)
+    elif request.META.has_key('HTTP_X_UWSGI_IT_USERNAME') and request.META.has_key('HTTP_X_UWSGI_IT_PASSWORD'):
+            uname = request.META['HTTP_X_UWSGI_IT_USERNAME'].decode('hex')
+            passwd = request.META['HTTP_X_UWSGI_IT_PASSWORD'].decode('hex')
+            return authenticate(username=uname, password=passwd)
+    return None
 
 def need_basicauth(func, realm='uwsgi.it api'):
     @wraps(func)
@@ -26,26 +38,13 @@ def need_basicauth(func, realm='uwsgi.it api'):
             response['Access-Control-Allow-Methods'] = 'GET,POST,DELETE,OPTIONS'
             response['Access-Control-Allow-Headers'] = 'X-uwsgi-it-username,X-uwsgi-it-password'
             return response
-        if request.META.has_key('HTTP_AUTHORIZATION'):
-            auth = request.META['HTTP_AUTHORIZATION'].split()
-            if len(auth) == 2:
-                if auth[0].lower() == "basic":
-                    uname, passwd = base64.b64decode(auth[1]).split(':')
-                    user = authenticate(username=uname, password=passwd)
-                    if user and user.is_active:
-                        login(request, user)
-                        request.user = user
-                        return func(request, *args, **kwargs)
-        elif request.META.has_key('HTTP_X_UWSGI_IT_USERNAME') and request.META.has_key('HTTP_X_UWSGI_IT_PASSWORD'):
-            uname = request.META['HTTP_X_UWSGI_IT_USERNAME'].decode('hex')
-            passwd = request.META['HTTP_X_UWSGI_IT_PASSWORD'].decode('hex')
-            user = authenticate(username=uname, password=passwd)
-            if user and user.is_active:
-                login(request, user)
-                request.user = user
-                response = func(request, *args, **kwargs)
-                response['Access-Control-Allow-Origin'] = '*'
-                return response
+        user = api_auth(request)
+        if user and user.is_active:
+            login(request, user)
+            request.user = user
+            response = func(request, *args, **kwargs)
+            response['Access-Control-Allow-Origin'] = '*'
+            return response
 
         response = HttpResponse(json.dumps({'error': 'Unauthorized'}), content_type="application/json")
         response.status_code = 401

@@ -69,9 +69,15 @@ class TagAdmin(admin.ModelAdmin):
 class FloatingAddressAdmin(admin.ModelAdmin):
     list_display = ('address', 'mapped_to_server', 'legion', 'customer', 'note')
 
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('user', 'user__email', 'org', 'vat')
+
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ('content', 'ctime', 'public')
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
-admin.site.register(Customer)
+admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Container, ContainerAdmin)
 admin.site.register(Domain, DomainAdmin)
 admin.site.register(Legion, LegionAdmin)
@@ -94,3 +100,5 @@ admin.site.register(QuotaContainerMetric,ContainerMetricAdmin)
 admin.site.register(HitsDomainMetric,DomainMetricAdmin)
 admin.site.register(NetworkRXDomainMetric,DomainMetricAdmin)
 admin.site.register(NetworkTXDomainMetric,DomainMetricAdmin)
+
+admin.site.register(News, NewsAdmin)

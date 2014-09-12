@@ -1,13 +1,14 @@
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 
-from uwsgi_it_api.decorators import need_basicauth
+from uwsgi_it_api.decorators import need_basicauth, api_auth
 from uwsgi_it_api.utils import spit_json, check_body, dns_check
 from uwsgi_it_api.models import *
 from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 
 import json
 import datetime
+import time
 
 
 @need_basicauth
@@ -99,6 +100,19 @@ def container(request, id):
         c['distro_name'] = container.distro.name
     return spit_json(request, c)
 
+def news(request):
+    news_list = []
+    user = api_auth(request)
+    if user:
+        for n in News.objects.all()[0:10]:
+            news_list.append({'content': n.content,
+                              'date': int(time.mktime(n.ctime.timetuple())) *1000})
+    else:
+        for n in News.objects.filter(public=True)[0:10]:
+            news_list.append({'content': n.content,
+                              'date': int(time.mktime(n.ctime.timetuple())) *1000})
+    return spit_json(request, news_list)
+        
 
 @need_basicauth
 @csrf_exempt
