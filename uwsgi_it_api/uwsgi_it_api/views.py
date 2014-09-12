@@ -106,11 +106,11 @@ def news(request):
     if user:
         for n in News.objects.all()[0:10]:
             news_list.append({'content': n.content,
-                              'date': int(time.mktime(n.ctime.timetuple())) *1000})
+                              'date': int(time.mktime(n.ctime.timetuple()))})
     else:
         for n in News.objects.filter(public=True)[0:10]:
             news_list.append({'content': n.content,
-                              'date': int(time.mktime(n.ctime.timetuple())) *1000})
+                              'date': int(time.mktime(n.ctime.timetuple()))})
     return spit_json(request, news_list)
         
 
