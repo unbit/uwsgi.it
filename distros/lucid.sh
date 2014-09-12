@@ -1,6 +1,6 @@
 set -u
 set -e
-debootstrap --components=main,universe,multiverse --include=build-essential,git-core,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby,wget,ruby-dev,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,irb,ruby1.9-dev,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,mercurial,tmux,htop,mc,zip lucid /distros/lucid
+debootstrap --components=main,universe,multiverse --include=build-essential,git-core,redis-server,lua5.1,postgresql,libpq-dev,python-dev,python3-dev,memcached,mongodb,libperl-dev,ruby,wget,ruby-dev,language-pack-en,libcurl4-openssl-dev,mysql-server,libyajl-dev,beanstalkd,ssh,rsync,libluajit-5.1-dev,curl,irb,ruby1.9-dev,ipython,liblocal-lib-perl,python-virtualenv,python-pip,libpcre3-dev,mercurial,tmux,htop,mc,zip,xmlsec1,libxmlsec1-dev lucid /distros/lucid
 chroot /distros/lucid /bin/bash -x <<'EOF'
 mkdir /.old_root
 mkdir /containers
