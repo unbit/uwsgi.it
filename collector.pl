@@ -17,6 +17,8 @@ my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api/private';
 my $ssl_key = $cfg->val('uwsgi', 'api_client_key_file');
 my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
 
+my $root_dev = get_mountpoint('/');
+
 sub collect_metrics {
 	my ($uid, $net_json) = @_;
 	collect_metrics_cpu($uid);
@@ -48,7 +50,7 @@ sub collect_metrics_mem {
 
 sub collect_metrics_quota {
         my ($uid) = @_;
-	my ($blocks) = Quota::query($cfg->val('uwsgi', 'api_hd'), $uid);
+	my ($blocks) = Quota::query($root_dev, $uid);
         push_metric($uid, 'container.quota', Math::BigInt->new($blocks) * 1024);
 }
 
@@ -197,3 +199,16 @@ sub push_domain_metric {
         }
 }
 
+sub get_mountpoint {
+	my ($mountpoint) = @_;
+	open MOUNTS,'/proc/self/mounts';
+	while(<MOUNTS>) {
+		my ($dev, $mp) = split /\s/;
+		if ($mp eq $mountpoint) {
+			if ($dev ne 'rootfs') {
+				return $dev;
+			}
+		}
+	}
+	return '';
+}
