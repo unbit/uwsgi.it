@@ -69,8 +69,13 @@ class TagAdmin(admin.ModelAdmin):
 class FloatingAddressAdmin(admin.ModelAdmin):
     list_display = ('address', 'mapped_to_server', 'legion', 'customer', 'note')
 
+def _user__email(self):
+    if self.user:
+        return self.user.email
+    return ''
+_user__email.short_description = 'Email'
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('user', 'user__email', 'org', 'vat')
+    list_display = ('user', _user__email, 'company', 'vat')
 
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('content', 'ctime', 'public')
