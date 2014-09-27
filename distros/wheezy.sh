@@ -4,6 +4,7 @@ debootstrap --components=main --include=vim,build-essential,git,redis-server,lua
 chroot /distros/wheezy /bin/bash -x <<'EOF'
 set -u
 set -e
+dpkg-reconfigure tzdata
 mkdir /.old_root
 rm /etc/mtab
 ln -s /proc/self/mounts /etc/mtab

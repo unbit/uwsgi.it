@@ -4,6 +4,7 @@ debootstrap --components=main,universe,multiverse --include=vim,build-essential,
 chroot /distros/precise /bin/bash -x <<'EOF'
 set -u
 set -e
+dpkg-reconfigure tzdata
 mkdir /.old_root
 mkdir /containers
 rmdir /dev/shm
