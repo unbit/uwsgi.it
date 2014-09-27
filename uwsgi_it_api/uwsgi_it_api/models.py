@@ -91,6 +91,8 @@ class Server(models.Model):
 
     owner = models.ForeignKey(Customer,null=True,blank=True)
 
+    ssd = models.BooleanField('SSD', default=False)
+
     @property
     def used_memory(self):
         n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
@@ -112,7 +114,15 @@ class Server(models.Model):
         return self.storage - self.used_storage
 
     def __unicode__(self):
-        return "%s - %s" % (self.name, self.address)
+        features = []
+        if self.ssd:
+            features.append('SSD')
+        if self.owner:
+            features.append('dedicated')
+        space = ''
+        if features:
+            space = ' '
+        return "%s - %s%s%s" % (self.name, self.address, space, ','.join(features))
 
     @property
     def etc_resolv_conf_lines(self):
