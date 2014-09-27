@@ -4,6 +4,7 @@ debootstrap --components=main,universe,multiverse --include=vim,build-essential,
 chroot /distros/trusty /bin/bash -x <<'EOF'
 set -u
 set -e
+dpkg-reconfigure tzdata
 echo "exit 101" > /usr/sbin/policy-rc.d
 chmod 755 /usr/sbin/policy-rc.d
 mkdir /.old_root
