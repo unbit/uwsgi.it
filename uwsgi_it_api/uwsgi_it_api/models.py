@@ -360,6 +360,22 @@ class ContainerLink(models.Model):
         if self.container == self.to:
             raise ValidationError("cannot link with myself")
 
+class Loopback(models.Model):
+    container = models.ForeignKey(Container)
+    filename = models.CharField(max_length=255)
+    mountpoint = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = ('container', 'filename', 'mountpoint')
+
+    def clean(self):
+        checks = ('..', './', '/.')
+        for check in checks:
+            if check in self.filename:
+                raise ValidationError("invalid filename")
+            if check in self.mountpoint:
+                raise ValidationError("invalid mountpoint")
+
 """
 domains are mapped to customers, each container of the customer
 can subscribe to them
