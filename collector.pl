@@ -13,9 +13,11 @@ $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}=0;
 
 my $cfg = Config::IniFiles->new( -file => "/etc/uwsgi/local.ini" );
 
-my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api';
+my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api/private';
 my $ssl_key = $cfg->val('uwsgi', 'api_client_key_file');
 my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
+
+my $root_dev = get_mountpoint('/');
 
 sub collect_metrics {
 	my ($uid, $net_json) = @_;
@@ -48,7 +50,7 @@ sub collect_metrics_mem {
 
 sub collect_metrics_quota {
         my ($uid) = @_;
-	my ($blocks) = Quota::query($cfg->val('uwsgi', 'api_hd'), $uid);
+	my ($blocks) = Quota::query($root_dev, $uid);
         push_metric($uid, 'container.quota', Math::BigInt->new($blocks) * 1024);
 }
 
@@ -107,7 +109,7 @@ for(;;) {
 
 	my $net_json = undef;
 	# get json stats from the tuntap router
-	my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1:5001');
+	my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1:5002');
 	if ($s) {
 		my $tuntap_json = '';
 		for(;;) {
@@ -121,6 +123,30 @@ for(;;) {
 
 	foreach(@{$containers}) {
 		collect_metrics($_->{uid}, $net_json);
+	}
+
+	my $d_json = undef;
+	# now collect domains metrics
+	my $s = IO::Socket::INET->new(PeerAddr => '127.0.0.1:5003');
+        if ($s) {
+                my $domains_json = '';
+                for(;;) {
+                        $s->recv(my $buf, 8192);
+                        last unless $buf;
+                        $domains_json .= $buf;
+                }
+                $d_json = decode_json($domains_json);
+        }
+	foreach(@{$d_json->{subscriptions}}) {
+		my $domain = $_->{key};
+		my $nodes = $_->{nodes};
+		foreach(@{$nodes}) {
+			if ($_->{uid} > 30000) {
+				push_domain_metric($_->{uid}, $domain, 'domain.net.rx', $_->{rx}); 
+				push_domain_metric($_->{uid}, $domain, 'domain.net.tx', $_->{rx}); 
+				push_domain_metric($_->{uid}, $domain, 'domain.hits', $_->{requests}); 
+			}
+		}
 	}
 
 	# gather metrics every 5 minutes
@@ -150,4 +176,39 @@ sub push_metric {
 	if ($response->is_error or $response->code != 201 ) {
                 print date().' oops for '.$path.'/'.$uid.': '.$response->code.' '.$response->message."\n";
         }
+}
+
+sub push_domain_metric {
+        my ($uid, $domain, $path, $value) = @_;
+
+        my $ua = LWP::UserAgent->new;
+        $ua->ssl_opts(
+                SSL_key_file => $ssl_key,
+                SSL_cert_file => $ssl_cert,
+        );
+        $ua->timeout(3);
+
+        my $j = JSON->new;
+        $j->allow_bignum(1);
+        $j = $j->encode({domain => $domain, unix => time, value => Math::BigInt->new($value)});
+
+        my $response =  $ua->post($base_url.'/metrics/'.$path.'/'.$uid, Content => $j);
+
+        if ($response->is_error or $response->code != 201 ) {
+                print date().' oops for '.$path.'/'.$uid.': '.$response->code.' '.$response->message."\n";
+        }
+}
+
+sub get_mountpoint {
+	my ($mountpoint) = @_;
+	open MOUNTS,'/proc/self/mounts';
+	while(<MOUNTS>) {
+		my ($dev, $mp) = split /\s/;
+		if ($mp eq $mountpoint) {
+			if ($dev ne 'rootfs') {
+				return $dev;
+			}
+		}
+	}
+	return '';
 }

@@ -6,7 +6,7 @@ The next-generation Unbit hosting platform
 Intro
 -----
 
-contrary to the current unbit.it hosting platform, the next generation one will be:
+contrary to the old unbit.it hosting platform, the new one is:
 
 - fully open source (currently at least 60% of the unbit.it kernel patches are not released to the public)
 - can be installed on vanilla kernels
@@ -35,14 +35,18 @@ Goals
 - Websockets support (in the routers/proxy) is enabled by default
 - Simple clustering and load-balancing
 - Sending emails is not part of the infrastructure (read:no SMTP services), but each container has transparent support for the nullmailer spool service (so you can use it to asynchronously send mails to external smtp services like mandrill and sendgrid)
-
+- /usr/local must be user-writable to allows custom installation/compilation (is bind-mounted to the container's home)
+- customers can buy a whole server, and create containers without supplier intervention
+- the unbit nss module exposes a name resolution facility to map `container`.local to the relevant ip
+- /run/shm (/dev/shm) is automatically mapped to the whole container memory
+- /var/run/utmp only exports sessions running in a container
 
 Status
 ------
 
-Currently we are in pre-beta status, the api is almost complete, while the example web interface is still in early stage of development.
+Currently the platform is in-production for unbit.it services, and working on hetzner and ovh hardware.
 
-Beta phase will officially start soon after the installation docs are complete.
+You still need a bit of work to install on your systems. Contact info@unbit.it for more infos.
 
 
 How it works
@@ -83,8 +87,6 @@ Three perl processes manage the infrastruture configuration:
 - dominator.pl -> manage domains to rsa key mappings
 - collector.pl -> gather statistics from the various exposed metrics
 
-
-A web interface written in perl/Dancer will integrate with the api to give users/customer a user-friendly tool
 
 
 TODO

@@ -59,7 +59,7 @@ This array is the list of containers mapped to our account. Containers are the "
 We can get a more verbose list of our containers with:
 
 ```sh
-curl https://kratos:deimos17@foobar.com/api/me/containers/
+curl https://kratos:deimos17@foobar.com/api/containers/
 ```
 
 But most of the time you just want to view a single one:
@@ -193,6 +193,9 @@ Just get the 'uuid' of your account (we have seen it in the first api call examp
 ```sh
 TXT        uwsgi:aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee
 ```
+
+IMPORTANT !!! the uuid is the one of your account, NOT the container one. A domain can be used by multiple containers that is why it is more logic to pair it with the account.
+
 
 To check your zone correctness:
 
@@ -352,6 +355,8 @@ route-if-not = equal:${HTTPS};on redirect-permanent:https://${HTTP_HOST}${REQUES
 
 wildcard/dotsplit SNI subscriptions are supported too
 
+IMPORTANT: mixing `ssl-domain` with `domain` for the same name, must be avoided. `ssl-domain` automatically register non-ssl record too
+
 Clustering
 ----------
 
@@ -403,19 +408,19 @@ Supposing 2 containers:
 we want them to communicate each other on the 10.0.0.0/8 network
 
 ```
-curl -X POST '{"link": 30008}' https://kratos:deimos17@foobar.com/api/containers/30009
+curl -X POST -d '{"link": 30008}' https://kratos:deimos17@foobar.com/api/containers/30009
 ```
 
 and
 
 ```
-curl -X POST '{"link": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
+curl -X POST -d '{"link": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
 ```
 
 to unlink a container just run
 
 ```
-curl -X POST '{"unlink": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
+curl -X POST -d '{"unlink": 30009}' https://anothercustomer:secret1@foobar.com/api/containers/30008
 ```
 
 the links of a container are showed in the "linked_to" attribute of the container api
@@ -423,20 +428,75 @@ the links of a container are showed in the "linked_to" attribute of the containe
 Rebooting containers
 --------------------
 
-to reboot a container just send an "empty object" POST request to its api:
+to reboot a container without making any change to it, just pass "reboot":1
 
 ```sh
-curl -X POST -d '{}' https://kratos:deimos17@foobar.com/api/containers/30009
+curl -X POST -d '{"reboot":1}' https://kratos:deimos17@foobar.com/api/containers/30009
 ```
 
 technically any update to the container object will trigger a reboot (remember it !!!)
+
+Tagging
+-------
+
+You can assign tags (or 'labels' if you tend to use 'tag' as a social thing) to containers and domains.
+
+Tagging is a handy way to "group" your items. For example you may want to group containers and domains related to the same sub-customer or project.
+
+Tags are related to uwsgi.it customers, so every customer will have its distinct set.
+
+To get the list of currently defined tags run
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/tags/
+```
+
+To create a tag
+
+```sh
+curl -X POST -d '{"name":"foobar"}' https://kratos:deimos17@foobar.com/api/tags/
+```
+
+To delete a tag (ID is the id of the tag as returned by the previous calls)
+
+```sh
+curl -X DELETE https://kratos:deimos17@foobar.com/api/tags/ID
+```
+
+Once you have your set of tags you can start mapping them to containers or domains using the 'tags' (array) attribute:
+
+```sh
+curl -X POST -d '{"tags":["foobar"]}' https://kratos:deimos17@foobar.com/api/containers/30009
+```
+
+or 
+
+```sh
+curl -X POST -d '{"tags":["foobar"]}' https://kratos:deimos17@foobar.com/api/domains/17
+```
+
+Now you can filter containers and domains by-tag, using the 'tags' QUERY_STRING attribute:
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/containers/?tags=foobar,zeus
+```
+
+the call will returns ONLY containers tagged with 'foobar' or 'zeus'
+
+as well as
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/domains/?tags=foobar
+```
+
+will returns domains tagged with 'foobar'
 
 Logging
 -------
 
 The logs/emperor.log file is created as the default logging file (and rotated when it reaches 100M size).
 
-Each vassal con log whatever (and however) it needs
+Each vassal can log whatever (and however) it needs
 
 
 Resources
@@ -475,6 +535,8 @@ The alarm is broadcasted to all of the conntected container shells and to an opt
 To enable jabber/xmpp alarm just set "jid", "jid_secret" and "jid_destinations" attributes of the container api.
 
 jid and jid_secret are the credentials the Emperor will use to login to a jabber/xmpp server while jid_destinations is the comma-separated list of jid that will receive the alarms.
+
+:Note: for trouble with google account check your gmail account and visit this link http://support.google.com/mail?p=client_login
 
 Snippets
 --------
