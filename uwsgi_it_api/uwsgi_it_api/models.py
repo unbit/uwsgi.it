@@ -362,7 +362,7 @@ class ContainerLink(models.Model):
 
 class Loopback(models.Model):
     container = models.ForeignKey(Container)
-    filename = models.CharField(max_length=255)
+    filename = models.CharField(max_length=64)
     mountpoint = models.CharField(max_length=255)
     ro = models.BooleanField(default=False)
 
