@@ -80,6 +80,9 @@ class CustomerAdmin(admin.ModelAdmin):
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('content', 'ctime', 'public')
 
+class LoopbackAdmin(admin.ModelAdmin):
+    list_display = ('container', 'filename', 'mountpoint')
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer, CustomerAdmin)
@@ -107,3 +110,4 @@ admin.site.register(NetworkRXDomainMetric,DomainMetricAdmin)
 admin.site.register(NetworkTXDomainMetric,DomainMetricAdmin)
 
 admin.site.register(News, NewsAdmin)
+admin.site.register(Loopback, LoopbackAdmin)

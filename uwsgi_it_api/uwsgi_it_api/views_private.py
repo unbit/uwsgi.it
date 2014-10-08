@@ -29,6 +29,15 @@ def private_containers(request):
         return HttpResponseForbidden('Forbidden\n')
 
 @need_certificate
+def private_loopbacks(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        j = [{'id': loopback.pk, 'uid':loopback.container.uid, 'filename': loopback.filename, 'mountpoint': loopback.mountpoint, 'ro': loopback.ro } for loopback in Loopback.objects.filter(container__server=server)]
+        return spit_json(request, j)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+
+@need_certificate
 def private_container_ini(request, id):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])

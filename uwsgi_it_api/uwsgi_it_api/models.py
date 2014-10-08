@@ -364,16 +364,35 @@ class Loopback(models.Model):
     container = models.ForeignKey(Container)
     filename = models.CharField(max_length=255)
     mountpoint = models.CharField(max_length=255)
+    ro = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('container', 'filename', 'mountpoint')
 
     def clean(self):
-        checks = ('..', './', '/.')
+        checks = ('..', './', '/.', '//')
+        starts = ('/',)
+        ends = ('/',)
+        equals = ('etc', 'logs', 'run', 'tmp', 'vassals')
         for check in checks:
             if check in self.filename:
                 raise ValidationError("invalid filename")
             if check in self.mountpoint:
+                raise ValidationError("invalid mountpoint")
+        for start in starts:
+            if self.filename.startswith(start):
+                raise ValidationError("invalid filename")
+            if self.mountpoint.startswith(start):
+                raise ValidationError("invalid mountpoint")
+        for end in ends:
+            if self.filename.endswith(end):
+                raise ValidationError("invalid filename")
+            if self.mountpoint.endswith(end):
+                raise ValidationError("invalid mountpoint")
+        for equal in equals:
+            if self.filename == equal:
+                raise ValidationError("invalid filename")
+            if self.mountpoint == equal:
                 raise ValidationError("invalid mountpoint")
 
 """
