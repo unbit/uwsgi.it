@@ -40,6 +40,14 @@ for(;;) {
 			if ($_->{mtime} > $st[9]) {
 				get_ini($_->{uid}, $vassal);
 			}
+			# if the .ini is ok, check only for ssh keys
+			else {
+				my $authorized_keys = '/containers/'.$_->{uid}.'/.ssh/uwsgi_authorized_keys';
+				my @st = stat($authorized_keys);
+				if ($_->{ssh_keys_mtime} > $st[9]) {
+                                	get_ssh_keys($_->{uid}, $authorized_keys);
+                        	}
+			}
 		}
 		else {
 			get_ini($_->{uid}, $vassal);
@@ -173,6 +181,31 @@ sub get_ini {
 
 	print date().' '.$vassal." updated\n";
 };
+
+sub get_ssh_keys {
+	my ($uid, $authorized_keys) = @_;
+	my $ua = LWP::UserAgent->new;
+        $ua->ssl_opts(
+                SSL_key_file => $ssl_key,
+                SSL_cert_file => $ssl_cert,
+        );
+        $ua->timeout(3);
+
+        my $response =  $ua->get($base_url.'/ssh_keys/'.$_->{uid});	
+	
+	if ($response->is_error or $response->code != 200) {
+                print date().' oops for '.$uid.': '.$response->code.' '.$response->message."\n";
+                return;
+        }
+
+	my $keys = $response->decoded_content;
+
+        open SSH,'>'.$authorized_keys;
+        print SSH $keys."\n";
+        close(SSH);
+
+        print date().' '.$authorized_keys." updated\n";
+}
 
 sub date {
 	return strftime "%Y-%m-%d %H:%M:%S", localtime;
