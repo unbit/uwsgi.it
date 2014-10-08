@@ -32,6 +32,7 @@ def container(request, id):
                 setattr(container, key, j[key])
         if 'ssh_keys' in j:
             container.ssh_keys_raw = '\n'.join(j['ssh_keys'])
+            container.ssh_keys_mtime = datetime.datetime.now()
         if 'distro' in j:
             container.distro = Distro.objects.get(pk=j['distro'])
         if 'memory' in j:

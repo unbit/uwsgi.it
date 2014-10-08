@@ -231,6 +231,8 @@ class Container(models.Model):
 
     last_reboot = models.DateTimeField(default=start_of_epoch)
 
+    ssh_keys_mtime = models.DateTimeField(default=start_of_epoch)
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
@@ -260,7 +262,6 @@ class Container(models.Model):
     # force a reboot if required
     def save(self, *args, **kwargs):
         interesting_fields = ('name',
-                              'ssh_keys_raw',
                               'distro', 
                               'server', 
                               'memory', 
@@ -281,6 +282,8 @@ class Container(models.Model):
                     break
             if set_reboot:
                 self.last_reboot = datetime.datetime.now()
+            if self.ssh_keys_raw != orig.ssh_keys_raw:
+                self.ssh_keys_mtime = datetime.datetime.now()
         super(Container, self).save(*args, **kwargs)
 
     @property
@@ -312,6 +315,10 @@ class Container(models.Model):
     @property
     def munix(self):
         return calendar.timegm(self.last_reboot.utctimetuple())
+
+    @property
+    def ssh_keys_munix(self):
+        return calendar.timegm(self.ssh_keys_mtime.utctimetuple())
 
     @property
     def ssh_keys(self):

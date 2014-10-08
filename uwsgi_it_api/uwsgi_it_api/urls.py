@@ -3,6 +3,7 @@ from django.conf.urls import patterns
 urlpatterns = patterns('uwsgi_it_api.views_private',
     (r'^private/containers/$', 'private_containers'),
     (r'^private/containers/(\d+)\.ini$', 'private_container_ini'),
+    (r'^private/ssh_keys/(\d+)$', 'private_container_ssh_keys'),
     (r'^private/legion/nodes/$', 'private_legion_nodes'),
     (r'^private/nodes/$', 'private_nodes'),
     (r'^private/domains/rsa/$', 'private_domains_rsa'),

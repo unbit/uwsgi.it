@@ -23,7 +23,7 @@ def private_custom_services(request):
 def private_containers(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
-        j = [{'uid':container.uid, 'mtime': container.munix } for container in server.container_set.exclude(distro__isnull=True).exclude(ssh_keys_raw__exact='').exclude(ssh_keys_raw__isnull=True)]
+        j = [{'uid':container.uid, 'mtime': container.munix, 'ssh_keys_mtime': container.ssh_keys_munix } for container in server.container_set.exclude(distro__isnull=True).exclude(ssh_keys_raw__exact='').exclude(ssh_keys_raw__isnull=True)]
         return spit_json(request, j)
     except:
         return HttpResponseForbidden('Forbidden\n')
@@ -47,6 +47,16 @@ def private_container_ini(request, id):
         return HttpResponse(j, content_type="text/plain")
     except:
         return HttpResponseForbidden('Forbidden\n')    
+
+@need_certificate
+def private_container_ssh_keys(request, id):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+        if not container.distro or not container.ssh_keys_raw: raise Exception("invalid container")
+        return HttpResponse(container.ssh_keys_raw, content_type="text/plain")
+    except:
+        return HttpResponseForbidden('Forbidden\n')
 
 @need_certificate
 def private_legion_nodes(request):
