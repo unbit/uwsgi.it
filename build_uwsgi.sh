@@ -1,7 +1,7 @@
 set -u
 set -e
 rm -rf uwsgi
-git clone https://github.com/unbit/uwsgi
+git clone --branch uwsgi-2.0 https://github.com/unbit/uwsgi
 cd uwsgi
 make uwsgi.it
 cp -f uwsgi /opt/unbit/uwsgi/uwsgi
