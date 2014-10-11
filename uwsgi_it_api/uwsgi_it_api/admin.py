@@ -84,7 +84,7 @@ class LoopboxAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(LoopboxAdminForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+            self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.container.customer)
         else:
             self.fields['tags'].widget = HiddenInput()
 
