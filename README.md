@@ -41,6 +41,7 @@ Goals
 - /run/shm (/dev/shm) is automatically mapped to the whole container memory
 - /var/run/utmp only exports sessions running in a container
 - xattrs and acls
+- allows mounting and managing loop block device via api
 
 Status
 ------
@@ -87,6 +88,7 @@ Three perl processes manage the infrastruture configuration:
 - configurator.pl -> manage containers vassal files
 - dominator.pl -> manage domains to rsa key mappings
 - collector.pl -> gather statistics from the various exposed metrics
+- loopboxer.pl -> manage loop block devices (loopbox)
 
 
 
