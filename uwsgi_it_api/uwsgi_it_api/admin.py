@@ -80,8 +80,18 @@ class CustomerAdmin(admin.ModelAdmin):
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('content', 'ctime', 'public')
 
+class LoopboxAdminForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(LoopboxAdminForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
+        else:
+            self.fields['tags'].widget = HiddenInput()
+
 class LoopboxAdmin(admin.ModelAdmin):
     list_display = ('container', 'filename', 'mountpoint')
+
+    form = LoopboxAdminForm
 
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
