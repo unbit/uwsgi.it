@@ -49,10 +49,19 @@ for(;;) {
         foreach my $lb (@{$loopboxes}) {
                 my $pid = get_container_pid($lb->{uid}, $containers_json->{vassals});
                 next unless $pid;
-                if (check_mountpoint($pid, $lb->{id}, $lb->{filename}, $lb->{mountpoint}, $loopboxes)) {
-                        print "need to create /dev/loop".$lb->{id}." from ".$lb->{filename}." on ".$lb->{mountpoint}."\n";
+                if (check_mountpoint($pid, $lb->{uid}, $lb->{id}, $lb->{filename}, $lb->{mountpoint}, $loopboxes)) {
+			my $cmd = '/etc/uwsgi/loopbox mount /containers/'.$lb->{uid}.'/run/ns.socket /dev/loop'.$lb->{id}.' /containers/'.$lb->{uid}.'/'.$lb->{filename}.' /containers/'.$lb->{uid}.'/'.$lb->{mountpoint}.' '.$lb->{ro};
+			print date().' running '.$cmd."\n";	
+			system($cmd.' >> /containers/'.$lb->{uid}.'/logs/emperor.log');
                 }
         }
+
+	
+	foreach(@{$containers_json->{vassals}}) {
+		if (!$_->{checked}) {
+			unmount_all($_);
+		}
+	}
 
         sleep(30);
 }
@@ -65,19 +74,33 @@ sub get_container_pid {
         my ($uid, $vassals) = @_;
         foreach(@{$vassals}) {
                 if ($uid.'.ini' eq $_->{id}) {
+			$_->{checked} = 1;
                         return $_->{pid};
                 }
         }
 
 }
+sub unmount_all {
+	my ($vassal) = @_;
+	open MOUNTS,'/proc/'.$vassal->{pid}.'/mounts';
+        while(<MOUNTS>) {
+                my ($device, $dir) = split /\s+/;
+                if ($device =~ /\/dev\/loop\d+/) {
+			my $uid = $vassal->{id};
+			$uid =~ s/\.ini$//;
+			umount($uid, $dir);
+		}
+	}
+	close(MOUNTS);
+}
 
 sub check_mountpoint {
-        my ($pid, $id, $filename, $mountpoint) = @_;
+        my ($pid, $uid, $id, $filename, $mountpoint, $loopboxes) = @_;
         my $ret = 1;
+        # first check if we need to umount devices
         open MOUNTS,'/proc/'.$pid.'/mounts';
         while(<MOUNTS>) {
                 my ($device, $dir) = split /\s+/;
-                # first check if we need to umount the device
                 if ($device =~ /\/dev\/loop(\d+)/) {
                         my $loop = $1;
                         my $found = 0;
@@ -88,9 +111,62 @@ sub check_mountpoint {
                                 }
                         }
                         unless($found) {
-                                print "need to remove ".$device."\n";
+				umount($uid, $dir);
                         }
+		}
+	}
+	close(MOUNTS);
+
+	open MOUNTS,'/proc/'.$pid.'/mounts';
+	while(<MOUNTS>) {
+                my ($device, $dir) = split /\s+/;
+		if ($device =~ /\/dev\/loop(\d+)/) {
+                        my $loop = $1;
+                        my $found = 0;
+                        foreach(@{$loopboxes}) {
+                                if ($loop eq $_->{id}) {
+                                        $found = 1;
+                                        last;
+                                }
+                        }
+			# exit in case of incongruence
+                        last unless($found);
+
                         if ($device eq '/dev/loop'.$id) {
+				# check if the size of the file is changed
+				open SYSFS, '/sys/class/block/loop'.$id.'/size';
+				my $sectors = <SYSFS>;
+				close SYSFS;	
+				my @st = stat('/containers/'.$uid.'/'.$filename);
+				# deleted file ?
+				unless(@st) {
+					umount($uid, $dir);
+					$ret = 0;
+                                	last;
+				}
+				# invalid file size ?
+				my $size = $st[7];
+				if ($size < (1024*1024)) {
+					umount($uid, $dir);
+					$ret = 0;
+                                	last;
+				}
+				# file decreased in size ?
+				$file_sectors = $size/512;
+				if ($file_sectors < $sectors) {
+					umount($uid, $dir);
+					$ret = 0;
+                                	last;
+				}
+				# at least 1 megabyte more
+				if ($file_sectors > $sectors + (2048)) {
+					umount($uid, $dir);
+					# calling resize2fs on a loopback device under a namespace
+					# make the kernel hang ... :( disable it for now
+					#my $cmd = '/etc/uwsgi/loopbox resize /containers/'.$uid.'/run/ns.socket /dev/loop'.$id.' /containers/'.$uid.'/'.$filename;
+        				#print date().' running '.$cmd."\n";
+					#system($cmd);
+				}
                                 $ret = 0;
                                 last;
                         }
@@ -98,4 +174,11 @@ sub check_mountpoint {
         }
         close(MOUNTS);
         return $ret;
+}
+
+sub umount {
+	my ($uid, $dir) = @_;
+	my $cmd = '/etc/uwsgi/loopbox umount /containers/'.$uid.'/run/ns.socket '.$dir;
+        print date().' running '.$cmd."\n";
+	system($cmd.' >> /containers/'.$uid.'/logs/emperor.log');
 }
