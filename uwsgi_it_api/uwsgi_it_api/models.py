@@ -376,7 +376,7 @@ class Loopbox(models.Model):
     tags = models.ManyToManyField('Tag', blank=True)
 
     class Meta:
-        unique_together = ('container', 'filename', 'mountpoint')
+        unique_together = (('container', 'filename'), ('container', 'mountpoint'))
 
     def clean(self):
         checks = ('..', './', '/.', '//')
