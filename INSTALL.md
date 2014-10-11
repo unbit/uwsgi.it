@@ -1,7 +1,7 @@
 Step by step guide for installing a uwsgi.it node
 -------------------------------------------------
 
-This procedure assumes an x86_64 Ubuntu 13.10 server (ubuntu-minimal) with ext4 filesystem.
+This procedure assumes an x86_64 Ubuntu 14.04 server (ubuntu-minimal) with ext4 filesystem.
 
 Note: you can set /etc/hostname to whatever you want, each container will have its own...
 
@@ -233,7 +233,7 @@ cp emperor.conf /etc/init
 cp emperor.ini /etc/uwsgi
 cp -R services /etc/uwsgi
 mkdir /etc/uwsgi/custom_services
-cp firewall.sh collector.pl configurator.pl dominator.pl /etc/uwsgi/
+cp firewall.sh collector.pl configurator.pl dominator.pl loopboxer.pl /etc/uwsgi/
 ```
 
 Configuring /etc/uwsgi/local.ini
