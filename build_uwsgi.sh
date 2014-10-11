@@ -45,5 +45,6 @@ git clone https://github.com/unbit/uwsgi-quota
 cp quota_plugin.so /opt/unbit/uwsgi/plugins
 
 git clone https://github.com/unbit/uwsgi-strophe
-/opt/unbit/uwsgi/uwsgi --build-plugin uwsgi-strophe
+cd uwsgi-strophe
+/opt/unbit/uwsgi/uwsgi --build-plugin .
 cp strophe_plugin.so /opt/unbit/uwsgi/plugins
