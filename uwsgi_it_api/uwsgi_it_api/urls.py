@@ -8,7 +8,7 @@ urlpatterns = patterns('uwsgi_it_api.views_private',
     (r'^private/nodes/$', 'private_nodes'),
     (r'^private/domains/rsa/$', 'private_domains_rsa'),
     (r'^private/custom_services/$', 'private_custom_services'),
-    (r'^private/loopbacks/$', 'private_loopbacks'),
+    (r'^private/loopboxes/$', 'private_loopboxes'),
 
     (r'^private/metrics/container.io.read/(\d+)$', 'private_metrics_container_io_read'),
     (r'^private/metrics/container.io.write/(\d+)$', 'private_metrics_container_io_write'),
