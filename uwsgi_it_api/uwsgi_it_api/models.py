@@ -367,11 +367,13 @@ class ContainerLink(models.Model):
         if self.container == self.to:
             raise ValidationError("cannot link with myself")
 
-class Loopback(models.Model):
+class Loopbox(models.Model):
     container = models.ForeignKey(Container)
     filename = models.CharField(max_length=64)
     mountpoint = models.CharField(max_length=255)
     ro = models.BooleanField(default=False)
+
+    tags = models.ManyToManyField('Tag', blank=True)
 
     class Meta:
         unique_together = ('container', 'filename', 'mountpoint')
