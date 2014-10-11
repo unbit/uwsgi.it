@@ -24,14 +24,14 @@ for(;;) {
         );
         $ua->timeout(3);
 
-        my $response =  $ua->get($base_url.'/loopbacks/');
+        my $response =  $ua->get($base_url.'/loopboxes/');
 
         if ($response->is_error or $response->code != 200 ) {
                 print date().' oops: '.$response->code.' '.$response->message."\n";
                 exit;
         }
 
-        my $loopbacks = decode_json($response->decoded_content);
+        my $loopboxes = decode_json($response->decoded_content);
 
         my $containers_json = undef;
         # get json stats from the Emperor stats
@@ -46,10 +46,10 @@ for(;;) {
                 $containers_json = decode_json($json);
         }
 
-        foreach my $lb (@{$loopbacks}) {
+        foreach my $lb (@{$loopboxes}) {
                 my $pid = get_container_pid($lb->{uid}, $containers_json->{vassals});
                 next unless $pid;
-                if (check_mountpoint($pid, $lb->{id}, $lb->{filename}, $lb->{mountpoint}, $loopbacks)) {
+                if (check_mountpoint($pid, $lb->{id}, $lb->{filename}, $lb->{mountpoint}, $loopboxes)) {
                         print "need to create /dev/loop".$lb->{id}." from ".$lb->{filename}." on ".$lb->{mountpoint}."\n";
                 }
         }
@@ -81,7 +81,7 @@ sub check_mountpoint {
                 if ($device =~ /\/dev\/loop(\d+)/) {
                         my $loop = $1;
                         my $found = 0;
-                        foreach(@{$loopbacks}) {
+                        foreach(@{$loopboxes}) {
                                 if ($loop eq $_->{id}) {
                                         $found = 1;
                                         last;
