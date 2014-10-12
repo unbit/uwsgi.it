@@ -202,6 +202,91 @@ def containers(request):
 
     return spit_json(request, c)
 
+@need_basicauth
+@csrf_exempt
+def loopboxes(request):
+    if request.method == 'POST':
+        response = check_body(request)
+        if response:
+            return response
+        j = json.loads(request.read())
+        needed_keys = ('container', 'filename', 'mountpoint')
+        for k in needed_keys:
+            if not k in j.keys():
+                return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        try:
+            container = request.user.customer.container_set.get(pk=(int(j['container']) - UWSGI_IT_BASE_UID))
+        except:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        try:
+            loopbox = Loopbox(container=container)
+            loopbox.filename = j['filename']
+            loopbox.mountpoint = j['mountpoint']
+            if 'ro' in j:
+                loopbox.ro = j['ro']
+            loopbox.save()
+            response = HttpResponse(json.dumps({'message': 'Created'}), content_type="application/json")
+            response.status_code = 201
+            return response
+        except:
+            response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
+            response.status_code = 409
+            return response
+    elif (request.method == 'GET' and
+         'tags' in request.GET):
+            loopboxes = Loopbox.objects.filter(container__in=request.user.customer.container_set.all(),tags__name__in=request.GET['tags'].split(','))
+    else:
+        loopboxes = Loopbox.objects.filter(container__in=request.user.customer.container_set.all())
+
+    l = []
+    for loopbox in loopboxes:
+        ll = {
+            'id': loopbox.pk,
+            'container': loopbox.container.uid,
+            'filename': loopbox.filename,
+            'mountpoint': loopbox.mountpoint,
+            'ro': loopbox.ro,
+            'tags': [t.name for t in loopbox.tags.all()]
+        }
+        l.append(ll)
+    return spit_json(request, l)
+
+@need_basicauth
+@csrf_exempt
+def loopbox(request, id):
+    customer = request.user.customer
+    try:
+        loopbox = Loopbox.objects.get(pk=id, container__in=customer.container_set.all())
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    if request.method == 'POST':
+        response = check_body(request)
+        if response:
+            return response
+        j = json.loads(request.read())
+        if not j:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        if 'tags' in j:
+            new_tags = []
+            for tag in j['tags']:
+                try:
+                    new_tags.append(Tag.objects.get(customer=customer, name=tag))
+                except:
+                    pass
+            loopbox.tags = new_tags
+        loopbox.save()
+    elif request.method == 'DELETE':
+        loopbox.delete()
+        return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
+    l = {
+        'id': loopbox.pk,
+        'container': loopbox.container.uid,
+        'filename': loopbox.filename,
+        'mountpoint': loopbox.mountpoint,
+        'ro': loopbox.ro,
+        'tags': [t.name for t in loopbox.tags.all()]
+    }
+    return spit_json(request, l)
 
 @need_basicauth
 def distros(request):

@@ -404,6 +404,9 @@ class Loopbox(models.Model):
             if self.mountpoint == equal:
                 raise ValidationError("invalid mountpoint")
 
+    class Meta:
+        verbose_name_plural = 'Loopboxes'
+
 """
 domains are mapped to customers, each container of the customer
 can subscribe to them
@@ -452,6 +455,7 @@ class News(models.Model):
 
     class Meta:
         ordering = ['-ctime']
+        verbose_name_plural = 'News'
 
 """
 Pretty low level model for storing customer configurations out of

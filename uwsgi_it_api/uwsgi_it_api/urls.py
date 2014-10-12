@@ -39,6 +39,9 @@ urlpatterns += patterns('uwsgi_it_api.views',
     (r'^tags/(\d+)$', 'tag'),
 
     (r'^news/?$', 'news'),
+
+    (r'^loopboxes/?$', 'loopboxes'),
+    (r'^loopboxes/(\d+)$', 'loopbox'),
 )
 
 urlpatterns += patterns('uwsgi_it_api.views_metrics',
