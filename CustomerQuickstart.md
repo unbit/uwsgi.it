@@ -491,6 +491,51 @@ curl https://kratos:deimos17@foobar.com/api/domains/?tags=foobar
 
 will returns domains tagged with 'foobar'
 
+
+Loopboxes
+---------
+
+Would not be amazing if you could "partitionate" your container diskspace and assign each partition to a customer ?
+
+Would not be even better to enforce disk usage limits to a single vassal/app ?
+
+Loopboxes allow you to "mount" loop block devices in your container.
+
+Loop block devices are a common UNIX feature: you use a file as a block device. When you download an .iso file, you can directly mount it thanks to loop block devices.
+
+You can create all the loopboxes you need in a container, and the system will take care of mapping them to a loop block device in the server and to mount it in your container.
+
+Confused ? let'see an example.
+
+You want the customer 'zeus' (using the container 30017) to be confined in a 100MB virtual disk. You first need to create a 100MB zero-filled file:
+
+```sh
+dd if=/dev/zero of=zeus001 bs=512 count=200000
+```
+
+(512 as the block size is only a convention, as generally block devices are managed in sectors, you are free to choose the approach you like most)
+
+now we can simply 'format' the file as it would be an hard disk or a usb key:
+
+```sh
+mkfs.ext4 zeus001
+```
+
+(only the ext4 filesystem is supported)
+
+Finally we create a directory mountpoint:
+
+```sh
+mkdir zeus
+```
+
+Let's mount zeus001 to zeus/ in container 30017 via the api:
+
+```sh
+curl -X POST -d '{"container":30017,"filename":"zeus001","mountpoint":"zeus"}' https://kratos:deimos17@foobar.com/api/loopboxes
+```
+
+
 Logging
 -------
 
