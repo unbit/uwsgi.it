@@ -499,6 +499,8 @@ Would not be amazing if you could "partitionate" your container diskspace and as
 
 Would not be even better to enforce disk usage limits to a single vassal/app ?
 
+What about single-file-contained apps ?
+
 Loopboxes allow you to "mount" loop block devices in your container.
 
 Loop block devices are a common UNIX feature: you use a file as a block device. When you download an .iso file, you can directly mount it thanks to loop block devices.
