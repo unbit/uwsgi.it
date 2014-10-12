@@ -234,6 +234,7 @@ cp emperor.ini /etc/uwsgi
 cp -R services /etc/uwsgi
 mkdir /etc/uwsgi/custom_services
 cp firewall.sh collector.pl configurator.pl dominator.pl loopboxer.pl /etc/uwsgi/
+gcc -o /etc/uwsgi/loopbox loopbox.c
 ```
 
 Configuring /etc/uwsgi/local.ini
