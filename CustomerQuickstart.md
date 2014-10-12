@@ -535,6 +535,55 @@ Let's mount zeus001 to zeus/ in container 30017 via the api:
 curl -X POST -d '{"container":30017,"filename":"zeus001","mountpoint":"zeus"}' https://kratos:deimos17@foobar.com/api/loopboxes
 ```
 
+Now check your logs/emperor.log logfile to get notifications about zeus001 mount status.
+
+To get the list of your loopboxes:
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/loopboxes
+```
+
+To get infos (included tags) of a loopbox:
+
+```sh
+curl https://kratos:deimos17@foobar.com/api/loopboxes/id
+```
+
+where id is the "id" field/attribute of a loopbox
+
+When you want to destroy a loopbox (destroying a loopbox will only unmount it from your container, the image files remain untouched) you simply call the DELETE method on it:
+
+```sh
+curl -X DELETE https://kratos:deimos17@foobar.com/api/loopboxes/id
+```
+
+You can assign tags to a loopbox too:
+
+```sh
+curl -X POST -d '{"tags":["foobar"]}' https://kratos:deimos17@foobar.com/api/loopboxes/id
+```
+
+When working with loopboxes you need to take care about the following rules:
+
+* deleting the image file will unmount the loopbox
+* resizing the image file will unmount the loopbox (it will be remounted 30 seconds later if all is right with the new size)
+* if you resize an image you can "fix" it with the resize2fs command (an fsck on the image file could be required)
+* the lost+found directory is owned by root
+* image files lower than 1MB are not mounted
+* always make a backup copy of an image file before resizing it
+* updating loopbox fields (except for tags) is not allowed. This is for avoiding mess (mainly race conditions) with the mount namespace. You can delete and recreate a loopbox easily
+* all the paths are relative to the container's home, paths cannot start with a / or contains './' and '../' sequences
+* You cannot mount an image file in one of the directories managed by the Emperor (like 'vassals' or 'etc')
+* When using loopboxes with vassals/apps you should ensure they are mounted, the `--wait-for-mountpoint` or `--wait-for-dir` options could be useful to suspend a uWSGI instance while waiting for a loopbox to be mounted (30 seconds at most if all is correct)
+
+In the 'zeus' example our vassal should be something like:
+
+```ini
+[uwsgi]
+; suspend the instance until /containers/30017/zeus is mounted
+wait-for-mountpoint = $(HOME)/zeus
+...
+```
 
 Logging
 -------
