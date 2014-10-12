@@ -578,6 +578,7 @@ When working with loopboxes you need to take care about the following rules:
 * You cannot mount an image file in one of the directories managed by the Emperor (like 'vassals' or 'etc')
 * ext4 is the only supporte filesystem with POSIX acl and extended attributes enabled
 * all the loopbox-related messages are logged to logs/emperor.log (it is hardcoded)
+* The 'loopback' wording is generally wrong, the real name of the technology is loop block devices. 
 * When using loopboxes with vassals/apps you should ensure they are mounted, the `--wait-for-mountpoint` or `--wait-for-dir` options could be useful to suspend a uWSGI instance while waiting for a loopbox to be mounted (30 seconds at most if all is correct)
 
 In the 'zeus' example our vassal should be something like:
