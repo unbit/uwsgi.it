@@ -131,8 +131,12 @@ def me(request):
         if 'password' in j:
             customer.user.set_password(j['password'])
             customer.user.save()
+        if 'email' in j:
+            customer.user.email = j['email']
+            customer.user.save()
         customer.save()
     c = {
+        'email': customer.user.email,
         'vat': customer.vat,
         'company': customer.company,
         'uuid': customer.uuid,
