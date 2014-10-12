@@ -574,6 +574,7 @@ When working with loopboxes you need to take care about the following rules:
 * updating loopbox fields (except for tags) is not allowed. This is for avoiding mess (mainly race conditions) with the mount namespace. You can delete and recreate a loopbox easily
 * all the paths are relative to the container's home, paths cannot start with a / or contains './' and '../' sequences
 * You cannot mount an image file in one of the directories managed by the Emperor (like 'vassals' or 'etc')
+* ext4 is the only supporte filesystem with POSIX acl and extended attributes enabled
 * When using loopboxes with vassals/apps you should ensure they are mounted, the `--wait-for-mountpoint` or `--wait-for-dir` options could be useful to suspend a uWSGI instance while waiting for a loopbox to be mounted (30 seconds at most if all is correct)
 
 In the 'zeus' example our vassal should be something like:
