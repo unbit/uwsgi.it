@@ -64,10 +64,11 @@ def private_legion_nodes(request):
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
         nodes = [] 
         unix = server.munix
-        for node in server.legion_set.first().nodes.all():
-            if node.address != server.address:
-                if node.munix > unix: unix = node.munix
-                nodes.append(node.address)
+        if server.legion_set.count() > 0:
+            for node in server.legion_set.first().nodes.all():
+                if node.address != server.address:
+                    if node.munix > unix: unix = node.munix
+                    nodes.append(node.address)
         return HttpResponse(json.dumps({'unix': unix, 'nodes':nodes}), content_type="text/plain")
     except:
         return HttpResponseForbidden('Forbidden\n')    
