@@ -113,7 +113,7 @@ def news(request):
             news_list.append({'content': n.content,
                               'date': int(time.mktime(n.ctime.timetuple()))})
     return spit_json(request, news_list)
-        
+
 
 @need_basicauth
 @csrf_exempt
@@ -236,9 +236,18 @@ def loopboxes(request):
             response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
             response.status_code = 409
             return response
-    elif (request.method == 'GET' and
-         'tags' in request.GET):
-            loopboxes = Loopbox.objects.filter(container__in=request.user.customer.container_set.all(),tags__name__in=request.GET['tags'].split(','))
+    elif request.method == 'GET':
+        query = {}
+        if 'tags' in request.GET:
+            query['tags__name__in'] = request.GET['tags'].split(',')
+        if 'container' in request.GET:
+            try:
+                query['container__in'] = request.user.customer.container_set.get(request.GET['container'])
+            except:
+                return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        else:
+            query['container__in'] = request.user.customer.container_set.all()
+        loopboxes = Loopbox.objects.filter(**query)
     else:
         loopboxes = Loopbox.objects.filter(container__in=request.user.customer.container_set.all())
 
@@ -254,6 +263,7 @@ def loopboxes(request):
         }
         l.append(ll)
     return spit_json(request, l)
+
 
 @need_basicauth
 @csrf_exempt
