@@ -18,8 +18,34 @@ int openat_alarm_global_fd = -1;
 static void openat_alarm_init(struct uwsgi_alarm_instance *uai) {
 }
 
+// the file format is a simple json:
+/*
+	{
+		"container": xxxxx,
+		"unix": yyyy,
+		"msg": "...",
+	}
+
+	where "container" is the container uid, "unix" is the unix epoch time and "msg" is the raw alarm msg
+*/
 static void openat_alarm_func(struct uwsgi_alarm_instance *uai, char *msg, size_t len) {
-	
+	if (openat_alarm_global_fd < 0) return;
+	// generate a uuid (36 bytes + \0 + ".tmp")
+	char uuid[41];
+	uwsgi_uuid(uuid);
+	memcpy(uuid+36, ".tmp\0", 5);
+	int fd = openat(openat_alarm_global_fd, uuid, O_CREAT|O_WRONLY|O_EXCL, S_IRUSR | S_IWUSR);
+	if (fd < 0) {
+		uwsgi_log("[alarm] unable to store alarm %.*s\n", 36, uuid);
+		uwsgi_error("openat()");
+		return;
+	}
+
+	// write the json
+
+	// close the file
+
+	// rename it (remove .tmp suffix)
 }
 
 static void register_openat_alarm() {
