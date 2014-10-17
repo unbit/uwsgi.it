@@ -242,7 +242,7 @@ def loopboxes(request):
             query['tags__name__in'] = request.GET['tags'].split(',')
         if 'container' in request.GET:
             try:
-                query['container__in'] = request.user.customer.container_set.get(request.GET['container'])
+                query['container'] = request.user.customer.container_set.get(pk=(int(request.GET['container']) - UWSGI_IT_BASE_UID))
             except:
                 return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
         else:
