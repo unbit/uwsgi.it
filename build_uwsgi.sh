@@ -18,6 +18,9 @@ cp corerouter_plugin.so http_plugin.so fastrouter_plugin.so rawrouter_plugin.so 
 /opt/unbit/uwsgi/uwsgi --build-plugin ../calc_ip.c
 cp calc_ip_plugin.so /opt/unbit/uwsgi/plugins
 
+/opt/unbit/uwsgi/uwsgi --build-plugin ../openat_alarm.c
+cp openat_alarm_plugin.so /opt/unbit/uwsgi/plugins
+
 /opt/unbit/uwsgi/uwsgi --build-plugin ../dgram_router.c
 cp dgram_router_plugin.so /opt/unbit/uwsgi/plugins
 
