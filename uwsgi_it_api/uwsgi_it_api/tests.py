@@ -40,13 +40,27 @@ class ViewsTest(TestCase):
             storage=10,
             name="container"
         )
+        self.container2, _ = Container.objects.get_or_create(
+            customer=self.customer,
+            server=self.server,
+            memory=10,
+            storage=10,
+            name="container2"
+        )
         self.c_uid = self.container.uid
         self.domain, _ = Domain.objects.get_or_create(customer=self.customer, name="domain")
         self.d_uuid = self.domain.uuid
         self.tag, _ = Tag.objects.get_or_create(customer=self.customer, name="tag")
-
+        self.loopbox, _ = Loopbox.objects.get_or_create(container=self.container, filename='filename', mountpoint='mountpoint')
+        self.loopbox2, _ = Loopbox.objects.get_or_create(container=self.container2, filename='filename2', mountpoint='mountpoint2')
+        self.loopbox3, _ = Loopbox.objects.get_or_create(container=self.container, filename='filename3', mountpoint='mountpoint3')
+        self.l_id = self.loopbox.id
+        self.l2_id = self.loopbox2.id
+        self.l3_id = self.loopbox3.id
         self.container.tags.add(self.tag)
         self.domain.tags.add(self.tag)
+        self.loopbox.tags.add(self.tag)
+        self.loopbox2.tags.add(self.tag)
         # metrics
         today = datetime.datetime.today()
         NetworkRXContainerMetric.objects.create(
@@ -144,10 +158,10 @@ class ApiTest(ViewsTest):
     def test_containers_filters_tags(self):
         response = self.logged_get_response_for_view('/containers', containers, params={'tags': 'tag'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'uid: {}'.format(self.c_uid))
+        self.assertContains(response, '"uid": {}'.format(self.c_uid))
         response = self.logged_get_response_for_view('/containers', containers, params={'tags': 'fail'})
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'uid: {}'.format(self.c_uid))
+        self.assertNotContains(response, '"uid": {}'.format(self.c_uid))
 
     def test_container(self):
         response = self.logged_get_response_for_view('/containers/1', container, {'id': self.c_uid})
@@ -164,14 +178,47 @@ class ApiTest(ViewsTest):
     def test_domains_filters_tags(self):
         response = self.logged_get_response_for_view('/domains', domains, params={'tags': 'tag'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'uid: {}'.format(self.d_uuid))
+        self.assertContains(response, '"uuid": "{}"'.format(self.d_uuid))
         response = self.logged_get_response_for_view('/domains', domains, params={'tags': 'fail'})
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'uid: {}'.format(self.d_uuid))
+        self.assertNotContains(response, 'uuid: "{}"'.format(self.d_uuid))
 
     def test_domain(self):
         response = self.logged_get_response_for_view('/domains/1', domain, {'id': self.domain.pk})
         self.assertEqual(response.status_code, 200)
+
+    def test_loopboxes(self):
+        response = self.logged_get_response_for_view('/loopboxes', loopboxes)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"id": {}'.format(self.l_id))
+        self.assertContains(response, '"id": {}'.format(self.l2_id))
+        self.assertContains(response, '"id": {}'.format(self.l3_id))
+
+    def test_loopboxes_filters_per_container(self):
+        response = self.logged_get_response_for_view('/loopboxes', loopboxes, params={'container': self.c_uid})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"id": {}'.format(self.l_id))
+        self.assertContains(response, '"id": {}'.format(self.l3_id))
+        self.assertNotContains(response, '"id": {}'.format(self.l2_id))
+
+    def test_loopboxes_filters_per_tag(self):
+        response = self.logged_get_response_for_view('/loopboxes', loopboxes, params={'tags': 'tag'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"id": {}'.format(self.l_id))
+        self.assertContains(response, '"id": {}'.format(self.l2_id))
+        self.assertNotContains(response, '"id": {}'.format(self.l3_id))
+
+    def test_loopboxes_filters_per_tag_and_container(self):
+        response = self.logged_get_response_for_view('/loopboxes', loopboxes, params={'tags': 'tag', 'container': self.c_uid})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"id": {}'.format(self.l_id))
+        self.assertNotContains(response, '"id": {}'.format(self.l2_id))
+        self.assertNotContains(response, '"id": {}'.format(self.l3_id))
+
+    def test_loopbox(self):
+        response = self.logged_get_response_for_view('/loopboxes/{}'.format(self.l_id), loopbox, {'id': self.l_id})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"id": {}'.format(self.l_id))
 
     def test_tags(self):
         response = self.logged_get_response_for_view('/tags', tags)
