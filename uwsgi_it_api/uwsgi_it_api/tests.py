@@ -44,7 +44,6 @@ class ViewsTest(TestCase):
         self.domain, _ = Domain.objects.get_or_create(customer=self.customer, name="domain")
         self.d_uuid = self.domain.uuid
         self.tag, _ = Tag.objects.get_or_create(customer=self.customer, name="tag")
-
         self.container.tags.add(self.tag)
         self.domain.tags.add(self.tag)
         # metrics
@@ -144,10 +143,10 @@ class ApiTest(ViewsTest):
     def test_containers_filters_tags(self):
         response = self.logged_get_response_for_view('/containers', containers, params={'tags': 'tag'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'uid: {}'.format(self.c_uid))
+        self.assertContains(response, '"uid": {}'.format(self.c_uid))
         response = self.logged_get_response_for_view('/containers', containers, params={'tags': 'fail'})
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'uid: {}'.format(self.c_uid))
+        self.assertNotContains(response, '"uid": {}'.format(self.c_uid))
 
     def test_container(self):
         response = self.logged_get_response_for_view('/containers/1', container, {'id': self.c_uid})
@@ -164,10 +163,10 @@ class ApiTest(ViewsTest):
     def test_domains_filters_tags(self):
         response = self.logged_get_response_for_view('/domains', domains, params={'tags': 'tag'})
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'uid: {}'.format(self.d_uuid))
+        self.assertContains(response, '"uuid": "{}"'.format(self.d_uuid))
         response = self.logged_get_response_for_view('/domains', domains, params={'tags': 'fail'})
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'uid: {}'.format(self.d_uuid))
+        self.assertNotContains(response, 'uuid: "{}"'.format(self.d_uuid))
 
     def test_domain(self):
         response = self.logged_get_response_for_view('/domains/1', domain, {'id': self.domain.pk})
