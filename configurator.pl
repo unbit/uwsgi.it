@@ -153,6 +153,37 @@ for(;;) {
 		system("sh /etc/uwsgi/firewall.sh");
 	}
 
+	# alarms;
+	opendir ALARMS,'/etc/uwsgi/alarms';
+	@alarms = readdir(ALARMS);
+	closedir(ALARMS);
+
+	foreach(@alarms) {
+		next if /^\./;
+		next if length($_) != 36 && length($_) != 40;
+		# is it a zombie .tmp file ?
+		if (length($_) == 40 && $_ =~ /\.tmp/) {
+			my $filename = '/etc/uwsgi/alarms/'.$_;
+			my @st = stat($filename);
+                        if ($st[9] + 300 < time()) {
+				print date()."unlinking zombie alarm file: ".$filename."\n";
+				unlink $filename;	
+                        }
+			next;
+		}	
+		my $filename = '/etc/uwsgi/alarms/'.$_;
+		open ALARM, $filename;
+		binmode ALARM;
+		my $alarm = <ALARM>;
+		close ALARM;
+		# just in case the json is broken...
+		eval {
+			my $j = decode_json($alarm);
+			trigger_alarm($j->{container}, $j->{msg}, $j->{unix});
+		};
+		unlink $filename;
+	}
+
 	sleep(30);
 }
 
@@ -227,4 +258,18 @@ sub write_ini {
         close(INI);
 
         print date().' '.$vassal." updated\n";
+}
+
+sub trigger_alarm {
+	my ($container, $msg, $unix) = @_;
+	my $ua = LWP::UserAgent->new;
+        $ua->ssl_opts(
+                SSL_key_file => $ssl_key,
+                SSL_cert_file => $ssl_cert,
+        );
+        $ua->timeout(3);
+	$response = $ua->post($base_url.'/alarms/'.$container.'?unix='.$unix, Content => $msg);
+        if ($response->is_error or $response->code != 201 ) {
+                print date().' oops: '.$response->code.' '.$response->message."\n";
+        }
 }
