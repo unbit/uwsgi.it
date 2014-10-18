@@ -628,7 +628,7 @@ Alarms
 
 The container Emperor automatically set a series of alarms.
 
-You will get an alarm when your container quota is low (you can set the threshold with the quota_threshold item of the container api), when a OOM (out of memory) is triggered and when it is rebooted.
+Currently, you will get an alarm when your container quota is low (you can set the threshold with the quota_threshold item of the container api) and when a OOM (out of memory) is triggered.
 
 The alarm is broadcasted to all of the conntected container shells and to an optional jabber/xmpp account.
 
@@ -637,6 +637,16 @@ To enable jabber/xmpp alarm just set "jid", "jid_secret" and "jid_destinations" 
 jid and jid_secret are the credentials the Emperor will use to login to a jabber/xmpp server while jid_destinations is the comma-separated list of jid that will receive the alarms.
 
 :Note: for trouble with google account check your gmail account and visit this link http://support.google.com/mail?p=client_login
+
+Additionally each alarm is stored as a persistent record in the Customer's infos. You can access those records with
+
+```
+curl https://kratos:deimos17@foobar.com/api/alarms/
+```
+
+You have (by default, but it is dependent by your uwsgi.it-compliant supplier) 100 alarms slot for each container. You can use those slots to store any kind of alarm (exceptions, tracebacks, logs...). When you reach the limit of records per container, the oldest record is deleted.
+
+The alarms api is pretty big, check https://github.com/unbit/uwsgi.it/edit/master/Alarms.md for a detailed description and example usages.
 
 Snippets
 --------
