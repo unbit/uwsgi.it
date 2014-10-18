@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login
-from functools import wraps
+from functools import wraps, partial
 import base64
 import json
 
@@ -15,7 +15,7 @@ def need_certificate(func):
 
     return _decorator
 
-def api_auth(request):
+def api_auth(request, fallback=None, *args, **kwargs):
     if request.META.has_key('HTTP_AUTHORIZATION'):
             auth = request.META['HTTP_AUTHORIZATION'].split()
             if len(auth) == 2:
@@ -26,9 +26,13 @@ def api_auth(request):
             uname = request.META['HTTP_X_UWSGI_IT_USERNAME'].decode('hex')
             passwd = request.META['HTTP_X_UWSGI_IT_PASSWORD'].decode('hex')
             return authenticate(username=uname, password=passwd)
+    elif fallback:
+        return fallback(request, *args, **kwargs)
     return None
 
-def need_basicauth(func, realm='uwsgi.it api'):
+def need_basicauth(func=None, realm='uwsgi.it api', fallback=None):
+    if func is None:
+        return partial(need_basicauth, fallback=fallback)
     @wraps(func)
     def _decorator(request, *args, **kwargs):
         # first check for crossdomain
@@ -38,7 +42,7 @@ def need_basicauth(func, realm='uwsgi.it api'):
             response['Access-Control-Allow-Methods'] = 'GET,POST,DELETE,OPTIONS'
             response['Access-Control-Allow-Headers'] = 'X-uwsgi-it-username,X-uwsgi-it-password'
             return response
-        user = api_auth(request)
+        user = api_auth(request, fallback, *args, **kwargs)
         if user and user.is_active:
             login(request, user)
             request.user = user

@@ -397,7 +397,22 @@ def alarm_key(request, id):
     return HttpResponse(json.dumps({'message': 'Ok', 'alarm_key': container.alarm_key}), content_type="application/json")
     
 
-@need_basicauth
+def alarm_key_auth(request, id):
+    if not 'key' in request.GET: 
+        return None
+    key = request.GET['key']
+    if len(key) != 36:
+        return None
+    try:
+        container = Container.objects.get(pk=(int(id) - UWSGI_IT_BASE_UID), alarm_key=key)
+        user = container.customer.user
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        return user
+    except:
+        pass
+    return None
+
+@need_basicauth(fallback=alarm_key_auth)
 @csrf_exempt
 def raise_alarm(request, id):
     customer = request.user.customer
