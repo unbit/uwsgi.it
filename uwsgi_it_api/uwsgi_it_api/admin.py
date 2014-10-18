@@ -95,6 +95,8 @@ class LoopboxAdmin(admin.ModelAdmin):
 
 class AlarmAdmin(admin.ModelAdmin):
     list_display = ('container', 'level', 'unix', 'msg')
+    list_filter = ('level',)
+    search_fields = ('msg', '_class', 'vassal', 'color') 
 
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
