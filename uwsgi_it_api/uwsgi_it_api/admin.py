@@ -93,6 +93,9 @@ class LoopboxAdmin(admin.ModelAdmin):
 
     form = LoopboxAdminForm
 
+class AlarmAdmin(admin.ModelAdmin):
+    list_display = ('container', 'level', 'unix', 'msg')
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer, CustomerAdmin)
@@ -121,3 +124,5 @@ admin.site.register(NetworkTXDomainMetric,DomainMetricAdmin)
 
 admin.site.register(News, NewsAdmin)
 admin.site.register(Loopbox, LoopboxAdmin)
+
+admin.site.register(Alarm, AlarmAdmin)

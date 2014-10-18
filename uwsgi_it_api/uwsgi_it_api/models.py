@@ -369,6 +369,7 @@ class ContainerLink(models.Model):
         if self.container == self.to:
             raise ValidationError("cannot link with myself")
 
+
 class Loopbox(models.Model):
     container = models.ForeignKey(Container)
     filename = models.CharField(max_length=64)
@@ -406,6 +407,28 @@ class Loopbox(models.Model):
     class Meta:
         verbose_name_plural = 'Loopboxes'
         unique_together = (('container', 'filename'), ('container', 'mountpoint'))
+
+
+class Alarm(models.Model):
+    container = models.ForeignKey(Container)
+    unix = models.DateTimeField()
+    level = models.PositiveIntegerField(choices=((0,'system'),(1, 'user')))
+    # in the format #xxxxxx
+    color = models.CharField(max_length=7, default='#ffffff')
+    msg = models.TextField()
+
+    def save(self, *args, **kwargs):
+        if len(self.color) < 7:
+            raise ValidationError('invalid color')
+        if not self.color.startswith('#'):
+            raise ValidationError('invalid color')
+        # how many alarms ?
+        alarms = self.container.alarm_set.count()
+        if alarms + 1 > self.container.max_alarms:
+            oldest = self.container.alarm_set.all().order_by('unix')[0]
+            oldest.delete()
+        super(Alarm, self).save(*args, **kwargs)
+    
 
 
 """
