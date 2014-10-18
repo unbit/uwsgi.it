@@ -9,6 +9,7 @@ from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 import json
 import datetime
 import time
+import uuid
 
 
 @need_basicauth
@@ -288,6 +289,15 @@ def alarms(request):
     if 'level' in request.GET:
         query['level'] = int(request.GET['level'])
 
+    if 'line' in request.GET:
+        query['line'] = int(request.GET['line'])
+
+    if 'filename' in request.GET:
+        query['filename'] = request.GET['filename']
+
+    if 'func' in request.GET:
+        query['func'] = request.GET['func']
+
     alarms = Alarm.objects.filter(**query)
 
     a = [] 
@@ -299,6 +309,9 @@ def alarms(request):
             'color': alarm.color,
             'class': alarm._class,
             'vassal': alarm.vassal,
+            'line': alarm.line,
+            'filename': alarm.filename,
+            'func': alarm.func,
             'unix': int(alarm.unix.strftime('%s')),
             'msg': alarm.msg
         }
@@ -362,11 +375,27 @@ def alarm(request, id):
         'level': alarm.level,
         'color': alarm.color,
         'class': alarm._class,
+        'line': alarm.line,
+        'filename': alarm.filename,
+        'func': alarm.func,
         'vassal': alarm.vassal,
         'unix': int(alarm.unix.strftime('%s')),
         'msg': alarm.msg
     }
     return spit_json(request, a)
+
+@need_basicauth
+@csrf_exempt
+def alarm_key(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    container.alarm_key = str(uuid.uuid4())
+    container.save()
+    return HttpResponse(json.dumps({'message': 'Ok', 'alarm_key': container.alarm_key}), content_type="application/json")
+    
 
 @need_basicauth
 @csrf_exempt
@@ -388,6 +417,9 @@ def raise_alarm(request, id):
             alarm.color = color
         alarm._class = request.GET.get('class', None)
         alarm.vassal = request.GET.get('vassal', None)
+        alarm.line = request.GET.get('line', None)
+        alarm.func = request.GET.get('func', None)
+        alarm.filename = request.GET.get('filename', None)
         if 'unix' in request.GET:
             alarm.unix = datetime.datetime.fromtimestamp(int(request.GET['unix']))
         else:

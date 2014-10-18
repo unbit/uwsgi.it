@@ -49,6 +49,8 @@ urlpatterns += patterns('uwsgi_it_api.views',
     (r'^alarms/(\d+)$', 'alarm'),
     (r'^alarms/raise/(\d+)$', 'raise_alarm'),
     (r'^alarms/trigger/(\d+)$', 'raise_alarm'),
+
+    (r'^alarm_key/(\d+)$', 'alarm_key'),
 )
 
 urlpatterns += patterns('uwsgi_it_api.views_metrics',

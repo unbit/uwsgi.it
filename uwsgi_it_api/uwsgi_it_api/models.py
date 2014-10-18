@@ -235,6 +235,8 @@ class Container(models.Model):
 
     max_alarms = models.PositiveIntegerField(default=100)
 
+    alarm_key = models.CharField(max_length=36, null=True, blank=True)
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
@@ -412,10 +414,14 @@ class Loopbox(models.Model):
 class Alarm(models.Model):
     container = models.ForeignKey(Container)
     unix = models.DateTimeField()
-    level = models.PositiveIntegerField(choices=((0,'system'),(1, 'user')))
+    level = models.PositiveIntegerField(choices=((0,'system'), (1, 'user'), (2, 'exception'), (3, 'traceback'), (4, 'log')))
     # in the format #xxxxxx
     color = models.CharField(max_length=7, default='#ffffff')
     msg = models.TextField()
+
+    line = models.PositiveIntegerField(null=True, blank=True)
+    func = models.CharField(max_length=255, null=True, blank=True)
+    filename = models.CharField(max_length=255, null=True, blank=True)
 
     _class = models.CharField('class', max_length=255,blank=True,null=True)
     vassal = models.CharField(max_length=255,blank=True,null=True)
