@@ -216,6 +216,9 @@ mkdir /etc/uwsgi/ssl
 mkdir /etc/uwsgi/tmp_ssl
 chown www-data:www-data /etc/uwsgi/tmp_ssl
 chmod 700 /etc/uwsgi/tmp_ssl
+# alarms store
+mkdir /etc/uwsgi/alarms
+chmod 777 /etc/uwsgi/alarms
 
 # for logging
 mkdir /var/log/uwsgi
