@@ -90,3 +90,10 @@ The first step is generating an authentication key/token for the container using
 curl https://kratos:deimos@foobar.com/api/alarm_key/30017
 ```
 
+this will generate an authentication token (it is a uuid) for the container 30017
+
+Now you can raise/trigger alarms using this token:
+
+```sh
+curl -X POST -d "it's a trap" https://kratos:deimos@foobar.com/api/alarms/raise/30017?color=ff0000&class=starwars&key=c5450a13-0f18-432f-9a37-74871d57cb20
+```
