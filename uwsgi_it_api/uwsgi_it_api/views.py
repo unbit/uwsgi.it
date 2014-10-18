@@ -435,6 +435,12 @@ def raise_alarm(request, id):
         alarm.line = request.GET.get('line', None)
         alarm.func = request.GET.get('func', None)
         alarm.filename = request.GET.get('filename', None)
+        # user alarm by default
+        alarm.level = 1
+        if 'level' in request.GET:
+            alarm.level = int(request.GET['level'])
+            if alarm.level < 1:
+                return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
         if 'unix' in request.GET:
             alarm.unix = datetime.datetime.fromtimestamp(int(request.GET['unix']))
         else:
