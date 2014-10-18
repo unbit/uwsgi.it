@@ -66,3 +66,27 @@ The following search filters are available:
 
 Generating alarms
 -----------------
+
+You can generate your alarms (to be stored in the api database) via the /alarms/raise/<id> api (aliased as /alarms/trigger/<id>). <id> is the uid of the container, while the body of the request is the raw body of the alarm:
+
+```sh
+curl -X POST -d "it's a trap" https://kratos:deimos@foobar.com/api/alarms/raise/30017
+```
+
+will create an alarm with the message "it's a trap" for the container 30017
+
+You can pass additional fields value for the alarm as a query string, so for defining the color red and the class 'starwars' you will use:
+
+
+```sh
+curl -X POST -d "it's a trap" https://kratos:deimos@foobar.com/api/alarms/raise/30017?color=ff0000&class=starwars
+```
+
+Til now we have used the customer credentials to generate alarms, but you may want to allow your user to define them or you can simply do not want to store your credentials in your app. For this reason a second authentication mechanism is available for raising alarms based on authentication token.
+
+The first step is generating an authentication key/token for the container using the /alarm_key/<id> api:
+
+```sh
+curl https://kratos:deimos@foobar.com/api/alarm_key/30017
+```
+
