@@ -264,6 +264,45 @@ def loopboxes(request):
         l.append(ll)
     return spit_json(request, l)
 
+@need_basicauth
+@csrf_exempt
+def alarms(request):
+    query = {}
+    if 'container' in request.GET:
+        try:
+            query['container'] = request.user.customer.container_set.get(pk=(int(request.GET['container']) - UWSGI_IT_BASE_UID))
+        except:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    else:
+        query['container__in'] = request.user.customer.container_set.all()
+
+    if 'vassal' in request.GET:
+        query['vassal'] = request.GET['vassal']
+
+    if 'class' in request.GET:
+        query['_class'] = request.GET['class']
+
+    if 'color' in request.GET:
+        query['color'] = request.GET['color']
+
+    alarms = Alarm.objects.filter(**query)
+
+    a = [] 
+    for alarm in alarms:
+        aa = {
+            'id': alarm.pk,
+            'container': alarm.container.uid,
+            'level': alarm.level,
+            'color': alarm.color,
+            'class': alarm._class,
+            'vassal': alarm.vassal,
+            'unix': int(alarm.unix.strftime('%s')),
+            'msg': alarm.msg
+        }
+        a.append(aa)
+    return spit_json(request, a) 
+
+
 
 @need_basicauth
 @csrf_exempt

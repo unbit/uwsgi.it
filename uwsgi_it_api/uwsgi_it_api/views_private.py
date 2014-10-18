@@ -198,3 +198,28 @@ def private_metrics_container_net_tx(request, id):
 @need_certificate
 def private_metrics_container_quota(request, id):
     return private_metrics_container_do(request, id, QuotaContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_alarms(request, id):
+    server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+    container = server.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    if request.method != 'POST':
+        response = HttpResponse('Method not allowed\n')
+        response.status_code = 405
+        return response
+    response = check_body(request)
+    if response: return response
+    msg = request.read()
+    if 'unix' in request.GET:
+        d = datetime.datetime.fromtimestamp(int(request.GET['unix']))
+    else:
+        d = datetime.datetime.now()
+    alarm = Alarm(container=container,unix=d)
+    # system
+    alarm.level = 0
+    alarm.msg = msg
+    alarm.save()
+    response = HttpResponse('Created\n')
+    response.status_code = 201
+    return response

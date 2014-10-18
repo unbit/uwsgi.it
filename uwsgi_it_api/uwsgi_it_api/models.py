@@ -417,6 +417,9 @@ class Alarm(models.Model):
     color = models.CharField(max_length=7, default='#ffffff')
     msg = models.TextField()
 
+    _class = models.CharField('class', max_length=255,blank=True,null=True)
+    vassal = models.CharField(max_length=255,blank=True,null=True)
+
     def save(self, *args, **kwargs):
         if len(self.color) < 7:
             raise ValidationError('invalid color')

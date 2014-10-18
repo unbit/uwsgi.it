@@ -21,6 +21,8 @@ urlpatterns = patterns('uwsgi_it_api.views_private',
     (r'^private/metrics/domain.net.rx/(\d+)$', 'private_metrics_domain_net_rx'),
     (r'^private/metrics/domain.net.tx/(\d+)$', 'private_metrics_domain_net_tx'),
     (r'^private/metrics/domain.hits/(\d+)$', 'private_metrics_domain_hits'),
+
+    (r'^private/alarms/(\d+)$', 'private_alarms'),
 )
 
 urlpatterns += patterns('uwsgi_it_api.views',
@@ -42,6 +44,8 @@ urlpatterns += patterns('uwsgi_it_api.views',
 
     (r'^loopboxes/?$', 'loopboxes'),
     (r'^loopboxes/(\d+)$', 'loopbox'),
+
+    (r'^alarms/?$', 'alarms'),
 )
 
 urlpatterns += patterns('uwsgi_it_api.views_metrics',
