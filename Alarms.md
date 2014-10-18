@@ -97,3 +97,15 @@ Now you can raise/trigger alarms using this token:
 ```sh
 curl -X POST -d "it's a trap" https://kratos:deimos@foobar.com/api/alarms/raise/30017?color=ff0000&class=starwars&key=c5450a13-0f18-432f-9a37-74871d57cb20
 ```
+
+Deleting alarms
+---------------
+
+Alarms are automatically deleted when you fill all of the available slots. By the way you can delete alarms manually
+using the DELETE method on the /alarms/<id> api:
+
+```
+curl -X DELETE https://kratos:deimos@foobar.com/api/alarms/1717
+```
+
+will delete the alarm with id 1717
