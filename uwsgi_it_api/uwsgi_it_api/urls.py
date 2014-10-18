@@ -46,6 +46,7 @@ urlpatterns += patterns('uwsgi_it_api.views',
     (r'^loopboxes/(\d+)$', 'loopbox'),
 
     (r'^alarms/?$', 'alarms'),
+    (r'^alarms/(\d+)$', 'alarm'),
 )
 
 urlpatterns += patterns('uwsgi_it_api.views_metrics',

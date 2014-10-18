@@ -285,6 +285,9 @@ def alarms(request):
     if 'color' in request.GET:
         query['color'] = request.GET['color']
 
+    if 'level' in request.GET:
+        query['level'] = int(request.GET['level'])
+
     alarms = Alarm.objects.filter(**query)
 
     a = [] 
@@ -340,6 +343,30 @@ def loopbox(request, id):
         'tags': [t.name for t in loopbox.tags.all()]
     }
     return spit_json(request, l)
+
+
+@need_basicauth
+@csrf_exempt
+def alarm(request, id):
+    customer = request.user.customer
+    try:
+        alarm = Alarm.objects.get(pk=id, container__in=customer.container_set.all())
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    if request.method == 'DELETE':
+        alarm.delete()
+        return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
+    a = {
+        'id': alarm.pk,
+        'container': alarm.container.uid,
+        'level': alarm.level,
+        'color': alarm.color,
+        'class': alarm._class,
+        'vassal': alarm.vassal,
+        'unix': int(alarm.unix.strftime('%s')),
+        'msg': alarm.msg
+    }
+    return spit_json(request, a)
 
 @need_basicauth
 def distros(request):
