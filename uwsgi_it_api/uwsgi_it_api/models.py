@@ -421,7 +421,7 @@ class Alarm(models.Model):
     vassal = models.CharField(max_length=255,blank=True,null=True)
 
     def save(self, *args, **kwargs):
-        if len(self.color) < 7:
+        if len(self.color) != 7:
             raise ValidationError('invalid color')
         if not self.color.startswith('#'):
             raise ValidationError('invalid color')
@@ -431,7 +431,9 @@ class Alarm(models.Model):
             oldest = self.container.alarm_set.all().order_by('unix')[0]
             oldest.delete()
         super(Alarm, self).save(*args, **kwargs)
-    
+
+    class Meta:
+        ordering = ['-unix']
 
 
 """

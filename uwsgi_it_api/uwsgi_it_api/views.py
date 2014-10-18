@@ -369,6 +369,45 @@ def alarm(request, id):
     return spit_json(request, a)
 
 @need_basicauth
+@csrf_exempt
+def raise_alarm(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    if request.method == 'POST':
+        response = check_body(request)
+        if response:
+            return response
+        alarm = Alarm(container=container, level=1)
+        if 'color' in request.GET:
+            color = request.GET['color']
+            if not color.startswith('#'):
+                color = '#' + color
+            alarm.color = color
+        alarm._class = request.GET.get('class', None)
+        alarm.vassal = request.GET.get('vassal', None)
+        if 'unix' in request.GET:
+            alarm.unix = datetime.datetime.fromtimestamp(int(request.GET['unix']))
+        else:
+            alarm.unix = datetime.datetime.now()
+        alarm.msg = request.read()
+        try:
+            alarm.save()
+            response = HttpResponse(json.dumps({'message': 'Created'}), content_type="application/json")
+            response.status_code = 201
+            return response
+        except:
+            response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
+            response.status_code = 409
+            return response
+    response = HttpResponse(json.dumps({'error': 'Method not allowed'}), content_type="application/json")
+    response.status_code = 405
+    return response
+    
+
+@need_basicauth
 def distros(request):
     j = [{'id': d.pk, 'name': d.name} for d in Distro.objects.all()]
     return spit_json(request, j)
