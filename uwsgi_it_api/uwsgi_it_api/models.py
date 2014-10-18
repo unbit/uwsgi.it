@@ -233,6 +233,8 @@ class Container(models.Model):
 
     ssh_keys_mtime = models.DateTimeField(default=start_of_epoch)
 
+    max_alarms = models.PositiveIntegerField(default=100)
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
@@ -375,9 +377,6 @@ class Loopbox(models.Model):
 
     tags = models.ManyToManyField('Tag', blank=True)
 
-    class Meta:
-        unique_together = (('container', 'filename'), ('container', 'mountpoint'))
-
     def clean(self):
         checks = ('..', './', '/.', '//')
         starts = ('/',)
@@ -406,6 +405,8 @@ class Loopbox(models.Model):
 
     class Meta:
         verbose_name_plural = 'Loopboxes'
+        unique_together = (('container', 'filename'), ('container', 'mountpoint'))
+
 
 """
 domains are mapped to customers, each container of the customer
