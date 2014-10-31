@@ -2,13 +2,14 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.backends.base import SessionBase
 from django.test import TestCase
 from django.test.client import RequestFactory
-
 from uwsgi_it_api.views import *
 from uwsgi_it_api.views_metrics import *
 from uwsgi_it_api.views_private import *
 
 import base64
 import datetime
+import json
+
 
 class FakeSession(SessionBase):
     def create(self):
@@ -61,6 +62,11 @@ class ViewsTest(TestCase):
         self.domain.tags.add(self.tag)
         self.loopbox.tags.add(self.tag)
         self.loopbox2.tags.add(self.tag)
+        self.alarms = []
+        for i in range(0, 10):
+            a = Alarm(container=self.container, msg='test', level=1, unix=datetime.datetime.now())
+            a.save()
+            self.alarms.append(a)
         # metrics
         today = datetime.datetime.today()
         NetworkRXContainerMetric.objects.create(
@@ -219,6 +225,42 @@ class ApiTest(ViewsTest):
         response = self.logged_get_response_for_view('/loopboxes/{}'.format(self.l_id), loopbox, {'id': self.l_id})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '"id": {}'.format(self.l_id))
+
+    def test_alarms_range(self):
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': '6'})
+        self.assertEqual(response.status_code, 200)
+        a = json.loads(response.content)
+        self.assertEqual(len(a), 6)
+        for i in range(0, 6):
+            self.assertEqual(a[i]['id'], self.alarms[9-i].id)
+
+    def test_alarms_range_throws_416(self):
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': '6-a'})
+        self.assertEqual(response.status_code, 416)
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': '6-'})
+        self.assertEqual(response.status_code, 416)
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': '-a'})
+        self.assertEqual(response.status_code, 416)
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': 'a'})
+        self.assertEqual(response.status_code, 416)
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': ''})
+        self.assertEqual(response.status_code, 416)
+
+    def test_alarms_range_between_two_values(self):
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': '3-6'})
+        self.assertEqual(response.status_code, 200)
+        a = json.loads(response.content)
+        self.assertEqual(len(a), 3)
+        for i in range(0, 3):
+            self.assertEqual(a[i]['id'], self.alarms[6-i].id)
+
+    def test_alarms_range_between_two_value_reversed(self):
+        response = self.logged_get_response_for_view('/alarms/', alarms, params={'range': '6-3'})
+        self.assertEqual(response.status_code, 200)
+        a = json.loads(response.content)
+        self.assertEqual(len(a), 3)
+        for i in range(0, 3):
+            self.assertEqual(a[i]['id'], self.alarms[3+i].id)
 
     def test_tags(self):
         response = self.logged_get_response_for_view('/tags', tags)
