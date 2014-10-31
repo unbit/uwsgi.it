@@ -13,8 +13,8 @@ contrary to the old unbit.it hosting platform, the new one is:
 - everyone can build it on his/her systems (and eventually buy commercial support from unbit.com ;)
 - will not rely on apache (so .htaccess will not be supported, unless you install apache in your container and proxy it via uWSGI routing)
 
-Goals
------
+Features
+--------
 
 - each customer has a pool of containers
 - each container has an associated disk quota, a cpu share and a fixed amount of memory
