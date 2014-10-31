@@ -265,6 +265,7 @@ def loopboxes(request):
         l.append(ll)
     return spit_json(request, l)
 
+
 @need_basicauth
 @csrf_exempt
 def alarms(request):
@@ -300,7 +301,29 @@ def alarms(request):
 
     alarms = Alarm.objects.filter(**query)
 
-    a = [] 
+    a = []
+
+    if 'with_total' in request.GET:
+        response = {'total': alarms.count(), 'alarms': a}
+    else:
+        response = a
+
+    if 'range' in request.GET:
+        to = request.GET['range']
+        try:
+            if '-' in to:
+                _from, to = to.split('-')
+            else:
+                _from = 0
+            alarms = alarms[int(min(_from, to)):int(max(_from, to))]
+
+        except:
+            response = HttpResponse(json.dumps({'error': 'Requested Range Not Satisfiable'}), content_type="application/json")
+            response.status_code = 416
+            return response
+        if _from > to:
+            alarms = alarms.reverse()
+
     for alarm in alarms:
         aa = {
             'id': alarm.pk,
@@ -316,8 +339,8 @@ def alarms(request):
             'msg': alarm.msg
         }
         a.append(aa)
-    return spit_json(request, a) 
 
+    return spit_json(request, response)
 
 
 @need_basicauth
@@ -395,10 +418,10 @@ def alarm_key(request, id):
     container.alarm_key = str(uuid.uuid4())
     container.save()
     return HttpResponse(json.dumps({'message': 'Ok', 'alarm_key': container.alarm_key}), content_type="application/json")
-    
+
 
 def alarm_key_auth(request, id):
-    if not 'key' in request.GET: 
+    if not 'key' in request.GET:
         return None
     key = request.GET['key']
     if len(key) != 36:
@@ -458,7 +481,7 @@ def raise_alarm(request, id):
     response = HttpResponse(json.dumps({'error': 'Method not allowed'}), content_type="application/json")
     response.status_code = 405
     return response
-    
+
 
 @need_basicauth
 def distros(request):
