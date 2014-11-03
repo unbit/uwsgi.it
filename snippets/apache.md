@@ -3,7 +3,7 @@ Running apache instances
 
 Distributions: precise,saucy,wheezy
 
-In some (really rare) case you may need to install an apache instance (heavily .htaccess based instances, mod_svn ...)
+In some (really rare) case you may need to install an apache instance (heavily .htaccess based instances, mod_svn, mod_php ...)
 
 Installation
 ============
