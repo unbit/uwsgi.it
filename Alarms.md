@@ -65,16 +65,16 @@ The following search filters are available:
 
 Pagination of results
 ---------------------
-Is it possible to paginate or limit results thanks to two additional parameters that can be mixed with search-filters:
+It is possible to paginate or limit results thanks to two additional parameters that can be mixed with search-filters:
 
 * with_total
 * range
 
 using *with_total* the api will return the list of alarms and the total number of alarms matching the query string (if present). Note that using this parameter the api will return a dictionary instead of a list.
 
-using *range* is it possible to limit results. Accepted values are:
+using *range* it is possible to limit results. Accepted values are:
 * single numbers (e.g. range=10 to get last ten alarms)
-* two number separated by a '-' (e.g. range=10-20 to get alarms between the two values). If the first value is greater than the second one than you'll get the same alarms but in reversed order.
+* two numbers separated by a '-' (e.g. range=10-20 to get alarms between the two values). If the first value is greater than the second one, you'll get the same alarms but in reversed order.
 
 ```sh
 curl https://kratos:deimos@foobar.com/api/alarms/?range=20-10&container=30017&with_total
