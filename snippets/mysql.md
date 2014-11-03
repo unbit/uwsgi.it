@@ -45,7 +45,7 @@ Check logs/emperor.log, if all goes well you can start using mysql normally (rem
 Backup
 ------
 
-```pl
+```perl
 #!/usr/bin/env perl
 
 use strict;
