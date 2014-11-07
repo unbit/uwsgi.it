@@ -19,7 +19,7 @@ mkdir -p /run/lock/apache2
 Configuration
 =============
 
-Edit $HOME/etc/apache2/ports.conf to bind on unprivileged ports (like 8080)
+Edit $HOME/etc/apache2/ports.conf to bind on unprivileged ports (like 8080) and remove ssl/gnutls modules from mods-enabled directory (if any)
 
 Edit $HOME/etc/apache2/sites-enabled/000-default to set your DocumentRoot
 
