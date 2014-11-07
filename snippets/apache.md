@@ -8,10 +8,12 @@ In some (really rare) case you may need to install an apache instance (heavily .
 Installation
 ============
 
+Ensure your $(HOME)/etc/hosts has an entry for your server name
+
 ```sh
 cp -R /etc/apache2 $HOME/etc
 mkdir /var/log/apache2
-mkdir /var/lock
+mkdir -p /run/lock/apache2
 ```
 
 Configuration
