@@ -1,7 +1,7 @@
 Running apache instances
 ========================
 
-Distributions: precise,saucy,wheezy
+Distributions: precise,saucy,wheezy,trusty
 
 In some (really rare) case you may need to install an apache instance (heavily .htaccess based instances, mod_svn, mod_php ...)
 
@@ -44,7 +44,7 @@ route-run = http:127.0.0.1:8080
 smart-attach-daemon = /run/apache2.pid apache2ctl -k start -d $(HOME)/etc/apache2
 ```
 
-and this one for saucy
+and this one for saucy or trusty
 
 ```ini
 [uwsgi]
@@ -60,7 +60,7 @@ offload-threads = 2
 route-run = http:127.0.0.1:8080
 ; monitor the apache instance
 env = APACHE_CONFDIR=$(HOME)/etc/apache2
-smart-attach-daemon = /run/apache2.pid apache2ctl -k start
+smart-attach-daemon = /run/apache2/apache2.pid apache2ctl -k start
 ```
 
 to reload the instance on precise and wheezy
@@ -69,7 +69,7 @@ to reload the instance on precise and wheezy
 apache2ctl -k restart -d $HOME/etc/apache2
 ```
 
-on saucy
+on saucy and trusty
 
 ```sh
 APACHE_CONFDIR=$HOME/etc/apache2 apache2ctl -k restart
