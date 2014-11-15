@@ -217,6 +217,10 @@ class Container(models.Model):
     jid_secret = models.CharField(max_length=255,blank=True,null=True)
     jid_destinations = models.CharField(max_length=255,blank=True,null=True)
 
+    pushover_user = models.CharField(max_length=255,blank=True,null=True)
+    pushover_token = models.CharField(max_length=255,blank=True,null=True)
+    pushover_sound = models.CharField(max_length=255,blank=True,null=True)
+
     quota_threshold = models.PositiveIntegerField("Quota threshold", default=90)
 
     tags = models.ManyToManyField('Tag', blank=True)
@@ -227,8 +231,6 @@ class Container(models.Model):
 
     accounted = models.BooleanField(default=False)
 
-    stackedfs_dir = models.CharField(max_length=255,blank=True,null=True)
-
     last_reboot = models.DateTimeField(default=start_of_epoch)
 
     ssh_keys_mtime = models.DateTimeField(default=start_of_epoch)
@@ -237,11 +239,15 @@ class Container(models.Model):
 
     alarm_key = models.CharField(max_length=36, null=True, blank=True)
 
+    alarm_freq = models.PositiveIntegerField(default=60)
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
     # do not allow over-allocate memory or storage
     def clean(self):
+        if self.alarm_freq < 60:
+            self.alarm_freq = 60
         # hack for empty server value
         try:
             if self.server is None: return
@@ -259,9 +265,6 @@ class Container(models.Model):
             raise ValidationError('the requested storage size is not available on the specified server')
         if current_memory+self.memory > self.server.memory:
             raise ValidationError('the requested memory size is not available on the specified server')
-        if self.stackedfs_dir:
-            if os.path.abspath(os.path.join('/', self.stackedfs_dir)) == '/':
-                raise ValidationError('invalid stackedfs_dir')
 
     # force a reboot if required
     def save(self, *args, **kwargs):
@@ -271,11 +274,14 @@ class Container(models.Model):
                               'memory', 
                               'storage', 
                               'customer', 
+                              'alarm_freq',
                               'jid', 
                               'jid_secret', 
                               'jid_destinations', 
+                              'pushover_user',
+                              'pushover_token',
+                              'pushover_sound',
                               'quota_threshold', 
-                              'stackedfs_dir', 
                               'nofollow')
         if self.pk is not None:
             orig = Container.objects.get(pk=self.pk)
@@ -289,6 +295,15 @@ class Container(models.Model):
             if self.ssh_keys_raw != orig.ssh_keys_raw:
                 self.ssh_keys_mtime = datetime.datetime.now()
         super(Container, self).save(*args, **kwargs)
+
+    @property
+    def combo_alarms(self):
+        alarms = []
+        if self.pushover_user and self.pushover_token:
+            alarms.append('pushover')
+        if self.jid and self.jid_secret and self.jid_destinations:
+            alarms.append('xmpp')
+        return ','.join(alarms)
 
     @property
     def rand_pid(self):
