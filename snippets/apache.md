@@ -75,6 +75,34 @@ on saucy and trusty
 APACHE_CONFDIR=$HOME/etc/apache2 apache2ctl -k restart
 ```
 
+High performance mode (pipe)
+============================
+
+As apache is a fully featured webserver, you can configure the proxy to be less smart about data received, and to
+blindly forward everything it receives. This will give you a performance boost as true keep-alive will be accomplished. To enable this mode you need to change the router from http to 'httpdumb' (it will not transform the request to an HTTP/1.0) and subscribe domains with the special/magic code 123 (when the http router sees it it put itself in raw mode):
+
+```ini
+[uwsgi]
+; register the domains you need
+domain = example.com
+domain = example2.com
+domain = .foo.bar
+
+; load the http proxy router
+plugins = router_http
+offload-threads = 2
+
+; instruct the http router to go in raw mode
+
+subscribe-with-modifier1 = 123
+
+; forward requests to apache in dumb mode
+route-run = httpdumb:127.0.0.1:8080
+; monitor the apache instance
+env = APACHE_CONFDIR=$(HOME)/etc/apache2
+smart-attach-daemon = /run/apache2/apache2.pid apache2ctl -k start
+```
+
 Logrotate
 =========
 
