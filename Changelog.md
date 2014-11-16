@@ -1,6 +1,10 @@
 uwsgi.it Changelog
 ==================
 
+[20141116]
+
+* added support for HTTPS/sni certificate authentication (https://github.com/unbit/uwsgi.it/blob/master/CustomerQuickstart.md#client-certificates-httpssni-authentication)
+
 [20141115]
 
 * updated to uWSGI 2.0.9
