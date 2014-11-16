@@ -357,6 +357,40 @@ wildcard/dotsplit SNI subscriptions are supported too
 
 IMPORTANT: mixing `ssl-domain` with `domain` for the same name, must be avoided. `ssl-domain` automatically register non-ssl record too
 
+Client-certificates HTTPS/SNI authentication
+--------------------------------------------
+
+You can authenticate your https clients via certificates. For doign it you need a certificate authentication for signing your clients.
+
+You can create a new CA pretty easily (weill it is only a pair of key and cert)
+
+```sh
+openssl genrsa -des3 -out ca.key 4096
+openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+```
+
+Now you can sign your clients csr's with:
+
+```sh
+openssl x509 -req -days 365 -in foobar.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out foobar.crt
+```
+
+foobar.csr is the filename of the csr sent by your client.
+
+Now to enable client certificate authentication for a domain:
+
+```ini
+[uwsgi]
+ssl-ca-domain = mynewdomain.org $(HOME)/foobar.key $(HOME)/foobar.crt !$(HOME)/ca.crt
+```
+
+the '!' prefix tell the server to disallow access to non-certificate-authenticated clients.
+
+If you want to support even client not supplying a certificate you can remove the '!' prefix.
+
+The ${HTTPS_DN} request var contains the certificate DN (if any).
+
+
 Clustering
 ----------
 
