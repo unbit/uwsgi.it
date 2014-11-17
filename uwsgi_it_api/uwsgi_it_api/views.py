@@ -24,7 +24,7 @@ def container(request, id):
         response = check_body(request)
         if response:
             return response
-        allowed_keys = ('name', 'note', 'quota_threshold', 'jid', 'jid_secret', 'jid_destinations', 'nofollow')
+        allowed_keys = ('name', 'note', 'quota_threshold', 'jid', 'jid_secret', 'jid_destinations', 'nofollow', 'pushover_user', 'pushover_token', 'pushover_sound')
         j = json.loads(request.read())
         if not j:
             return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
@@ -89,6 +89,9 @@ def container(request, id):
         'server_address': container.server.address,
         'jid': container.jid,
         'jid_destinations': container.jid_destinations,
+        'pushover_user': container.pushover_user,
+        'pushover_token': container.pushover_token,
+        'pushover_sound': container.pushover_sound,
         'quota_threshold': container.quota_threshold,
         'nofollow': container.nofollow,
         'note': container.note,
