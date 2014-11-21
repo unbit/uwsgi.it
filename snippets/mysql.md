@@ -1,7 +1,7 @@
 Running MySQL
 -------------
 
-For Saucy Salamander:
+For Saucy, Trusty and Utopic:
 
 create ~/.my.cnf (substitute XXXXX with your container uid)
 ```ini
