@@ -1,7 +1,7 @@
 Running the nullmailer spooler
 ------------------------------
 
-Distribution: Saucy Salamander
+Distribution: Saucy, Trusty, Utopic
 
 Nullmailer emulates the venerable sendmail approach giving you a safe spool directory in which messages are stored.
 
