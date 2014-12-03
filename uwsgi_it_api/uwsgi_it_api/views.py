@@ -168,6 +168,10 @@ def containers(request):
                 return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
         except:
             return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        if int(j['memory']) > server.free_memory or int(j['memory']) <= 0:
+            return HttpResponse(json.dumps({'error': 'Conflict', 'reason':'not enough memory'}), content_type="application/json")
+        if int(j['storage']) > server.free_storage or int(j['storage']) <= 0:
+            return HttpResponse(json.dumps({'error': 'Conflict', 'reason':'not enough storage'}), content_type="application/json")
         try:
             container = Container(customer=request.user.customer, server=server)
             container.name = j['name']
