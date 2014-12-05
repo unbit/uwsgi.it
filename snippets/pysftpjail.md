@@ -7,7 +7,7 @@ pip install pysftpserver
 
 this will install pysftpjail in /usr/local/bin
 
-Now edit the ssh key you want to "jail" forcing it to call "pysftpjail <path"
+Now edit the ssh key you want to "jail" forcing it to call "pysftpjail <path>"
 
 ```ssh
 command="pysftpjail logs" ssh-rsa AAAA.......
