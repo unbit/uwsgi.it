@@ -44,6 +44,7 @@ Features and Goals
 - allows mounting and managing loop block device via api
 - The HTTP router can forward RTSP and chunked input requests
 - support for old CGI's (via uWSGI cgi plugin)
+- SFTP virtual chroot/jail is managed via the pysftpserver project
 
 Status
 ------
