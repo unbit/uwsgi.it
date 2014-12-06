@@ -43,6 +43,7 @@ Features and Goals
 - xattrs and acls
 - allows mounting and managing loop block device via api
 - The HTTP router can forward RTSP and chunked input requests
+- support for old CGI's (via uWSGI cgi plugin)
 
 Status
 ------
@@ -98,7 +99,6 @@ TODO
 
 - fastrouter-only implementation for nginx integration
 - is SPDY support whorty ?
-- Are CGIs still of interest ?
 
 
 LONG TERM GOALS
