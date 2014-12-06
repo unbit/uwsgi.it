@@ -32,7 +32,7 @@ Features and Goals
 - SNI is the only https/spdy supported approach
 - cron and external processes (like dbs) are managed as vassals
 - native (as uWSGI plugins) supported languages are Perl, CPython, PyPy, Ruby, Lua, Java and php (yes php apps works even without .htaccess...) 
-- you can easily proxy (in offloaded mode too) to external services, line nodejs, meteor, zope, elasticsearch ...
+- you can easily proxy (in offloaded mode too) to external services, like nodejs, meteor, zope, elasticsearch ...
 - Websockets support (in the routers/proxy) is enabled by default
 - Simple clustering and load-balancing
 - Sending emails is not part of the infrastructure (read:no SMTP services), but each container has transparent support for the nullmailer spool service (so you can use it to asynchronously send mails to external smtp services like mandrill and sendgrid)
