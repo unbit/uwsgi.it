@@ -23,6 +23,8 @@ Edit $HOME/etc/apache2/ports.conf to bind on unprivileged ports (like 8080) and 
 
 Edit $HOME/etc/apache2/sites-enabled/000-default to set your DocumentRoot
 
+Eventually link rewrite.load, vhost_alias.load, headers.load in mods-enabled
+
 Running it
 ==========
 
