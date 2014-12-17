@@ -21,7 +21,14 @@ class ContainerAdminForm(ModelForm):
             self.fields['tags'].widget = HiddenInput()
 
 class ContainerAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', 'accounted')
+    def is_accounted(self):
+        if self.accounted:
+            return True
+        if self.server and self.server.owner:
+            return True
+        return False
+    is_accounted.boolean = True
+    list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', is_accounted)
     list_filter = ('server', 'distro', 'accounted')
     search_fields = ('name', 'customer__user__username', 'tags__name')
 
