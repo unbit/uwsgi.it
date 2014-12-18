@@ -24,7 +24,12 @@ def container(request, id):
         response = check_body(request)
         if response:
             return response
-        allowed_keys = ('name', 'note', 'quota_threshold', 'jid', 'jid_secret', 'jid_destinations', 'nofollow', 'pushover_user', 'pushover_token', 'pushover_sound')
+        allowed_keys = (
+            'name', 'note', 'quota_threshold', 'jid', 'jid_secret',
+            'jid_destinations', 'nofollow', 'pushover_user',
+            'pushover_token', 'pushover_sound', 'alarm_freq',
+        )
+
         j = json.loads(request.read())
         if not j:
             return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
@@ -72,6 +77,8 @@ def container(request, id):
                 response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
                 response.status_code = 409
                 return response
+        if 'alarm_freq' in j:
+            container.full_clean()
         if 'reboot' in j:
             container.last_reboot = datetime.datetime.now()
         container.save()
@@ -92,6 +99,7 @@ def container(request, id):
         'pushover_user': container.pushover_user,
         'pushover_token': container.pushover_token,
         'pushover_sound': container.pushover_sound,
+        'alarm_freq': container.alarm_freq,
         'quota_threshold': container.quota_threshold,
         'nofollow': container.nofollow,
         'note': container.note,
