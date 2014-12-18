@@ -172,6 +172,7 @@ class ApiTest(ViewsTest):
     def test_container(self):
         response = self.logged_get_response_for_view('/containers/1', container, {'id': self.c_uid})
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'alarm_freq')
 
     def test_distros(self):
         response = self.logged_get_response_for_view('/distros', distros)
