@@ -77,10 +77,9 @@ def container(request, id):
                 response = HttpResponse(json.dumps({'error': 'Conflict'}), content_type="application/json")
                 response.status_code = 409
                 return response
-        if 'alarm_freq' in j:
-            container.full_clean()
         if 'reboot' in j:
             container.last_reboot = datetime.datetime.now()
+        container.full_clean()
         container.save()
     c = {
         'uid': container.uid,
