@@ -12,12 +12,14 @@ pip install pysftpserver
 
 this will install pysftpjail in /usr/local/bin (the path will be automatically created by pip)
 
-Now edit the ssh keyyou want to "jail" (via the api or one of its gui) forcing it to call "pysftpjail \<path\>"
+Now edit the ssh key you want to "jail" (via the api or one of its gui) forcing it to call "pysftpjail \<path\>"
 
 ```ssh
-command="pysftpjail logs" ssh-rsa AAAA.......
+command="pysftpjail /absolute-path-to-dir" ssh-rsa AAAA.......
 ```
 
 this will "jail" every session using this key to the logs directory.
 
-Note: The path argument of pysftpjail is always relative to the home
+Note: The path argument of pysftpjail should be absolute, for example:
+
+/containers/xxxxx/www/yyyyyyy.com/images
