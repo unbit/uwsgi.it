@@ -20,7 +20,7 @@ with (replace `[HOME]` with your home path)
 ```
 pidfile [HOME]/run/redis-server.pid
 logfile [HOME]/logs/redis-server.log
-dir     [HOME]/db.redis
+dir     [HOME]
 ```
 
 Create vassals/redis.ini
