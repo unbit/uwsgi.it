@@ -99,6 +99,8 @@ Four perl processes manage the infrastruture configuration:
 TODO
 ----
 
+- Implement sub-users concept for the api (maybe as subuser@user)
+- Add support for https://github.com/unbit/spockfs mounts (maybe in the same way as loopboxes ?)
 - fastrouter-only implementation for nginx integration
 - is SPDY support whorty ?
 
