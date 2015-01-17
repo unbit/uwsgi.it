@@ -99,6 +99,7 @@ Four perl processes manage the infrastruture configuration:
 TODO
 ----
 
+- Map public ipv4/ipv6 addresses directly to a container (via NAT)
 - Support for custom-images (Docker dumps, ACI https://github.com/appc/spec/blob/master/SPEC.md#app-container-image, simple tarballs, zips...)
 - Implement sub-users concept for the api (maybe as subuser@user)
 - Add support for https://github.com/unbit/spockfs mounts (maybe in the same way as loopboxes ?)
