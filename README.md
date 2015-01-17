@@ -1,14 +1,14 @@
 uwsgi.it
 ========
 
-The next-generation Unbit hosting platform
+The latest Unbit hosting platform
 
 Intro
 -----
 
 contrary to the old unbit.it hosting platform, the new one is:
 
-- fully open source (currently at least 60% of the unbit.it kernel patches are not released to the public)
+- fully open source (oldest platforms was more-or-less proprietary software)
 - can be installed on vanilla kernels
 - everyone can build it on his/her systems (and eventually buy commercial support from unbit.com ;)
 - will not rely on apache (so .htaccess will not be supported, unless you install apache in your container and proxy it via uWSGI routing)
@@ -99,6 +99,7 @@ Four perl processes manage the infrastruture configuration:
 TODO
 ----
 
+- Support for custom-images (Docker dumps, ACI https://github.com/appc/spec/blob/master/SPEC.md#app-container-image, simple tarballs, zips...)
 - Implement sub-users concept for the api (maybe as subuser@user)
 - Add support for https://github.com/unbit/spockfs mounts (maybe in the same way as loopboxes ?)
 - fastrouter-only implementation for nginx integration
