@@ -28,7 +28,7 @@ class ContainerAdmin(admin.ModelAdmin):
             return True
         return False
     is_accounted.boolean = True
-    list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', is_accounted)
+    list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', is_accounted, 'ctime')
     list_filter = ('server', 'distro', 'accounted')
     search_fields = ('name', 'customer__user__username', 'tags__name')
 
