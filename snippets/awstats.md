@@ -1,6 +1,12 @@
 Awstats
 =======
 
+ensure your app/domain logs in the apache format:
+
+
+http://uwsgi-docs.readthedocs.org/en/latest/LogFormat.html#apache-style-combined-request-logging
+
+
 This will run awstats under /awstats (it assumes awstats is untar'ed under $(HOME)/awstats/awstats-7.3)
 
 ```ini
