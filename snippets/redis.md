@@ -1,7 +1,21 @@
 Running Redis
 -------------
 
-For Saucy Salamander:
+
+Simple mode
+-----------
+
+```ini
+[uwsgi]
+attach-daemon = redis-server
+```
+
+
+this will simply bind redis to 127.0.0.1:6379
+
+
+Smart mode
+----------
 
 ```sh
 cp /etc/redis/redis.conf $HOME/etc/redis.conf
@@ -20,7 +34,7 @@ with (replace `[HOME]` with your home path)
 ```
 pidfile [HOME]/run/redis-server.pid
 logfile [HOME]/logs/redis-server.log
-dir     [HOME]/db.redis
+dir     [HOME]
 ```
 
 Create vassals/redis.ini
