@@ -15,7 +15,8 @@ plugin = router_basicauth, cgi
 static-map = /awstats/icon=$(HOME)/awstats/awstats-7.3/wwwroot/icon
 ; authentication
 route = ^/awstats basicauth:awstats,test:test
-; force running the specified cgi script for /awstats
+; force running the specified cgi script for /awstats but avoid /awstats/icon to be managed as cgi
+route = ^/awstats/icon last:
 route = ^/awstats cgi:$(HOME)/awstats/awstats-7.3/wwwroot/cgi-bin/awstats.pl
 
 ; update stats every hour (remember to create a config for 'domain')
