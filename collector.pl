@@ -24,6 +24,8 @@ sub collect_metrics {
 	collect_metrics_cpu($uid);
 	collect_metrics_io($uid);
 	collect_metrics_mem($uid);
+	collect_metrics_mem_rss($uid);
+	collect_metrics_mem_cache($uid);
 	collect_metrics_quota($uid);
 	if ($net_json) {
 		collect_metrics_net($uid, $net_json);
@@ -47,6 +49,41 @@ sub collect_metrics_mem {
         chomp $value;
         push_metric($uid, 'container.mem', $value);
 }
+
+sub collect_metrics_mem_rss {
+        my ($uid) = @_;
+        open CGROUP,'/sys/fs/cgroup/'.$uid.'/memory.stat';
+	my $found = '';
+	while(<CGROUP>) {
+        	my ($key, $value) = split /\s/;
+		if ($key eq 'total_rss') {
+			$found = $value;
+			break;
+		}
+	}
+        close CGROUP;
+	return unless $found;
+        chomp $found;
+        push_metric($uid, 'container.mem.rss', $found);
+}
+
+sub collect_metrics_mem_cache {
+        my ($uid) = @_;
+        open CGROUP,'/sys/fs/cgroup/'.$uid.'/memory.stat';
+        my $found = '';
+        while(<CGROUP>) {
+                my ($key, $value) = split /\s/;
+                if ($key eq 'total_cache') {
+                        $found = $value;
+                        break;
+                }
+        }
+        close CGROUP;
+        return unless $found;
+        chomp $found;
+        push_metric($uid, 'container.mem.cache', $found);
+}
+
 
 sub collect_metrics_quota {
         my ($uid) = @_;
