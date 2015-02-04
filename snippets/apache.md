@@ -19,7 +19,7 @@ mkdir -p /run/lock/apache2
 Configuration
 =============
 
-Edit $HOME/etc/apache2/ports.conf to bind on unprivileged ports (like 8080) and remove ssl/gnutls modules from mods-enabled directory (if any)
+Edit $HOME/etc/apache2/ports.conf to bind on unprivileged ports (like 8080) and remove ssl/gnutls modules from mods-enabled directory (if any). Remove mod_rpaf too if you plan to use the high-performance mode (see below)
 
 Edit $HOME/etc/apache2/sites-enabled/000-default to set your DocumentRoot
 
@@ -103,6 +103,63 @@ route-run = httpdumb:127.0.0.1:8080
 ; monitor the apache instance
 env = APACHE_CONFDIR=$(HOME)/etc/apache2
 smart-attach-daemon = /run/apache2/apache2.pid apache2ctl -k start
+```
+
+Unfortutanely this approach requires a little modification to apache to log the right address.
+
+The dumb_remoteaddr module will do the trick:
+
+```c
+#include "httpd.h"
+#include "http_core.h"
+#include "http_protocol.h"
+#include "http_config.h"
+#include "http_connection.h"
+#include "apr_strings.h"
+
+static int dumb_remoteaddr_modify_request(request_rec *r) {
+        r->useragent_ip = r->connection->client_ip;
+        char *remote = (char *) apr_table_get(r->headers_in, "X-Forwarded-For");
+        if (!remote) return OK;
+        char *last_comma = strrchr(remote, ',');
+        if (last_comma) {
+                if (strlen(last_comma) < 9) {
+                        return HTTP_INTERNAL_SERVER_ERROR;
+                }
+                r->connection->client_ip = apr_pstrdup(r->connection->pool, last_comma+2);
+        }
+        else {
+                r->connection->client_ip = apr_pstrdup(r->connection->pool, remote);
+        }
+        r->useragent_ip = r->connection->client_ip;
+        return OK;
+}
+
+static void register_hooks(apr_pool_t *p) {
+    ap_hook_post_read_request(dumb_remoteaddr_modify_request, NULL, NULL, APR_HOOK_FIRST);
+}
+
+AP_DECLARE_MODULE(dumb_remoteaddr) = {
+    STANDARD20_MODULE_STUFF,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    register_hooks,
+};
+```
+
+build it with 
+
+```sh
+apxs2 -c mod_dumb_remoteaddr.c
+```
+
+and add on top of etc/apache2/sites-enabled/000-default (change XXX with your container id)
+
+```
+LoadModule dumb_remoteaddr_module /containers/XXX/.libs/mod_dumb_remoteaddr.so
 ```
 
 Logrotate
