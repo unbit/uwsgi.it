@@ -1,6 +1,10 @@
 uwsgi.it Changelog
 ==================
 
+[20150204]
+
+* added mem.rss and mem.cache metrics
+
 [20141116]
 
 * added support for HTTPS/sni certificate authentication (https://github.com/unbit/uwsgi.it/blob/master/CustomerQuickstart.md#client-certificates-httpssni-authentication)
