@@ -171,6 +171,16 @@ def private_metrics_container_mem(request, id):
 
 @csrf_exempt
 @need_certificate
+def private_metrics_container_mem_rss(request, id):
+    return private_metrics_container_do(request, id, MemoryRSSContainerMetric)
+
+@csrf_exempt
+@need_certificate
+def private_metrics_container_mem_cache(request, id):
+    return private_metrics_container_do(request, id, MemoryCacheContainerMetric)
+
+@csrf_exempt
+@need_certificate
 def private_metrics_container_cpu(request, id):
     return private_metrics_container_do(request, id, CPUContainerMetric)
 

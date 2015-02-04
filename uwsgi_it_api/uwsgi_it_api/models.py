@@ -588,6 +588,14 @@ class MemoryContainerMetric(ContainerMetric):
     pass
 
 # stores values from the container cgroup
+class MemoryRSSContainerMetric(ContainerMetric):
+    pass
+
+# stores values from the container cgroup
+class MemoryCacheContainerMetric(ContainerMetric):
+    pass
+
+# stores values from the container cgroup
 class IOReadContainerMetric(ContainerMetric):
     pass
 

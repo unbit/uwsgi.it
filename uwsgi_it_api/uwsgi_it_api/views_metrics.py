@@ -93,6 +93,24 @@ def metrics_container_mem(request, id):
     return metrics_container_do(request, container, container.memorycontainermetric_set, 'mem')
 
 @need_basicauth
+def metrics_container_mem_rss(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.memoryrsscontainermetric_set, 'mem.rss')
+
+@need_basicauth
+def metrics_container_mem_cache(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id)-UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+    return metrics_container_do(request, container, container.memorycachecontainermetric_set, 'mem.cache')
+
+@need_basicauth
 def metrics_container_quota(request, id):
     customer = request.user.customer
     try:
