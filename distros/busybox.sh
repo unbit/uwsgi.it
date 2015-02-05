@@ -22,6 +22,6 @@ mkdir /distros/busybox/var/tmp
 chroot /distros/busybox /bin/busybox sh <<'EOF'
 /bin/busybox --install -s /bin
 echo "#!/bin/sh" > /bin/bash
-echo "/bin/ash $@" >> /bin/bash
+echo "/bin/ash \$@" >> /bin/bash
 chmod 755 /bin/bash
 EOF
