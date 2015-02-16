@@ -25,6 +25,29 @@ Edit $HOME/etc/apache2/sites-enabled/000-default to set your DocumentRoot
 
 Eventually link rewrite.load, vhost_alias.load, headers.load in mods-enabled
 
+An example mass virtualhosting configuration:
+
+```xml
+<VirtualHost *>
+        ServerAdmin info@XXXXX
+        DocumentRoot /var/www/html
+
+        SetEnv SERVER_PORT 80
+        UseCanonicalName Off
+        VirtualDocumentRoot /containers/XXXXX/www/%0
+
+        <Directory /containers/XXXXX/www>
+                Options FollowSymLinks
+                AllowOverride All
+                Require all granted
+        </Directory>
+
+        LogFormat "%{Host}i %h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" massive
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log massive
+</VirtualHost>
+```
+
 Running it
 ==========
 
