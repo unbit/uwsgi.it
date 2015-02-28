@@ -4,8 +4,8 @@ Static only sites with uwsgi
 Having all of our static files in a common directory is the simplest
 way to serve them. Unfortunately it may happen to have static files in
 different directories.
-The easiest configuration to handle this configuration may be a catch
-all rule:
+The easiest configuration to handle this scenario is a *catch
+all* rule:
 
 ```ini
 [uwsgi]
@@ -17,12 +17,11 @@ route = ^/$ static:%(basedir)/index.html
 route = /(.*) static:%(basedir)$1
 ```
 
-Please note that the specific rule for */* must be the before the
-catch all one.
+Please note that the specific rule for */* must be placed before the
+*catch all* one.
 
-Most of the time though we want ti restrict the served directories.
-If you just wanna to restrict to some directories better use a
-*regular expression group*:
+Most of the time though we want to restrict the directories served.
+To accomplish that better use a *regular expression group*:
 
 ```ini
 [uwsgi]
