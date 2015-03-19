@@ -80,6 +80,6 @@ recovery.conf
 start the slave
 
 electing the slave as master
-****************************
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
