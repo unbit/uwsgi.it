@@ -60,7 +60,7 @@ postgresql.conf
 
 ```
 
-creating the replica role
+creating the replica role (from the psql shell)
 
 
 ```sql
@@ -80,5 +80,6 @@ recovery.conf
 start the slave
 
 electing the slave as master
+****************************
 
 
