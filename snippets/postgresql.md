@@ -46,3 +46,14 @@ cron = 59 3 -1 -1 -1  pg_dump -U ZZZ YYY |bzip2 -9 > $(HOME)/backup/YYY_`date +"
 ```
 
 change XXX with your db password, ZZZ with the username and YYY with the db name
+
+Super Bonus: master-slave replication
+-------------------------------------
+
+Requirements: two linked containers (hey, do not forget to 'link' them, if you do not know what linking is, check the customer quickstart, but technically linking is simply allowing network access between containers)
+
+On the master container:
+
+
+On the slave container:
+
