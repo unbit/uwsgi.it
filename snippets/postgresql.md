@@ -141,5 +141,63 @@ this will put the slave in "writable" mode, and will rename recovery.done (renam
 
 ... do not suddenly revert your app to point to the master !!! your master is very probbaly out of sync (read: the slave has newer data)
 
+Make a copy of the whole db.pg (well, technically you only need to copy db.pg/postgresql.conf and db.pg/pg_hba.conf, but backups are always good), remove it and resync from the master:
 
+* ensure postgresql is off
 
+```
+mv vassals/pg.ini vassals/pg.off
+/usr/lib/postgresql/9.3/bin/pg_ctl stop -D db.pg
+```
+
+* make a copy of db.pg
+
+```sh
+cp -R db.pg db.pg.backup
+```
+
+* remove db.pg
+
+```sh
+rm -rf db.pg
+```
+
+and resync with the slave
+
+```sh
+pg_basebackup -h 10.Y.Y.Y -D db.pg -U replicator -P -v -x
+```
+
+(change 10.Y.Y.Y with slave address)
+
+put back postgresql.conf and pg_hba.conf
+
+```sh
+cp db.pg.backup/postgresql.conf db.pg/
+cp db.pg.backup/ph_hba.conf db.pg/
+```
+
+and restart postgresql:
+
+```sh
+mv vassals/pg.off vassals/pg.ini
+```
+
+Now your master is ready again, but we need to set back the slave as a replica (it is still in writable state):
+
+```
+mv db.pg/recovery.done db.pg/recovery.conf
+mv vassals/pg.ini vassals/pg.off
+/usr/lib/postgresql/9.3/bin/pg_ctl stop -D db.pg
+mv vassals/pg.off vassals/pg.ini
+```
+
+Congratulations, all is fine again, you can start pointing your apps back to the master.
+
+Note: it could happen that the slave updates its data while you bring up the old master. In such a case the master will not be able to synchronize spitting out an error like:
+
+```
+FATAL:  highest timeline X of the primary is behind recovery timeline Y
+```
+
+to fix it, just resync-back the slave with the master (read: run pg_basebackup on the slave)
