@@ -79,7 +79,9 @@ recovery.conf
 
 start the slave
 
-* electing the slave as master
+###### electing the slave as master
+
+If your master goes down (for whatever reason) you may want your slave (that is readonly, remember) to became the new master (with write capability). To force a slave to became a master, you just need to 'create' the 'trigger file'.
 
 
 
