@@ -56,7 +56,16 @@ On the master container:
 
 postgresql.conf
 
+```
+
+```
+
 creating the replica role
+
+
+```sql
+CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'foobar';
+```
 
 rsync data directory
 
