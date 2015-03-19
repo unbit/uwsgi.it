@@ -131,5 +131,15 @@ LOG:  started streaming WAL from primary at XXXX
 
 If your master goes down (for whatever reason) you may want your slave (that is readonly, remember) to became the new master (with write capability). To force a slave to became a master, you just need to 'create' the 'trigger file'.
 
+```sh
+touch /run/postgresql.trigger
+```
+
+this will put the slave in "writable" mode, and will rename recovery.done (renaming it will allow the slave to continue to be writable/master even if the slave is rebooted). Now ensure your apps start pointing to the slave address.
+
+###### ... when the master is back
+
+... do not suddenly revert your app to point to the master !!! your master is very probbaly out of sync (read: the slave has newer data)
+
 
 
