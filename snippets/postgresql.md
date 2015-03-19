@@ -50,34 +50,82 @@ change XXX with your db password, ZZZ with the username and YYY with the db name
 Super Bonus: master-slave replication
 -------------------------------------
 
-Requirements: two linked containers (hey, do not forget to 'link' them, if you do not know what linking is, check the customer quickstart, but technically linking is simply allowing network access between containers)
+Requirements: two linked containers (hey, do not forget to 'link' them, if you do not know what linking is, check the customer quickstart, but technically linking is simply allowing network access between containers).
+
+The slave container MUST NOT be configured with postgres (read: the db.pg directory or the vassal file must not be created, see below).
 
 ###### on the master container:
 
-postgresql.conf
+edit db.pg/postgresql.conf (adapt listen_address directive with the internal ip address of your container, and ensure the other options are set)
 
 ```
-
+listen_addresses = 'localhost,10.X.X.X'
+max_wal_senders = 3
+checkpoint_segments = 8
+wal_keep_segments = 8
+wal_level = hot_standby
 ```
 
-creating the replica role (from the psql shell)
+create the replica role (from the psql shell)
 
 
 ```sql
 CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'foobar';
 ```
 
-rsync data directory
+(change 'foobar' to whatever you want)
 
-restarting the master
+and add a rule for it in the pg_hba.conf
+
+```
+host	replication	replicator	10.Y.Y.Y/32		md5
+```
+
+(change 10.Y.Y.Y with the address of the slave container)
+
+now you can restart the master (but soon after ensure no process will write to it, as we need the first sync with the slave):
+
+```sh
+mv vassals/pg.ini vassals/pg.off
+/usr/lib/postgresql/9.3/bin/pg_ctl stop -D db.pg
+mv vassals/pg.off vassals/pg.ini
+```
 
 ###### on the slave container
 
-postgresql.conf
+the first step is making a 1:1 copy of the master in the db.pg directory (using the previously created replicator user)
 
-recovery.conf
+```sh
+pg_basebackup -h 10.X.X.X -D db.pg -U replicator -P -v -x
+```
 
-start the slave
+( change 10.X.X.X with the master container ip).
+
+After few seconds you should end with an exact copy of the master's db.pg in the slave server.
+
+Now edit db.pg/postgresql.conf and change listen_address to bind to the slave address, and the following line:
+
+```
+hot_standby = on
+```
+
+Change db.pg/pg_hba.conf line for the replicator user with the master's ip address. and finally create a db.pg/recovery.conf file:
+
+```
+standby_mode = 'on'
+primary_conninfo = 'host=10.X.X.X port=5432 user=replicator password=YYY'
+trigger_file = '/run/postgresql.trigger'
+```
+
+change 10.X.X.X with the master ip and YYY with the replicator password.
+
+Now you can start the slave (you can use the same vassals/pg.ini of the master an copy it in the slave vassal's dir)
+
+Check its logs, if all goes well you should see something like this:
+
+```
+LOG:  started streaming WAL from primary at XXXX
+```
 
 ###### electing the slave as master
 
