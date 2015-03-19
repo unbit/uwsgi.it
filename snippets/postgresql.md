@@ -52,7 +52,7 @@ Super Bonus: master-slave replication
 
 Requirements: two linked containers (hey, do not forget to 'link' them, if you do not know what linking is, check the customer quickstart, but technically linking is simply allowing network access between containers)
 
-On the master container:
+###### on the master container:
 
 postgresql.conf
 
@@ -71,7 +71,7 @@ rsync data directory
 
 restarting the master
 
-On the slave container:
+###### on the slave container
 
 postgresql.conf
 
