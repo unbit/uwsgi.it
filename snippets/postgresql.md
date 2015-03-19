@@ -54,6 +54,22 @@ Requirements: two linked containers (hey, do not forget to 'link' them, if you d
 
 On the master container:
 
+postgresql.conf
+
+creating the replica role
+
+rsync data directory
+
+restarting the master
 
 On the slave container:
+
+postgresql.conf
+
+recovery.conf
+
+start the slave
+
+electing the slave as master
+
 
