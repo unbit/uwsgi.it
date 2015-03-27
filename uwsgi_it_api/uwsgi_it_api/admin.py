@@ -101,7 +101,7 @@ class LoopboxAdmin(admin.ModelAdmin):
     form = LoopboxAdminForm
 
 class AlarmAdmin(admin.ModelAdmin):
-    list_display = ('container', 'level', 'unix', 'msg')
+    list_display = ('container', 'vassal', 'level', 'unix', 'msg')
     list_filter = ('level',)
     search_fields = ('msg', '_class', 'vassal', 'color') 
 
