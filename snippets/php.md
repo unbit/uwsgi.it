@@ -40,3 +40,5 @@ processes = 10
 ; ...but start with only 2 and spawn the others on demand
 cheaper = 2
 ```
+
+remember to add the domain/ssl-domain/cluster-domain option and to tune the processes and cheaper values to your needs
