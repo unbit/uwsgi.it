@@ -275,15 +275,15 @@ bash -x build_uwsgi.sh
 SSL certificates
 ----------------
 
-We will generate SSL certificates in the /etc/uwsgi/ssl directory, if you already have a valid key and a cert, copy the in /etc/uwsgi/ssl as uwsgi.it.key and uwsgi.it.crt
+We will generate SSL certificates in the /etc/uwsgi/ssl directory, if you already have a valid key and a cert, copy them in /etc/uwsgi/ssl as uwsgi.it.key and uwsgi.it.crt. They will be used as the default ssl context for the https server.
 
 Then you need a key/cert pair for authenticating with the api server.
 
-The first distro
-----------------
+Distros
+-------
 
-The first vassal
-----------------
+TODO
+
 
 The firewall
 ------------
@@ -295,13 +295,10 @@ Check the PORTS.md file to understand which ports are opened to the world and ho
 Install the api server - Only for the API node -
 ------------------------------------------------
 
-The API server runs in a container as all of the other apps. It is a simple django app answering requests from emperor daemons (configurator, collector and dominator) and from customers.
+The API server is a simple django app answering requests from emperor daemons (configurator, collector and dominator) and from customers.
 
 Data of customers and containers (as well as servers and their topology) can be stored in a SQL database. (we strongly suggest postgresql for it).
 
 You can run the app on one of the nodes or on an external ones. You can eventually distribute it.
 
-
-Clustering
-----------
 
