@@ -534,7 +534,10 @@ def domains(request):
         if response:
             return response
         j = json.loads(request.read())
-        customer.domain_set.get(name=j['name']).delete()
+        try:
+            customer.domain_set.get(name=j['name']).delete()
+        except Domain.DoesNotExist:
+            return HttpResponseNotFound(json.dumps({'error': 'Not found'}), content_type="application/json")
         return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
 
     elif request.method == 'GET':
