@@ -284,6 +284,7 @@ class Container(models.Model):
                               'pushover_user',
                               'pushover_token',
                               'pushover_sound',
+                              'pushbullet_token',
                               'quota_threshold', 
                               'nofollow')
         if self.pk is not None:
