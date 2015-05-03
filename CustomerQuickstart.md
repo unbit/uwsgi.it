@@ -664,7 +664,7 @@ The container Emperor automatically set a series of alarms.
 
 Currently, you will get an alarm when your container quota is low (you can set the threshold with the quota_threshold item of the container api) and when a OOM (out of memory) is triggered.
 
-The alarm is broadcasted to all of the connected container shells and optionally to a jabber/xmpp account and/or a pushover app (https://pushover.net/)
+The alarm is broadcasted to all of the connected container shells and optionally to a jabber/xmpp account, a pushover app (https://pushover.net/) or to pushbullet devices (https://www.pushbullet.com)
 
 To enable jabber/xmpp alarm just set "jid", "jid_secret" and "jid_destinations" attributes of the container api.
 
@@ -674,6 +674,8 @@ jid and jid_secret are the credentials the Emperor will use to login to a jabber
 
 
 to enable pushover support just set "pushover_user" and "pushover_token" values, and optionally the "pushover_sound"
+
+to enable pushbullet support just set the "pushbullet_token" field
 
 You will get at most an alarm every 60 seconds, if you want to raise this value set the field "alarm_freq"
 
