@@ -14,7 +14,8 @@ import os.path
 
 # Create your models here.
 
-generate_uuid = lambda: str(uuid.uuid4())
+def generate_uuid():
+    return str(uuid.uuid4())
 
 def generate_rsa():
     return RSA.generate(2048).exportKey()

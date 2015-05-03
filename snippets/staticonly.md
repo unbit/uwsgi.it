@@ -1,6 +1,33 @@
 Static only sites with uwsgi
 ----------------------------
 
+Simple mode
+-----------
+
+```ini
+[uwsgi]
+plugin = 0:notfound
+
+domain = mydomain.it
+
+; set it to the path of not found page
+error-page-404 = path_to_404.html
+
+; the file to search when asking for directories
+static-index = index.html
+
+; the document root (you can specify it multiple times for fallbacks)
+check-static = path_to_the_document_root
+
+```
+
+More infos here:
+
+http://uwsgi-docs.readthedocs.org/en/latest/StaticFiles.html
+
+Advanced mode
+-------------
+
 Having all of our static files in a common directory is the simplest
 way to serve them. Unfortunately it may happen to have static files in
 different directories.

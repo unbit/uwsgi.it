@@ -51,6 +51,10 @@ git clone https://github.com/unbit/uwsgi-pushover
 /opt/unbit/uwsgi/uwsgi --build-plugin uwsgi-pushover
 cp pushover_plugin.so /opt/unbit/uwsgi/plugins
 
+git clone https://github.com/unbit/uwsgi-pushbullet
+/opt/unbit/uwsgi/uwsgi --build-plugin uwsgi-pushbullet
+cp pushbullet_plugin.so /opt/unbit/uwsgi/plugins
+
 git clone https://github.com/unbit/uwsgi-strophe
 cd uwsgi-strophe
 /opt/unbit/uwsgi/uwsgi --build-plugin .
