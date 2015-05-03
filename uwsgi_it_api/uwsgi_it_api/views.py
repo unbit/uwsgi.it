@@ -28,6 +28,7 @@ def container(request, id):
             'name', 'note', 'quota_threshold', 'jid', 'jid_secret',
             'jid_destinations', 'nofollow', 'pushover_user',
             'pushover_token', 'pushover_sound', 'alarm_freq',
+            'pushbullet_token',
         )
 
         j = json.loads(request.read())
@@ -98,6 +99,7 @@ def container(request, id):
         'pushover_user': container.pushover_user,
         'pushover_token': container.pushover_token,
         'pushover_sound': container.pushover_sound,
+        'pushbullet_token': container.pushbullet_token,
         'alarm_freq': container.alarm_freq,
         'quota_threshold': container.quota_threshold,
         'nofollow': container.nofollow,

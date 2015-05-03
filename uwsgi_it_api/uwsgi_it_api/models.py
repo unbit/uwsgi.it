@@ -222,6 +222,8 @@ class Container(models.Model):
     pushover_token = models.CharField(max_length=255,blank=True,null=True)
     pushover_sound = models.CharField(max_length=255,blank=True,null=True)
 
+    pushbullet_token = models.CharField(max_length=255,blank=True,null=True)
+
     quota_threshold = models.PositiveIntegerField("Quota threshold", default=90)
 
     tags = models.ManyToManyField('Tag', blank=True)
@@ -302,6 +304,8 @@ class Container(models.Model):
         alarms = []
         if self.pushover_user and self.pushover_token:
             alarms.append('pushover')
+        if self.pushbullet_token:
+            alarms.append('pushbullet')
         if self.jid and self.jid_secret and self.jid_destinations:
             alarms.append('xmpp')
         return ','.join(alarms)
