@@ -81,8 +81,13 @@ def _user__email(self):
         return self.user.email
     return ''
 _user__email.short_description = 'Email'
+
+def _containers__count(self):
+    return self.container_set.count()
+_containers__count.short_description = 'Containers'
+
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('user', _user__email, 'company', 'vat')
+    list_display = ('user', _user__email, 'company', 'vat', _containers__count)
 
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('content', 'ctime', 'public')
