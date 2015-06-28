@@ -551,12 +551,36 @@ def distros(request):
     return spit_json(request, j)
 
 @need_basicauth
-def custom_distros(request, id):
+@csrf_exempt
+def custom_distros(request, id=None):
     customer = request.user.customer
+    if not id:
+        j = [{'id': d.pk, 'name': d.name, 'container': d.container.uid} for d in CustomDistro.objects.filter(container__customer=customer)]
+        return spit_json(request, j)
     try:
         container = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    if request.method == 'POST':
+        if not container.custom_distros_storage:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        response = check_body(request)
+        if response:
+            return response
+        j = json.loads(request.read())
+        distro = CustomDistro(container=container) 
+        allowed_fields = ('name', 'path', 'note')
+        for field in allowed_fields:
+            if field in j:
+                setattr(distro, field, j[field])
+        try:
+            distro.full_clean()
+            distro.save()
+        except:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        response = HttpResponse(json.dumps({'message': 'Created'}), content_type="application/json")
+        response.status_code = 201
+        return response
     j = [{'id': d.pk, 'name': d.name} for d in CustomDistro.objects.filter(container__server=container.server,container__customer=customer).exclude(container=container)]
     return spit_json(request, j)
 
