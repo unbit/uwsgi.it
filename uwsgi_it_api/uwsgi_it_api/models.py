@@ -195,6 +195,27 @@ class Distro(models.Model):
     def __unicode__(self):
         return self.name
 
+class CustomDistro(models.Model):
+    container = models.ForeignKey('Container')
+    name = models.CharField(max_length=255)
+    path = models.CharField(max_length=255)
+
+    uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
+    note = models.TextField(blank=True,null=True)
+
+    tags = models.ManyToManyField('Tag', blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def clean(self):
+        allowed = string.letters + string.digits + '._-'
+        for letter in self.path:
+           if letter not in allowed:
+               raise ValidationError('invalid path for custom distro, can contains only "%s"' % allowed)
+
+    class Meta:
+        unique_together = (('container', 'name'), ('container', 'path'))
 
 def start_of_epoch():
     return datetime.datetime.fromtimestamp(1)
