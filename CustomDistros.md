@@ -22,8 +22,8 @@ The API
 -------
 
 ```/api/custom_distros/```
-```/api/custom_distros/<id>```
-```/api/custom_distro/<id>```
+```/api/custom_distros/id```
+```/api/custom_distro/id```
 
 Building distros
 ----------------
