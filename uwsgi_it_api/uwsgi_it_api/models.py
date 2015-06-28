@@ -266,6 +266,8 @@ class Container(models.Model):
     alarm_freq = models.PositiveIntegerField(default=60)
 
     custom_distros_storage = models.BooleanField(default=False)
+    custom_distro = models.ForeignKey(CustomDistro,null=True,blank=True,related_name='+')
+    
 
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
