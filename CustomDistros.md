@@ -24,5 +24,16 @@ The API
 Building distros
 ----------------
 
+/.old_root
+
+/containers
+
+nss
+/opt/unbit/uwsgi/uwsgi
+vassals
+
 Debootstrap
 Docker
+
+Check list for when you have problems
+-------------------------------------
