@@ -46,6 +46,7 @@ Features and Goals
 - The HTTP router can forward RTSP and chunked input requests
 - support for old CGI's (via uWSGI cgi plugin)
 - SFTP virtual chroot/jail is managed via the pysftpserver project
+- support in home etc/rc.local for distros without a uWSGI installation
 
 Status
 ------
