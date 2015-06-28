@@ -312,6 +312,7 @@ class Container(models.Model):
                               'pushbullet_token',
                               'quota_threshold', 
                               'custom_distros_storage',
+                              'custom_distro',
                               'nofollow')
         if self.pk is not None:
             orig = Container.objects.get(pk=self.pk)

@@ -17,7 +17,7 @@ class ContainerAdminForm(ModelForm):
         super(ContainerAdminForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['tags'].queryset = Tag.objects.filter(customer=self.instance.customer)
-            self.fields['custom_distro'].queryset = CustomDistro.objects.filter(container__server=self.instance.server, container__customer=self.instance.customer)
+            self.fields['custom_distro'].queryset = CustomDistro.objects.filter(container__server=self.instance.server, container__customer=self.instance.customer).exclude(container=self.instance)
         else:
             self.fields['tags'].widget = HiddenInput()
             self.fields['custom_distro'].widget = HiddenInput()

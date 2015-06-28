@@ -43,6 +43,8 @@ def container(request, id):
             container.ssh_keys_mtime = datetime.datetime.now()
         if 'distro' in j:
             container.distro = Distro.objects.get(pk=j['distro'])
+        if 'custom_distro' in j:
+            container.custom_distro = CustomDistro.objects.filter(pk=j['custom_distro'], container__server=container.server, container__customer=customer).exclude(container=container)
         if 'memory' in j:
             if container.server.owner == customer:
                 container.memory = int(j['memory'])
@@ -107,6 +109,7 @@ def container(request, id):
         'note': container.note,
         'linked_to': container.linked_to,
         'custom_distros_storage': container.custom_distros_storage,
+        'custom_distro': None,
         'ssh_keys': container.ssh_keys,
         'tags': [t.name for t in container.tags.all()],
         'legion_address': [l.address for l in container.server.legion_set.all()]
@@ -114,6 +117,9 @@ def container(request, id):
     if container.distro:
         c['distro'] = container.distro.pk
         c['distro_name'] = container.distro.name
+    if container.custom_distro:
+        c['custom_distro'] = container.custom_distro.pk
+        c['custom_distro_name'] = container.custom_distro.name
     return spit_json(request, c)
 
 def news(request):
@@ -214,6 +220,8 @@ def containers(request):
             'uuid': container.uuid,
             'distro': None,
             'distro_name': None,
+            'custom_distro': None,
+            'custom_distro_name': None,
             'server': container.server.name,
             'server_address': container.server.address,
             'tags': [t.name for t in container.tags.all()]
@@ -221,6 +229,9 @@ def containers(request):
         if container.distro:
             cc['distro'] = container.distro.pk
             cc['distro_name'] = container.distro.name
+        if container.custom_distro:
+            cc['custom_distro'] = container.custom_distro.pk
+            cc['custom_distro_name'] = container.custom_distro.name
         c.append(cc)
 
     return spit_json(request, c)
@@ -427,6 +438,39 @@ def alarm(request, id):
 
 @need_basicauth
 @csrf_exempt
+def custom_distro(request, id):
+    customer = request.user.customer
+    try:
+        distro = CustomDistro.objects.get(pk=id, container__customer=customer)
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    if request.method == 'DELETE':
+        distro.delete()
+        return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
+    if request.method == 'POST':
+        response = check_body(request)
+        if response:
+            return response
+        j = json.loads(request.read())
+        allowd_fields = ('name', 'path', 'note')
+        for field in allowed_fields:
+            if field in j:
+                setattr(distro, field, j[field])
+        distro.full_clean()
+        distro.save()
+    d = {
+        'id': distro.pk,
+        'container': distro.container.uid,
+        'name': distro.name,
+        'path': distro.path,
+        'note': distro.note,
+        'uuid': distro.uuid,
+    }
+    return spit_json(request, d)
+            
+
+@need_basicauth
+@csrf_exempt
 def alarm_key(request, id):
     customer = request.user.customer
     try:
@@ -513,7 +557,7 @@ def custom_distros(request, id):
         container = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
     except:
         return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
-    j = [{'id': d.pk, 'name': d.name} for d in CustomDistro.objects.filter(container__server=container.server,container__customer=customer)]
+    j = [{'id': d.pk, 'name': d.name} for d in CustomDistro.objects.filter(container__server=container.server,container__customer=customer).exclude(container=container)]
     return spit_json(request, j)
 
 
