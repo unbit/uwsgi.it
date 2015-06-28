@@ -506,6 +506,16 @@ def distros(request):
     j = [{'id': d.pk, 'name': d.name} for d in Distro.objects.all()]
     return spit_json(request, j)
 
+@need_basicauth
+def custom_distros(request, id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    j = [{'id': d.pk, 'name': d.name} for d in CustomDistro.objects.filter(container__server=container.server,container__customer=customer)]
+    return spit_json(request, j)
+
 
 @need_basicauth
 @csrf_exempt
