@@ -309,6 +309,7 @@ class Container(models.Model):
                               'pushover_sound',
                               'pushbullet_token',
                               'quota_threshold', 
+                              'custom_distros_storage',
                               'nofollow')
         if self.pk is not None:
             orig = Container.objects.get(pk=self.pk)

@@ -29,6 +29,7 @@ def container(request, id):
             'jid_destinations', 'nofollow', 'pushover_user',
             'pushover_token', 'pushover_sound', 'alarm_freq',
             'pushbullet_token',
+            'custom_distros_storage',
         )
 
         j = json.loads(request.read())
@@ -105,6 +106,7 @@ def container(request, id):
         'nofollow': container.nofollow,
         'note': container.note,
         'linked_to': container.linked_to,
+        'custom_distros_storage': container.custom_distros_storage,
         'ssh_keys': container.ssh_keys,
         'tags': [t.name for t in container.tags.all()],
         'legion_address': [l.address for l in container.server.legion_set.all()]

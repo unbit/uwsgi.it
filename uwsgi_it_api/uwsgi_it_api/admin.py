@@ -110,6 +110,10 @@ class AlarmAdmin(admin.ModelAdmin):
     list_filter = ('level',)
     search_fields = ('msg', '_class', 'vassal', 'color') 
 
+class CustomDistroAdmin(admin.ModelAdmin):
+    list_display = ('container', 'name', 'path')
+    
+
 admin.site.register(Server, ServerAdmin)
 admin.site.register(Distro)
 admin.site.register(Customer, CustomerAdmin)
@@ -142,3 +146,5 @@ admin.site.register(News, NewsAdmin)
 admin.site.register(Loopbox, LoopboxAdmin)
 
 admin.site.register(Alarm, AlarmAdmin)
+
+admin.site.register(CustomDistro, CustomDistroAdmin)
