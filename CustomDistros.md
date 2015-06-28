@@ -21,6 +21,9 @@ This container CANNOT use custom distros for itself, its only purpose is to serv
 
 A custom_distro storage container can serve images only for containers running on its same server and for the same customer (your images cannot be shared with other customers)
 
+A custom_distro storage container should not run vassals (albeit it is possible). This is a best practice to improve security.
+
+Unless you give world write privileges to directories of your images, they are readonly. If you need to give write access to containers, give them world write privilege (this is not a big problem as images are not shared with other customers)
 
 The API
 -------
