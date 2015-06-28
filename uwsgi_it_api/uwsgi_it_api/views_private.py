@@ -46,6 +46,8 @@ def private_container_ini(request, id):
         j = render_to_string('vassal.ini', {'container': container})
         return HttpResponse(j, content_type="text/plain")
     except:
+        import sys
+        print sys.exc_info()
         return HttpResponseForbidden('Forbidden\n')    
 
 @need_certificate
