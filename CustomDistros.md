@@ -12,11 +12,15 @@ Another important topic is that your images must be constantly security checked 
 Not scared enough ? Let's' start
 --------------------------------
 
-Requirements
-------------
+Requirements and (Security) Limits
+----------------------------------
 
-(Security) Limits
------------------
+You need a dedicated container (with very few memory) to store your distro images.
+
+This container CANNOT use custom distros for itself, its only purpose is to serve images.
+
+A custom_distro storage container can serve images only for containers running on its same server and for the same customer (your images cannot be shared with other customers)
+
 
 The API
 -------
