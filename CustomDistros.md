@@ -52,7 +52,11 @@ nss
 vassals
 
 Debootstrap
+
 Docker
 
 Check list for when you have problems
 -------------------------------------
+
+Tips & Tricks
+-------------
