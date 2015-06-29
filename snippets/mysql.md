@@ -37,10 +37,15 @@ create vassals/mysql.ini
 
 ```ini
 [uwsgi]
-smart-attach-daemon = $(HOME)/db.mysql/mysqld.pid mysqld --defaults-file=$(HOME)/.my.cnf
+smart-attach-daemon = $(HOME)/db.mysql/mysqld.pid,180 mysqld --defaults-file=$(HOME)/.my.cnf
 ```
 
 Check logs/emperor.log, if all goes well you can start using mysql normally (remember to assign a root password)
+
+What is that '180' after the pidfile ?
+--------------------------------------
+
+By default the daemons manager ensures up to 10 times that the external process daemonized. (this is about 10 seconds of retries). Unfortunately if you have corruptions, the amount of time required for a repair could be way bigger. That '180' instructs the master to retries up to 180 times (about 3 minutes) before giving up.
 
 Backup
 ------
