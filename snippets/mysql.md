@@ -93,6 +93,6 @@ save it as `mysql_backup.pl` and run it via uWSGI cron:
 
 ```ini
 [uwsgi]
-smart-attach-daemon = $(HOME)/db.mysql/mysqld.pid mysqld --defaults-file=$(HOME)/.my.cnf
+smart-attach-daemon = $(HOME)/db.mysql/mysqld.pid,180 mysqld --defaults-file=$(HOME)/.my.cnf
 cron = 59 3 -1 -1 -1 perl $(HOME)/mysql_backup.pl
 ```
