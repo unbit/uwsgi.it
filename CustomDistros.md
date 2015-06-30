@@ -169,4 +169,6 @@ If your bash report "I have no name" as the prompt, it means your /etc/passwd do
 Tips & Tricks
 -------------
 
+When exploding tar images you may get errors about permissions (expecially for /dev/ devices). You can safely ignore them.
 
+If you want to use the minimal amount of memory for your custom_distros container you may want to use busybox based distros for it.
