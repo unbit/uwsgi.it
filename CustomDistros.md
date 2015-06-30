@@ -87,13 +87,49 @@ DELETE /api/custom_distro/id
 Building distros
 ----------------
 
+Now you can start building your distro images.
+
+There are a bunch of ways to do it, but first you need to know about a couple of tunings you need
+to do on images.
+
+The following 2 directories must exist in the distro root:
+
+```
 /.old_root
-
 /containers
+```
 
-nss
+If your distro /etc/passwd does not contain an entry for your container uid, some commodity command could not work
+as expected. You can add an entry in /etc/passwd or use this nss module (you should run the commands using the distro as the root fs, chroot is your friend):
+
+```
+git clone https://github.com/unbit/nss-unbit
+cd nss-unbit
+# requires running as root/sudo
+make
+```
+
+then edit /etc/nsswitch.conf (in the distro root)
+
+```
+passwd:         compat unbit
+group:          compat unbit
+shadow:         compat unbit
+...
+```
+
+If you want to use the uWSGI Emperor of your container you need a uwsgi installation.
+
+The Emperor searches for the uwsgi binary in the following paths (and order):
+
+```
+/containers/<container_uid>/bin/uwsgi
+/usr/local/bin/uwsgi
 /opt/unbit/uwsgi/uwsgi
-vassals
+```
+
+You can eventually completely ignore the Emperor, and use a rc.local script to spawn your processes (place it into the etc dir in the home, the distro /etc/rc.local script will be ignored)
+
 
 Debootstrap
 
