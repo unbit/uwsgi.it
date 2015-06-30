@@ -128,7 +128,7 @@ The Emperor searches for the uwsgi binary in the following paths (and order, rem
 /opt/unbit/uwsgi/uwsgi
 ```
 
-You can eventually completely ignore the Emperor, and use a rc.local script to spawn your processes (place it into the etc dir in the home, the distro /etc/rc.local script will be ignored)
+You can eventually completely ignore the Emperor, and use a rc.local script to spawn your processes (place it into the etc dir in the home, the distro /etc/rc.local script will be executed before it)
 
 To create your distros you can use the venerable debootstrap:
 
@@ -172,3 +172,5 @@ Tips & Tricks
 When exploding tar images you may get errors about permissions (expecially for /dev/ devices). You can safely ignore them.
 
 If you want to use the minimal amount of memory for your custom_distros container you may want to use busybox based distros for it.
+
+Remember that /etc/rc.local of a custom distro is executed at every restart of the container along the home based etc/rc.local. This means you can put code that must be executed for every container using this custom distro in /etc/rc.local while you edit $HOME/etc/rc.local for container specific scripts
