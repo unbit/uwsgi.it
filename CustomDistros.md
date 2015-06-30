@@ -130,13 +130,43 @@ The Emperor searches for the uwsgi binary in the following paths (and order, rem
 
 You can eventually completely ignore the Emperor, and use a rc.local script to spawn your processes (place it into the etc dir in the home, the distro /etc/rc.local script will be ignored)
 
+To create your distros you can use the venerable debootstrap:
 
-Debootstrap
+```
+debootstrap trusty your_dir
+chroot your_dir
+... run tuning commands ...
+```
 
-Docker
+exit the chroot, make a tarball of the distro dir and upload it into the custom_distros_storage container
+
+But with Docker (https://www.docker.com/) things could be way easier:
+
+```
+.. create your docker container and tune it ...
+docker export image_id | gzip > image.tgz
+```
+
+and upload image.tgz in the custom_distros_storage container
+
+Images tar must be exploded into the distros/<image_name> path (<image_name> is the value of the path field in the api)
+
+Mapping custom distros to containers
+------------------------------------
+
+Each container as a 'custom_distro' field. Just set it ot the id of the distro you want to use. (Remember to get the list of allowed custom distros for that container)
 
 Check list for when you have problems
 -------------------------------------
 
+If the /.old_root directory is not found, the container will fallback to the default distro set for the container. In such a case you will get an alarm too.
+
+If the container does not start, reset custom_distro to null, wait for the container to restart back in the default distro and check logs/emperor.log for problems. Every operation on the distro image is reported there.
+
+If your bash report "I have no name" as the prompt, it means your /etc/passwd does not contain and entry for your container uid, or you did not setup the unbit nss module.
+
+
 Tips & Tricks
 -------------
+
+
