@@ -47,6 +47,7 @@ Features and Goals
 - support for old CGI's (via uWSGI cgi plugin)
 - SFTP virtual chroot/jail is managed via the pysftpserver project
 - support in home etc/rc.local for distros without a uWSGI installation
+- support for custom distributions (https://github.com/unbit/uwsgi.it/blob/master/CustomDistros.md)
 
 Status
 ------
@@ -105,7 +106,7 @@ TODO
 - Implement sub-users concept for the api (maybe as subuser@user)
 - Add support for https://github.com/unbit/spockfs mounts (maybe in the same way as loopboxes ?)
 - fastrouter-only implementation for nginx integration
-- is SPDY support whorty ?
+- is SPDY/HTTP2 support whorty ?
 
 
 LONG TERM GOALS

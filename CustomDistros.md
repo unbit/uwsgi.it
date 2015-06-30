@@ -87,20 +87,88 @@ DELETE /api/custom_distro/id
 Building distros
 ----------------
 
+Now you can start building your distro images.
+
+There are a bunch of ways to do it, but first you need to know about a couple of tunings you need
+to do on images.
+
+The following 2 directories must exist in the distro root (yes yes, they could be automatically created, but manually managing it ensure you do not use unchecked dirs as rootfs):
+
+```
 /.old_root
-
 /containers
+```
 
-nss
+If your distro /etc/passwd does not contain an entry for your container uid, some commodity command could not work
+as expected. You can add an entry in /etc/passwd or use this nss module (you should run the commands using the distro as the root fs, chroot is your friend):
+
+```
+git clone https://github.com/unbit/nss-unbit
+cd nss-unbit
+# requires running as root/sudo
+make
+```
+
+then edit /etc/nsswitch.conf (in the distro root)
+
+```
+passwd:         compat unbit
+group:          compat unbit
+shadow:         compat unbit
+...
+```
+
+If you want to use the uWSGI Emperor of your container you need a uwsgi installation.
+
+The Emperor searches for the uwsgi binary in the following paths (and order, remember that /usr/local is automatically mapped to the home):
+
+```
+/containers/<container_uid>/bin/uwsgi
+/usr/local/bin/uwsgi
 /opt/unbit/uwsgi/uwsgi
-vassals
+```
 
-Debootstrap
+You can eventually completely ignore the Emperor, and use a rc.local script to spawn your processes (place it into the etc dir in the home, the distro /etc/rc.local script will be ignored)
 
-Docker
+To create your distros you can use the venerable debootstrap:
+
+```
+debootstrap trusty your_dir
+chroot your_dir
+... run tuning commands ...
+```
+
+exit the chroot, make a tarball of the distro dir and upload it into the custom_distros_storage container
+
+But with Docker (https://www.docker.com/) things could be way easier:
+
+```
+.. create your docker container and tune it ...
+docker export image_id | gzip > image.tgz
+```
+
+and upload image.tgz in the custom_distros_storage container
+
+Images tar must be exploded into the distros/_image_name_ path (_image_name_ is the value of the path field in the api)
+
+Mapping custom distros to containers
+------------------------------------
+
+Each container as a 'custom_distro' field. Just set it ot the id of the distro you want to use. (Remember to get the list of allowed custom distros for that container)
 
 Check list for when you have problems
 -------------------------------------
 
+If the /.old_root directory is not found, the container will fallback to the default distro set for the container. In such a case you will get an alarm too.
+
+If the container does not start, reset custom_distro to null, wait for the container to restart back in the default distro and check logs/emperor.log for problems. Every operation on the distro image is reported there.
+
+If your bash report "I have no name" as the prompt, it means your /etc/passwd does not contain and entry for your container uid, or you did not setup the unbit nss module.
+
+
 Tips & Tricks
 -------------
+
+When exploding tar images you may get errors about permissions (expecially for /dev/ devices). You can safely ignore them.
+
+If you want to use the minimal amount of memory for your custom_distros container you may want to use busybox based distros for it.
