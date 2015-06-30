@@ -120,7 +120,7 @@ shadow:         compat unbit
 
 If you want to use the uWSGI Emperor of your container you need a uwsgi installation.
 
-The Emperor searches for the uwsgi binary in the following paths (and order):
+The Emperor searches for the uwsgi binary in the following paths (and order, remember that /usr/local is automatically mapped to the home):
 
 ```
 /containers/<container_uid>/bin/uwsgi
