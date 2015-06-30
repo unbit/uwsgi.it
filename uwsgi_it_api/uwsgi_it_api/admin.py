@@ -100,8 +100,17 @@ def _containers__count(self):
     return self.container_set.count()
 _containers__count.short_description = 'Containers'
 
+class CustomerContainerInline(admin.TabularInline):
+    model = Container
+    fields = ['name', 'server', 'memory', 'storage']
+    readonly_fields = ['name', 'server', 'memory', 'storage']
+    extra = 0
+    can_delete = False
+    max_num = 0
+
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('user', _user__email, 'company', 'vat', _containers__count)
+    inlines = [CustomerContainerInline]
 
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('content', 'ctime', 'public')
