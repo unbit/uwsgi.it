@@ -44,7 +44,7 @@ class ContainerAdmin(admin.ModelAdmin):
     is_accounted.boolean = True
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', is_accounted, 'ctime')
     list_filter = ('server', 'distro', ContainerAccounted)
-    search_fields = ('name', 'customer__user__username', 'tags__name', 'admin_note', 'admin__order')
+    search_fields = ('name', 'customer__user__username', 'tags__name', 'admin_note', 'admin_order')
 
     form = ContainerAdminForm
 
