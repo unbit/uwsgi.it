@@ -44,7 +44,7 @@ class ContainerAdmin(admin.ModelAdmin):
     is_accounted.boolean = True
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', is_accounted, 'ctime')
     list_filter = ('server', 'distro', ContainerAccounted)
-    search_fields = ('name', 'customer__user__username', 'tags__name')
+    search_fields = ('name', 'customer__user__username', 'tags__name', 'admin_note', 'admin__order')
 
     form = ContainerAdminForm
 
@@ -111,6 +111,7 @@ class CustomerContainerInline(admin.TabularInline):
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('user', _user__email, 'company', 'vat', _containers__count)
     inlines = [CustomerContainerInline]
+    search_fields = ('user__username', 'user__email', 'company', 'vat', 'admin_note')
 
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('content', 'ctime', 'public')

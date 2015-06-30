@@ -32,6 +32,8 @@ class Customer(models.Model):
 
     rsa_key = models.TextField(default=generate_rsa, unique=True)
 
+    admin_note = models.TextField(blank=True,null=True)
+
     @property
     def rsa_key_lines(self):
         return self.rsa_key.split('\n')
@@ -267,6 +269,9 @@ class Container(models.Model):
 
     custom_distros_storage = models.BooleanField(default=False)
     custom_distro = models.ForeignKey(CustomDistro,null=True,blank=True,related_name='+')
+
+    admin_note = models.TextField(blank=True,null=True)
+    admin_order = models.CharField(max_length=255,blank=True,null=True)
     
 
     def __unicode__(self):
