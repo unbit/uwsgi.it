@@ -92,7 +92,7 @@ Now you can start building your distro images.
 There are a bunch of ways to do it, but first you need to know about a couple of tunings you need
 to do on images.
 
-The following 2 directories must exist in the distro root:
+The following 2 directories must exist in the distro root (yes yes, they could be automatically created, but manually managing it ensure you do not use unchecked dirs as rootfs):
 
 ```
 /.old_root
