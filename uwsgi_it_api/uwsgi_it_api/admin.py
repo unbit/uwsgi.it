@@ -12,6 +12,18 @@ class ServerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', memory_status, storage_status, 'weight', 'owner')
     list_filter = ('datacenter',)
 
+class ContainerAccounted(admin.SimpleListFilter):
+    title = 'is accounted ?'
+    parameter_name = 'is_accounted'
+    def lookups(self, request, model_admin):
+        return (('1', 'Yes'), ('0', 'No'))
+    def queryset(self, request, queryset):
+        if self.value() == '0':
+            return queryset.filter(accounted=False, server__owner=None)
+        elif self.value() == '1':
+            return queryset.filter(accounted=True, server__owner=None)
+        return queryset
+
 class ContainerAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContainerAdminForm, self).__init__(*args, **kwargs)
@@ -31,7 +43,7 @@ class ContainerAdmin(admin.ModelAdmin):
         return False
     is_accounted.boolean = True
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', is_accounted, 'ctime')
-    list_filter = ('server', 'distro', 'accounted')
+    list_filter = ('server', 'distro', ContainerAccounted)
     search_fields = ('name', 'customer__user__username', 'tags__name')
 
     form = ContainerAdminForm
