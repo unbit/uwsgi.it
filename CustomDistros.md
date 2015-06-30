@@ -149,7 +149,7 @@ docker export image_id | gzip > image.tgz
 
 and upload image.tgz in the custom_distros_storage container
 
-Images tar must be exploded into the distros/<image_name> path (<image_name> is the value of the path field in the api)
+Images tar must be exploded into the distros/_image_name_ path (_image_name_ is the value of the path field in the api)
 
 Mapping custom distros to containers
 ------------------------------------
