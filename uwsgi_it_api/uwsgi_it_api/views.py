@@ -44,7 +44,7 @@ def container(request, id):
         if 'distro' in j:
             container.distro = Distro.objects.get(pk=j['distro'])
         if 'custom_distro' in j:
-            container.custom_distro = CustomDistro.objects.filter(pk=j['custom_distro'], container__server=container.server, container__customer=customer).exclude(container=container)
+            container.custom_distro = CustomDistro.objects.filter(pk=j['custom_distro'], container__server=container.server, container__customer=customer).exclude(container=container)[0]
         if 'memory' in j:
             if container.server.owner == customer:
                 container.memory = int(j['memory'])
