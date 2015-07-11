@@ -14,6 +14,30 @@ import uuid
 
 @need_basicauth
 @csrf_exempt
+def portmappings(request, ip):
+    customer = request.user.customer
+    try:
+        server = Server.objects.get(address=ip,owner=customer)
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    if request.method == 'POST':
+        response = check_body(request)
+        if response:
+            return response
+    mappings = []
+    for portmap in Portmap.objects.filter(container__server=server):
+        mappings.append({'id': portmap.pk,
+                         'proto': portmap.proto,
+                         'public_port': portmap.public_port,
+                         'container': portmap.container.uid,
+                         'container_ip': str(portmap.container.ip),
+                         'private_port': portmap.private_port,
+                       })
+    return spit_json(request, mappings)
+    
+
+@need_basicauth
+@csrf_exempt
 def container(request, id):
     customer = request.user.customer
     try:
