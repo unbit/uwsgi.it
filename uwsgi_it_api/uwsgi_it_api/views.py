@@ -11,7 +11,6 @@ import datetime
 import time
 import uuid
 
-
 @need_basicauth
 @csrf_exempt
 def portmappings(request, ip):
@@ -24,6 +23,37 @@ def portmappings(request, ip):
         response = check_body(request)
         if response:
             return response
+        j = json.loads(request.read())
+        if not j:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        pm = Portmap()
+        try:
+            pm.proto = j['proto']
+            pm.public_port = int(j['public_port'])
+            pm.private_port = int(j['private_port'])
+            pm.container = server.container_set.get(pk=(int(j['container']) - UWSGI_IT_BASE_UID), customer=customer)
+            pm.full_clean()
+            pm.save()
+        except:
+            import sys
+            print sys.exc_info()
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        response = HttpResponse(json.dumps({'message': 'Created'}), content_type="application/json")
+        response.status_code = 201
+        return response
+    elif request.method == 'DELETE':
+        response = check_body(request)
+        if response:
+            return response
+        j = json.loads(request.read())
+        if not j:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        try:
+            pm = Portmap.objects.get(pk=j['id'], container__server=server)
+            pm.delete()
+        except:
+            return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+        return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
     mappings = []
     for portmap in Portmap.objects.filter(container__server=server):
         mappings.append({'id': portmap.pk,
