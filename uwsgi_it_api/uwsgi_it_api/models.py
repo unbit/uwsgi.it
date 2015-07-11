@@ -425,6 +425,7 @@ class ContainerLink(models.Model):
             raise ValidationError("cannot link with myself")
 
 class Portmap(models.Model):
+    proto = models.CharField(max_length=4,choices=(('tcp',) * 2, ('udp',) * 2))
     public_port = models.PositiveIntegerField()
     container = models.ForeignKey(Container)
     private_port = models.PositiveIntegerField()
@@ -433,14 +434,14 @@ class Portmap(models.Model):
     mtime = models.DateTimeField(auto_now=True)
 
     def clean(self):
-        if public_port < 1024 or public_port > 65535:
+        if self.public_port < 1024 or self.public_port > 65535:
             raise ValidationError("invalid public port range")
-        if private_port < 1024 or private_port > 65535:
+        if self.private_port < 1024 or self.private_port > 65535:
             raise ValidationError("invalid private port range")
 
     class Meta:
         verbose_name_plural = 'Port Mapping'
-        unique_together = (('public_port', 'container'), ('private_port', 'container'))
+        unique_together = (('proto', 'public_port', 'container'), ('proto', 'private_port', 'container'))
 
 
 class Loopbox(models.Model):

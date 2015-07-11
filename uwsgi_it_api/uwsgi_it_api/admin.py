@@ -136,6 +136,13 @@ class AlarmAdmin(admin.ModelAdmin):
 
 class CustomDistroAdmin(admin.ModelAdmin):
     list_display = ('container', 'name', 'path')
+
+class PortmapAdmin(admin.ModelAdmin):
+    def _container__server(self):
+        return self.container.server
+    def _container__ip(self):
+        return self.container.ip
+    list_display = (_container__server, 'proto', 'public_port', 'container', _container__ip, 'private_port')
     
 
 admin.site.register(Server, ServerAdmin)
@@ -172,3 +179,5 @@ admin.site.register(Loopbox, LoopboxAdmin)
 admin.site.register(Alarm, AlarmAdmin)
 
 admin.site.register(CustomDistro, CustomDistroAdmin)
+
+admin.site.register(Portmap, PortmapAdmin)
