@@ -424,6 +424,24 @@ class ContainerLink(models.Model):
         if self.container == self.to:
             raise ValidationError("cannot link with myself")
 
+class Portmap(models.Model):
+    public_port = models.PositiveIntegerField()
+    container = models.ForeignKey(Container)
+    private_port = models.PositiveIntegerField()
+
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        if public_port < 1024 or public_port > 65535:
+            raise ValidationError("invalid public port range")
+        if private_port < 1024 or private_port > 65535:
+            raise ValidationError("invalid private port range")
+
+    class Meta:
+        verbose_name_plural = 'Port Mapping'
+        unique_together = (('public_port', 'container'), ('private_port', 'container'))
+
 
 class Loopbox(models.Model):
     container = models.ForeignKey(Container)
