@@ -41,7 +41,7 @@ def private_loopboxes(request):
 def private_portmappings(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
-        unix = server.munix
+        unix = server.portmappings_munix
         pmappings = []
         for portmap in Portmap.objects.filter(container__server=server):
             pmappings.append({

@@ -10,6 +10,7 @@ from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 import random
 import datetime
 import os.path
+from django.db.models.signals import post_delete
 
 
 # Create your models here.
@@ -96,6 +97,9 @@ class Server(models.Model):
 
     ssd = models.BooleanField('SSD', default=False)
 
+    
+    portmappings_mtime = models.DateTimeField(auto_now=True)
+
     @property
     def used_memory(self):
         n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
@@ -138,6 +142,10 @@ class Server(models.Model):
     @property
     def munix(self):
         return calendar.timegm(self.mtime.utctimetuple())
+
+    @property
+    def portmappings_munix(self):
+        return calendar.timegm(self.portmappings_mtime.utctimetuple())
 
 class Legion(models.Model):
     name = models.CharField(max_length=255,unique=True)
@@ -448,6 +456,10 @@ class Portmap(models.Model):
     class Meta:
         verbose_name_plural = 'Port Mapping'
         unique_together = (('proto', 'public_port', 'container'), ('proto', 'private_port', 'container'))
+def portmap_post_delete_handler(sender, instance, **kwargs):
+    # this ensure mtiem is not called
+    Server.objects.filter(pk=instance.container.server.pk).update(portmappings_mtime=datetime.datetime.now())
+post_delete.connect(portmap_post_delete_handler, Portmap)
 
 
 class Loopbox(models.Model):
