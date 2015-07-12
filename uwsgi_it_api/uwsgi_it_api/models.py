@@ -439,6 +439,10 @@ class Portmap(models.Model):
         if self.private_port < 1024 or self.private_port > 65535:
             raise ValidationError("invalid private port range")
 
+    @property
+    def munix(self):
+        return calendar.timegm(self.mtime.utctimetuple())
+
     class Meta:
         verbose_name_plural = 'Port Mapping'
         unique_together = (('proto', 'public_port', 'container'), ('proto', 'private_port', 'container'))

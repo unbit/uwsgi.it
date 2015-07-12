@@ -25,6 +25,8 @@ urlpatterns = patterns('uwsgi_it_api.views_private',
     (r'^private/metrics/domain.hits/(\d+)$', 'private_metrics_domain_hits'),
 
     (r'^private/alarms/(\d+)$', 'private_alarms'),
+
+    (r'^private/portmappings/$', 'private_portmappings'),
 )
 
 urlpatterns += patterns('uwsgi_it_api.views',

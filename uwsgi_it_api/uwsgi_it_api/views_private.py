@@ -38,6 +38,27 @@ def private_loopboxes(request):
         return HttpResponseForbidden('Forbidden\n')
 
 @need_certificate
+def private_portmappings(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        unix = server.munix
+        pmappings = []
+        for portmap in Portmap.objects.filter(container__server=server):
+            pmappings.append({
+                             'proto': portmap.proto,
+                             'public_ip': str(portmap.container.server.address),
+                             'public_port': portmap.public_port,
+                             'private_ip': str(portmap.container.ip),
+                             'private_port': portmap.private_port,
+                            })
+            if portmap.munix > munix:
+                munix = portmap.munix
+        j = {'unix': munix, 'mappings':pmappings}
+        return spit_json(request, j)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
+
+@need_certificate
 def private_container_ini(request, id):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
