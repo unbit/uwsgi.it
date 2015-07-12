@@ -51,9 +51,9 @@ def private_portmappings(request):
                              'private_ip': str(portmap.container.ip),
                              'private_port': portmap.private_port,
                             })
-            if portmap.munix > munix:
-                munix = portmap.munix
-        j = {'unix': munix, 'mappings':pmappings}
+            if portmap.munix > unix:
+                unix = portmap.munix
+        j = {'unix': unix, 'mappings':pmappings}
         return spit_json(request, j)
     except:
         return HttpResponseForbidden('Forbidden\n')
