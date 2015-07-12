@@ -184,6 +184,26 @@ for(;;) {
 		unlink $filename;
 	}
 
+
+	# portmappings
+	$response = $ua->get($base_url.'/portmappings/');
+        if ($response->is_error or $response->code != 200 ) {
+                print date().' oops: '.$response->code.' '.$response->message."\n";
+                exit;
+        }
+
+        my $portmappings = decode_json($response->decoded_content);
+        my $etc_uwsgi_portmappings = '/etc/uwsgi/portmappings.sh';
+	if (-f $etc_uwsgi_portmappings) {
+		my @st = stat($etc_uwsgi_portmappings);
+                if ($portmappings->{unix} > $st[9]) {
+			update_portmappings($etc_uwsgi_portmappings, $portmappings->{'mappings'});
+		}
+	}
+	else {
+		update_portmappings($etc_uwsgi_portmappings, $portmappings->{'mappings'});
+	}
+
 	sleep(30);
 }
 
@@ -249,6 +269,19 @@ sub update_nodes {
 		print LN $_."\n";
 	}
 	close(LN);
+}
+
+sub update_portmappings {
+	my ($filename, $mappings) = @_;
+	open PM,'>'.$filename;
+	print PM "iptables -t nat -F portmappings\n\n";
+	foreach(@{$mappings}) {
+		my $iptables = 'iptables -t nat -A portmappings -p '.$_->{proto}.' -d '.$_->{public_ip}.
+				' --dport '.$_->{public_port}.' -j DNAT --to '.$_->{private_ip}.':'.$_->{private_port};
+		print PM $iptables."\n";
+	}
+	close(PM);
+	system('sh '.$filename);
 }
 
 sub write_ini {
