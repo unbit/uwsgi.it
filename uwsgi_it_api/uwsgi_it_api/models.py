@@ -436,6 +436,8 @@ class Portmap(models.Model):
     def clean(self):
         if self.public_port < 1024 or self.public_port > 65535:
             raise ValidationError("invalid public port range")
+        if self.public_port in (1999, 3022, 3026):
+            raise ValidationError("invalid public port range")
         if self.private_port < 1024 or self.private_port > 65535:
             raise ValidationError("invalid private port range")
 
