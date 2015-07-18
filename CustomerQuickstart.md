@@ -13,6 +13,15 @@ With those parameters you will be able to configure your services using the HTTP
 
 In this quickstart we will use the 'curl' command, but your supplier could give a you a more user-friendly interface (like a web-based one) build over the api
 
+The reference (python) implementation for the api is the following one:
+
+https://github.com/xrmx/uwsgiit-py (by Riccardo Magliocchetti)
+
+while a web interface (django) is available at
+
+https://github.com/20tab/uwsgiit_console (by 20Tab S.r.l.)
+
+
 Let's start: get your personal data
 -----------------------------------
 
