@@ -673,7 +673,7 @@ The container Emperor automatically set a series of alarms.
 
 Currently, you will get an alarm when your container quota is low (you can set the threshold with the quota_threshold item of the container api) and when a OOM (out of memory) is triggered.
 
-The alarm is broadcasted to all of the connected container shells and optionally to a jabber/xmpp account, a pushover app (https://pushover.net/) or to pushbullet devices (https://www.pushbullet.com)
+The alarm is broadcasted to all of the connected container shells and optionally to a jabber/xmpp account, a pushover app (https://pushover.net/) or a pushbullet devices (https://www.pushbullet.com) or a slack (https://slack.com) channel
 
 To enable jabber/xmpp alarm just set "jid", "jid_secret" and "jid_destinations" attributes of the container api.
 
