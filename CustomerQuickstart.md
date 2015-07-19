@@ -686,6 +686,8 @@ to enable pushover support just set "pushover_user" and "pushover_token" values,
 
 to enable pushbullet support just set the "pushbullet_token" field
 
+To enable slack support, set the "slack_webhook" field with the integration api url generated in the slack interface
+
 You will get at most an alarm every 60 seconds, if you want to raise this value set the field "alarm_freq"
 
 Additionally each alarm is stored as a persistent record in the Customer's infos. You can access those records with
