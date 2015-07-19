@@ -21,7 +21,7 @@ Prepare the environment to support both the 'node' and 'nodejs' binary name:
 ln -s /usr/bin/nodejs /usr/local/bin/node
 ```
 
-The install the required dependancies (from the ghost directory):
+Then install the required dependancies (from the ghost directory):
 
 ```sh
 npm install --production
