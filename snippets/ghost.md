@@ -37,3 +37,19 @@ when the instance is fully spawned (the first time will require a bit of time to
 
 The vassal file
 ***************
+
+Its objective is to spawn the ghost service and to forward requests from the domain to its port:
+
+```ini
+[uwsgi]
+domain = your_domain_name
+chdir = $(HOME)/ghost
+plugin = router_http
+route-run = http:127.0.0.1:2368
+env = NODE_ENV=production
+attach-daemon = node index.js
+offload-threads = 1
+logto = $(HOME)/logs/ghost.log
+```
+
+this configuration (call it ghost.ini) once dropped in the vassals directory will start the ghost server and will log any request to logs/ghost.log
