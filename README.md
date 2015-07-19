@@ -47,7 +47,7 @@ Features and Goals
 - support for old CGI's (via uWSGI cgi plugin)
 - SFTP virtual chroot/jail is managed via the pysftpserver project
 - support in home etc/rc.local for distros without a uWSGI installation
-- support for custom distributions (https://github.com/unbit/uwsgi.it/blob/master/CustomDistros.md)
+- support for custom distributions/images (https://github.com/unbit/uwsgi.it/blob/master/CustomDistros.md)
 
 Status
 ------
@@ -102,7 +102,6 @@ TODO
 ----
 
 - Map public ipv4/ipv6 addresses directly to a container (via NAT)
-- Support for custom-images (Docker dumps, ACI https://github.com/appc/spec/blob/master/SPEC.md#app-container-image, simple tarballs, zips...)
 - Implement sub-users concept for the api (maybe as subuser@user)
 - Add support for https://github.com/unbit/spockfs mounts (maybe in the same way as loopboxes ?)
 - fastrouter-only implementation for nginx integration
