@@ -12,7 +12,7 @@ Download the latest ghost zip file from https://ghost.org/download/ and explode 
 ```sh
 mkdir ghost
 cd ghost
-unzip <path_of_the_zip_file>
+unzip <path_of_the_ghost_zip_file>
 ```
 
 Prepare the environment to support both the 'node' and 'nodejs' binary name:
