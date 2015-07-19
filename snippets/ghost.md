@@ -36,7 +36,7 @@ npm start --production
 when the instance is fully spawned (the first time will require a bit of time to create db structures) hit ctrl-c and go to your vassals directory.
 
 The vassal file
-***************
+---------------
 
 Its objective is to spawn the ghost service and to forward requests from the domain to its port:
 
