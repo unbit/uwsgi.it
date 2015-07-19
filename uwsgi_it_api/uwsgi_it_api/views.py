@@ -82,7 +82,7 @@ def container(request, id):
             'name', 'note', 'quota_threshold', 'jid', 'jid_secret',
             'jid_destinations', 'nofollow', 'pushover_user',
             'pushover_token', 'pushover_sound', 'alarm_freq',
-            'pushbullet_token',
+            'pushbullet_token', 'slack_webhook',
             'custom_distros_storage',
         )
 
@@ -157,6 +157,7 @@ def container(request, id):
         'pushover_token': container.pushover_token,
         'pushover_sound': container.pushover_sound,
         'pushbullet_token': container.pushbullet_token,
+        'slack_webhook': container.slack_webhook,
         'alarm_freq': container.alarm_freq,
         'quota_threshold': container.quota_threshold,
         'nofollow': container.nofollow,
