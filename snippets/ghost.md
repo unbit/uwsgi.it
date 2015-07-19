@@ -7,7 +7,7 @@ The following steps will guide you in its installation in a uwsgi.it container.
 
 Requirements: a domain name mapped to a container with at least 512M ram, a recent (post-2013) distribution.
 
-Download the latest ghost zip file from https://ghost.org/download/ and explode in the 'ghost' directory in your home:
+Download the latest ghost zip file from https://ghost.org/download/ and explode it in the 'ghost' directory in your home:
 
 ```sh
 mkdir ghost
