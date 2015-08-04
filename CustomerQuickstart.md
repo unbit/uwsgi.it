@@ -231,9 +231,8 @@ Remember that www.mynewdomain.org and mynewdomain.org are two different objects,
 The first deploy
 ----------------
 
-Currently (January 2014) the uwsgi.it platform supports python, perl and ruby applications.
 
-We will try to deploy each of them
+We will try to deploy a python WSGI app, a perl PSGI app, and a ruby Rack app
 
 From the ssh shell, let's create 3 files (in the home):
 
