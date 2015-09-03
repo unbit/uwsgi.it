@@ -39,6 +39,7 @@ An example mass virtualhosting configuration:
         <Directory /containers/XXXXX/www>
                 Options FollowSymLinks
                 AllowOverride All
+                # Only for apache v2.4+
                 Require all granted
         </Directory>
 
