@@ -186,12 +186,49 @@ for(;;) {
 		}
 	}
 
+	my $response =  $ua->get($base_url.'/serverfilemetadata/');
+
+        if ($response->is_error or $response->code != 200 ) {
+                print date().' oops: '.$response->code.' '.$response->message."\n";
+                exit;
+        }
+
+        my $file_metadata = decode_json($response->decoded_content);
+	foreach(@{$file_metadata}) {
+		push_metadata_file($_);
+	}
+
 	# gather metrics every 5 minutes
 	sleep(300);
 }
 
 sub date {
 	return strftime "%Y-%m-%d %H:%M:%S", localtime;
+}
+
+sub push_metadata_file {
+	my ($filename) = @_;
+
+	my $ua = LWP::UserAgent->new;
+        $ua->ssl_opts(
+                SSL_key_file => $ssl_key,
+                SSL_cert_file => $ssl_cert,
+        );
+        $ua->timeout(3);
+
+	open my $fh, '<',$filename;
+	return unless $fh;
+	my $value = do { local $/; <$fh> };
+	close $fh;
+        my $j = JSON->new;
+        $j = $j->encode({file => $filename, value => $value });
+
+        my $response =  $ua->post($base_url.'/serverfilemetadata/', Content => $j);
+
+        if ($response->is_error or $response->code != 201 ) {
+                print date().' oops for '.$path.'/'.$uid.': '.$response->code.' '.$response->message."\n";
+        }
+	
 }
 
 sub push_metric {
