@@ -147,6 +147,26 @@ class Server(models.Model):
     def portmappings_munix(self):
         return calendar.timegm(self.portmappings_mtime.utctimetuple())
 
+class ServerFileMetadata(models.Model):
+    filename = models.CharField(max_length=255,unique=True)
+
+    def __unicode__(self):
+        return self.filename
+
+class ServerMetadata(models.Model):
+    server = models.ForeignKey(Server)
+    metadata = models.ForeignKey(ServerFileMetadata)
+    value = models.TextField(blank=True,null=True)
+
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return "%s - %s " % (self.server.name, self.metadata.filename)
+
+    class Meta:
+        unique_together = ( 'server', 'metadata')
+
 class Legion(models.Model):
     name = models.CharField(max_length=255,unique=True)
     address = models.GenericIPAddressField()

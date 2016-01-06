@@ -130,6 +130,14 @@ class LoopboxAdmin(admin.ModelAdmin):
 
     form = LoopboxAdminForm
 
+class ServerMetadataAdmin(admin.ModelAdmin):
+    def brvalue(self):
+        return self.value.replace('\n', '<br/>').replace(' ', '&nbsp;')
+    brvalue.short_description = 'Value'
+    brvalue.allow_tags = True
+    list_display = ('server', 'metadata', brvalue, 'mtime')
+    list_filter = ('server', 'metadata')
+
 class AlarmAdmin(admin.ModelAdmin):
     list_display = ('container', 'vassal', 'level', 'unix', 'msg')
     list_filter = ('level',)
@@ -182,3 +190,6 @@ admin.site.register(Alarm, AlarmAdmin)
 admin.site.register(CustomDistro, CustomDistroAdmin)
 
 admin.site.register(Portmap, PortmapAdmin)
+
+admin.site.register(ServerFileMetadata)
+admin.site.register(ServerMetadata, ServerMetadataAdmin)

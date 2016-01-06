@@ -11,6 +11,31 @@ import json
 import datetime
 
 @need_certificate
+@csrf_exempt
+def private_server_file_metadata(request):
+    try:
+        server = Server.objects.get(address=request.META['REMOTE_ADDR'])
+        if request.method == 'POST':
+            response = check_body(request)
+            if response: return response
+            j = json.loads(request.read())
+            metadata = ServerFileMetadata.objects.get(filename=j['file'])
+            sm, created = ServerMetadata.objects.get_or_create(server=server, metadata=metadata)
+            sm.value = j['value']
+            sm.save()
+            response = HttpResponse('Created\n')
+            response.status_code = 201
+            return response
+        files = []
+        for _file in ServerFileMetadata.objects.all():
+            files.append(_file.filename)
+        return spit_json(request, files)
+    except:
+        import sys
+        print sys.exc_info()
+        return HttpResponseForbidden('Forbidden\n')
+
+@need_certificate
 def private_custom_services(request):
     try:
         server = Server.objects.get(address=request.META['REMOTE_ADDR'])
