@@ -1,7 +1,7 @@
 uwsgi.it
 ========
 
-The latest Unbit hosting platform
+The latest Unbit hosting platform, sponsored by Consulthink S.p.a.
 
 Intro
 -----
