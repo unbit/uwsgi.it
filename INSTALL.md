@@ -82,7 +82,7 @@ Find the line with
 and change to
 
 ```sh
-AuthorizedKeysFile %h/.ssh/authorized_keys %h/.ssh/uwsgi_authorized_keys
+AuthorizedKeysFile %h/.ssh/authorized_keys %h/.ssh/uwsgi_authorized_keys %h/.ssh/authorized_keys2
 ```
 
 Then find 
