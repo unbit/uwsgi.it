@@ -54,7 +54,7 @@ will return the current mappings for the server (specified by its public ip addr
 curl -X POST -d '{"container": 30001, "proto":"tcp", "public_port": 9000, "private_port": 8000}' https://kratos:deimos@api.uwsgi.it/api/portmappings/ip
 ```
 
-will create a mapping from public tcp port 9000 to private port 8000 on the container 3001 on the nwtwork 10.x.x.x
+will create a mapping from public tcp port 9000 to private port 8000 on the container 3001 on the network 10.x.x.x
 
 finally
 
