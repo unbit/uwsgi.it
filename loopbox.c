@@ -13,6 +13,7 @@
 #include <sched.h>
 #include <sys/mount.h>
 #include <time.h>
+#include <sys/stat.h>
 
 #define UNBIT_EMPEROR_MAX_NS 64
 
