@@ -1,0 +1,14 @@
+[Unit]
+Description=uWSGI Emperor
+After=syslog.target
+
+[Service]
+LimitNOFILE=65536
+ExecStart=/opt/unbit/uwsgi/uwsgi /etc/uwsgi/emperor.ini
+Restart=always
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
