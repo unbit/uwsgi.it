@@ -1,7 +1,7 @@
 Step by step guide for installing a uwsgi.it node
 -------------------------------------------------
 
-This procedure assumes an x86_64 Ubuntu 14.04 server (ubuntu-minimal) with ext4 filesystem.
+This procedure assumes an x86_64 Ubuntu 14.04 server (ubuntu-minimal) with ext4 filesystem or an x86_64 Ubuntu 16.04 server (ubuntu-minimal)
 
 Note: you can set /etc/hostname to whatever you want, each container will have its own...
 
@@ -59,7 +59,7 @@ First step is finding the line on which the rootfs (or more general where /conta
 
 in this example /dev/md2 will store customer's file so we add `noatime,usrjquota=aquota.user,jqfmt=vfsv1` to its options
 
-Finally the cgroup line:
+Finally add the cgroup line if you are on Trusty (not required for Xenial):
 
 ```sh
 ...
@@ -127,7 +127,7 @@ apt-installing packages
 -----------------------
 
 ```sh
-apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl telnet automake libcap2-dev libcap2-bin libtool tmux libssl-dev
+apt-get install git make build-essential libpam-dev ntp libcurl4-openssl-dev quota libpcre3-dev libjansson-dev uuid-dev libexpat-dev libwww-perl libjson-perl libconfig-inifiles-perl libquota-perl telnet automake libcap2-dev libcap2-bin libtool tmux libssl-dev python pkg-config
 ```
 
 As we are going to use secured subscription subsystem (that includes anti-replay-attacks mesaures) we need synchronized-clocks (that is why ntp daemon is installed)
