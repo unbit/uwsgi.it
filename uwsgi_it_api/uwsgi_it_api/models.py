@@ -100,6 +100,8 @@ class Server(models.Model):
     
     portmappings_mtime = models.DateTimeField(auto_now=True)
 
+    systemd = models.BooleanField('systemd', default=False)
+
     @property
     def used_memory(self):
         n = self.container_set.all().aggregate(models.Sum('memory'))['memory__sum']
@@ -383,6 +385,12 @@ class Container(models.Model):
     @property
     def uid(self):
         return UWSGI_IT_BASE_UID+self.pk
+
+    @property
+    def cgroup_uid(self):
+        if self.server.systemd:
+            return 'cpu/%d' % self.uid
+        return self.uid
 
     @property
     def hostname(self):
