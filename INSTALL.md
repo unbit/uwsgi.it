@@ -3,6 +3,8 @@ Step by step guide for installing a uwsgi.it node
 
 This procedure assumes an x86_64 Ubuntu 14.04 server (ubuntu-minimal) with ext4 filesystem or an x86_64 Ubuntu 16.04 server (ubuntu-minimal)
 
+Note: systemd is currently not supported, install upstart-sysv package on ubuntu xenial
+
 Note: you can set /etc/hostname to whatever you want, each container will have its own...
 
 /etc/default/grub
@@ -59,7 +61,7 @@ First step is finding the line on which the rootfs (or more general where /conta
 
 in this example /dev/md2 will store customer's file so we add `noatime,usrjquota=aquota.user,jqfmt=vfsv1` to its options
 
-Finally add the cgroup line if you are on Trusty (not required for Xenial):
+Finally add the cgroup line:
 
 ```sh
 ...
