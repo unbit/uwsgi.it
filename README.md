@@ -4,8 +4,11 @@ uwsgi.it
 The latest Unbit hosting platform, sponsored by:
 
 unbit.com
+
 20Tab S.r.l.
+
 Holey S.r.l.
+
 Consulthink S.p.a.
 
 Intro
