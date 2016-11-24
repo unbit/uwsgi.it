@@ -304,7 +304,8 @@ class Container(models.Model):
 
     admin_note = models.TextField(blank=True,null=True)
     admin_order = models.CharField(max_length=255,blank=True,null=True)
-    
+
+    dmz = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
@@ -351,7 +352,8 @@ class Container(models.Model):
                               'quota_threshold', 
                               'custom_distros_storage',
                               'custom_distro',
-                              'nofollow')
+                              'nofollow',
+                              'dmz')
         if self.pk is not None:
             orig = Container.objects.get(pk=self.pk)
             set_reboot = False
