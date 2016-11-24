@@ -165,6 +165,7 @@ admin.site.register(Datacenter)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(CustomService)
 admin.site.register(CustomerAttribute)
+admin.site.register(Rule)
 
 admin.site.register(FloatingAddress,FloatingAddressAdmin)
 

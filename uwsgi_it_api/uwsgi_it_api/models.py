@@ -252,6 +252,27 @@ class CustomDistro(models.Model):
 def start_of_epoch():
     return datetime.datetime.fromtimestamp(1)
 
+class Rule(models.Model):
+    container = models.ForeignKey('Container')
+    direction = models.CharField(max_length=17, choices=(('in', 'in'), ('out', 'out')), blank=False, null=False)
+    src = models.CharField(max_length=30, blank=False, null=False)
+    dst = models.CharField(max_length=30, blank=False, null=False)
+    action = models.CharField(max_length=17, choices=(('allow', 'allow'), ('deny', 'deny'), ('gateway', 'gateway')), blank=False, null=False)
+    target = models.CharField(max_length=17, blank=True, null=True)
+    priority = models.IntegerField(default=0)
+
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+    uuid = models.CharField(max_length=36, default=generate_uuid, unique=True)
+    note = models.TextField(blank=True,null=True)
+
+    def __unicode__(self):
+        return '{} {} {} {} {} {}'.format(self.container, self.direction, self.src, self.dst, self.action, self.priority)
+
+    class Meta:
+        ordering = ['-priority']
+
 class Container(models.Model):
     name = models.CharField(max_length=255)
     ssh_keys_raw = models.TextField("SSH keys", blank=True,null=True)
