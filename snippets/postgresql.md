@@ -1,30 +1,35 @@
 Running PostgreSQL
 ------------------
 
-For Saucy Salamander:
+From Precise Pangolin (Ubuntu 12.04 LTS) to Saucy Salamander (Ubuntu 13.10):
 
 ```sh
 /usr/lib/postgresql/9.1/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
 mkdir /run/postgresql
 ```
 
-For Trusty:
+From Trusty Tahr (Ubuntu 14.04 LTS) to Wily Werewolf (Ubuntu 15.10):
 
 ```sh
 /usr/lib/postgresql/9.3/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
 mkdir /run/postgresql
 ```
+For Xenial Xerus (Ubuntu 16.04 LTS):
 
+```sh
+/usr/lib/postgresql/9.5/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
+mkdir /run/postgresql
+```
 
-create vassals/pg.ini (change 9.1 to 9.3 on trusty)
+create `vassals/pg.ini` (change 9.1, 9.3 or 9.5)
 
 ```ini
 [uwsgi]
 pg = $(HOME)/db.pg
-smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.1/bin/postgres -D %(pg)
+smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.5/bin/postgres -D %(pg)
 ```
 
-check logs/emperor.log, if all goes well your postgresql instance should be started and you can use it normally
+check `logs/emperor.log`, if all goes well your postgresql instance should be started and you can use it normally
 
 Bonus: auto-backup
 ------------------
@@ -33,12 +38,12 @@ use the cron facilities to run automatic dump of your db.
 
 The following example will create a dump every day of the month (be sure to create a backup directory in your home):
 
-(as before, remember to change 9.1 to 9.3 for trusty)
+(as before, remember to change 9.1, 9.3 or 9.5)
 
 ```ini
 [uwsgi]
 pg = $(HOME)/db.pg
-smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.1/bin/postgres -D %(pg)
+smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.5/bin/postgres -D %(pg)
 
 ; backup
 env = PGPASSWORD=XXX
