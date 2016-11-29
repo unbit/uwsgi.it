@@ -35,6 +35,11 @@ class ContainerAdminForm(ModelForm):
             self.fields['tags'].widget = HiddenInput()
             self.fields['custom_distro'].widget = HiddenInput()
 
+def regenerate_secret_uuid(modeladmin, request, queryset):
+    for item in queryset.all():
+        item.regenerate_secret_uuid()
+regenerate_secret_uuid.short_description = 'Regenerate secret uuid'
+
 class ContainerAdmin(admin.ModelAdmin):
     def is_accounted(self):
         if self.accounted:
@@ -46,6 +51,8 @@ class ContainerAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'ip', 'hostname', 'customer', 'server', 'distro', 'memory', 'storage', is_accounted, 'ctime')
     list_filter = ('server', 'distro', ContainerAccounted)
     search_fields = ('name', 'customer__user__username', 'tags__name', 'admin_note', 'admin_order')
+    actions = [regenerate_secret_uuid]
+    
 
     form = ContainerAdminForm
 

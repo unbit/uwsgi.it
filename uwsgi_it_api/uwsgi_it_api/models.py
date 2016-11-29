@@ -328,6 +328,12 @@ class Container(models.Model):
 
     dmz = models.BooleanField(default=False)
 
+    secret_uuid = models.CharField(max_length=36, blank=True, null=True)
+
+    def regenerate_secret_uuid(self):
+        self.secret_uuid = generate_uuid()
+        self.save()
+
     def __unicode__(self):
         return "%d (%s)" % (self.uid, self.name)
 
