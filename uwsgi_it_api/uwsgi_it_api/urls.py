@@ -29,6 +29,8 @@ urlpatterns = patterns('uwsgi_it_api.views_private',
     (r'^private/portmappings/$', 'private_portmappings'),
 
     (r'^private/serverfilemetadata/$', 'private_server_file_metadata'),
+
+    (r'^privileged/secret_uuids/$', 'private_privileged_secret_uuids'),
 )
 
 urlpatterns += patterns('uwsgi_it_api.views',

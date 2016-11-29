@@ -70,6 +70,13 @@ class Datacenter(models.Model):
     def __unicode__(self):
         return self.name
 
+class PrivilegedClient(models.Model):
+    name = models.CharField(max_length=255,unique=True)
+    address = models.GenericIPAddressField()
+
+    def __unicode__(self):
+        return '{} - {}'.format(self.name, self.address)
+
 class Server(models.Model):
     name = models.CharField(max_length=255,unique=True)
     address = models.GenericIPAddressField()

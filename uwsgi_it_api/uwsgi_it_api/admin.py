@@ -173,6 +173,7 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(CustomService)
 admin.site.register(CustomerAttribute)
 admin.site.register(Rule)
+admin.site.register(PrivilegedClient)
 
 admin.site.register(FloatingAddress,FloatingAddressAdmin)
 

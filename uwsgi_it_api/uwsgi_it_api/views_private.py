@@ -281,3 +281,13 @@ def private_alarms(request, id):
     response = HttpResponse('Created\n')
     response.status_code = 201
     return response
+
+
+@need_certificate
+def private_privileged_secret_uuids(request):
+    try:
+        privileged_client = PrivilegedClient.objects.get(address=request.META['REMOTE_ADDR'])
+        j = [{'uid':container.uid, 'mtime': container.munix, 'secret_uuid': container.secret_uuid, 'address': container.server.address } for container in Container.objects.all().exclude(distro__isnull=True).exclude(ssh_keys_raw__exact='').exclude(ssh_keys_raw__isnull=True)]
+        return spit_json(request, j)
+    except:
+        return HttpResponseForbidden('Forbidden\n')
