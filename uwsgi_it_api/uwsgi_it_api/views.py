@@ -165,6 +165,7 @@ def container(request, id):
         'linked_to': container.linked_to,
         'custom_distros_storage': container.custom_distros_storage,
         'custom_distro': None,
+        'secret_uuid': container.secret_uuid,
         'ssh_keys': container.ssh_keys,
         'tags': [t.name for t in container.tags.all()],
         'legion_address': [l.address for l in container.server.legion_set.all()]
@@ -176,6 +177,17 @@ def container(request, id):
         c['custom_distro'] = container.custom_distro.pk
         c['custom_distro_name'] = container.custom_distro.name
     return spit_json(request, c)
+
+@need_basicauth
+@csrf_exempt
+def container_regenerate_secret_uuid(request, container_id):
+    customer = request.user.customer
+    try:
+        container = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
+    except:
+        return HttpResponseForbidden(json.dumps({'error': 'Forbidden'}), content_type="application/json")
+    container.regenerate_secret_uuid()
+    return HttpResponse(json.dumps({'message': 'Ok'}), content_type="application/json")
 
 def news(request):
     news_list = []

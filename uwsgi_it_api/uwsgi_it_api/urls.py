@@ -38,6 +38,8 @@ urlpatterns += patterns('uwsgi_it_api.views',
     (r'^containers/?$', 'containers'),
     (r'^containers/(\d+)$', 'container'),
 
+    (r'^regenerate_secret_uuid/(\d+)$', 'container_regenerate_secret_uuid'),
+
     (r'^portmappings/(.+)$', 'portmappings'),
 
     (r'^distros/?$', 'distros'),
