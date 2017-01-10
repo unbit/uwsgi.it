@@ -50,6 +50,9 @@ class Customer(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    class Meta:
+        ordering = ['user__username']
+
 class CustomerAttribute(models.Model):
     customer = models.ForeignKey(Customer)
     namespace = models.CharField(max_length=255)
