@@ -7,7 +7,7 @@ it. One of the included scripts (named pysftpjail) is a virtual chrooot/jail one
 Being a python module/tool you can install pysftpserver via "pip" (a python package manager)
 
 ```sh
-pip install pysftpserver
+pip install --system pysftpserver
 ```
 
 this will install pysftpjail in /usr/local/bin (the path will be automatically created by pip)
