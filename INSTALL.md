@@ -3,7 +3,7 @@ Step by step guide for installing a uwsgi.it node
 
 This procedure assumes an x86_64 Ubuntu 14.04 server (ubuntu-minimal) with ext4 filesystem or an x86_64 Ubuntu 16.04 server (ubuntu-minimal)
 
-Note: systemd is currently not supported, install upstart-sysv package on ubuntu xenial
+Note: systemd is currently not supported, install upstart-sysv package on ubuntu xenial and be sure to fix the rsyslog logrotate script (bug described here: https://bugs.launchpad.net/ubuntu/+source/rsyslog/+bug/940030)
 
 Note: you can set /etc/hostname to whatever you want, each container will have its own...
 
