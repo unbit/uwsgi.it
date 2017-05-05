@@ -969,7 +969,7 @@ def domains_in_container(request, id):
     if request.method == 'GET':
         customer = request.user.customer
         try:
-            container_obj = customer.container_set.get(pk=id)
+            container_obj = customer.container_set.get(pk=(int(id) - UWSGI_IT_BASE_UID))
         except:
             return HttpResponseNotFound(json.dumps({'error': 'Not found'}),
                                         content_type="application/json")
