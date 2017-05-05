@@ -39,6 +39,7 @@ urlpatterns += patterns('uwsgi_it_api.views',
     (r'^me/containers/?$', 'containers'),
     (r'^containers/?$', 'containers'),
     (r'^containers/(\d+)$', 'container'),
+    (r'^containers/(\d+)/domains$', 'domains_in_container'),
 
     (r'^regenerate_secret_uuid/(\d+)$', 'container_regenerate_secret_uuid'),
 
@@ -51,6 +52,7 @@ urlpatterns += patterns('uwsgi_it_api.views',
 
     (r'^domains/?$', 'domains'),
     (r'^domains/(\d+)$', 'domain'),
+    (r'^domains/(\d+)/containers$', 'containers_per_domain'),
 
     (r'^tags/?$', 'tags'),
     (r'^tags/(\d+)$', 'tag'),
