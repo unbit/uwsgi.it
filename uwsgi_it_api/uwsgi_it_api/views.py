@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from uwsgi_it_api.decorators import need_basicauth, api_auth
 from uwsgi_it_api.utils import spit_json, check_body, dns_check
-from .models import *
+from uwsgi_it_api.models import *
 from uwsgi_it_api.config import UWSGI_IT_BASE_UID
 
 import json
