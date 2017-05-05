@@ -950,11 +950,11 @@ def containers_per_domain(request, id):
             return HttpResponseNotFound(json.dumps({'error': 'Not found'}),
                                         content_type="application/json")
 
-        container_list = Container.objects.values_list('id', 'uuid', 'name').filter(
+        container_list = [{'id': c.pk, 'uuid': c.uuid, 'name': c.name} for c in Container.objects.filter(
             pk__in=HitsDomainMetric.objects.values_list(
                 'container', flat=True).filter(domain=domain).order_by(
                     '-year', '-month', '-day')
-        )
+        )]
         return spit_json(request, container_list)
 
     response = HttpResponse(json.dumps({'error': 'Method not allowed'}),
@@ -974,11 +974,11 @@ def domains_in_container(request, id):
             return HttpResponseNotFound(json.dumps({'error': 'Not found'}),
                                         content_type="application/json")
 
-        domain_list = Domain.objects.values_list('id', 'uuid', 'name').filter(
+        domain_list = [{'id': d.pk, 'uuid': d.uuid, 'name': d.name} for d in Domain.objects.filter(
             pk__in=HitsDomainMetric.objects.values_list(
                 'domain', flat=True).filter(container=container_obj).order_by(
                     '-year', '-month', '-day')
-        )
+        )]
 
         return spit_json(request, domain_list)
 
