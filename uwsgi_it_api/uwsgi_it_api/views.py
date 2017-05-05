@@ -950,7 +950,7 @@ def containers_per_domain(request, id):
             return HttpResponseNotFound(json.dumps({'error': 'Not found'}),
                                         content_type="application/json")
 
-        container_list = Container.objects.values_list('pk', 'uuid', 'name').filter(
+        container_list = Container.objects.values_list('id', 'uuid', 'name').filter(
             pk__in=HitsDomainMetric.objects.values_list(
                 'container', flat=True).filter(domain=domain).order_by(
                     '-year', '-month', '-day')
@@ -974,7 +974,7 @@ def domains_in_container(request, id):
             return HttpResponseNotFound(json.dumps({'error': 'Not found'}),
                                         content_type="application/json")
 
-        domain_list = Domain.objects.values_list('pk', 'uuid', 'name').filter(
+        domain_list = Domain.objects.values_list('id', 'uuid', 'name').filter(
             pk__in=HitsDomainMetric.objects.values_list(
                 'domain', flat=True).filter(container=container_obj).order_by(
                     '-year', '-month', '-day')
