@@ -5,49 +5,63 @@ From Precise Pangolin (Ubuntu 12.04 LTS) to Saucy Salamander (Ubuntu 13.10):
 
 ```sh
 /usr/lib/postgresql/9.1/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
-mkdir /run/postgresql
 ```
 
 From Trusty Tahr (Ubuntu 14.04 LTS) to Wily Werewolf (Ubuntu 15.10):
 
 ```sh
 /usr/lib/postgresql/9.3/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
-mkdir /run/postgresql
 ```
-For Xenial Xerus (Ubuntu 16.04 LTS):
+
+For Xenial Xerus (Ubuntu 16.04 LTS) to Yakkety Yak (Ubuntu 16.10):
 
 ```sh
 /usr/lib/postgresql/9.5/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
+```
+
+For Zesty Zapus (Ubuntu 17.04) to Artful Aardvark (Ubuntu 17.10):
+
+```sh
+/usr/lib/postgresql/9.6/bin/initdb -A md5 -U postgres -W -D db.pg -E UTF-8
+```
+
+Create `/run/postgresql` directory:
+
+```sh
 mkdir /run/postgresql
 ```
 
-create `vassals/pg.ini` (change 9.1, 9.3 or 9.5)
+Create `~/vassals/pg.ini` (change 9.1, 9.3, 9.5 or 9.6):
 
 ```ini
 [uwsgi]
 pg = $(HOME)/db.pg
-smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.5/bin/postgres -D %(pg)
+smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.6/bin/postgres -D %(pg)
 ```
 
-check `logs/emperor.log`, if all goes well your postgresql instance should be started and you can use it normally
+Check `~/logs/emperor.log`, if all goes well your PostgreSQL instance should be started and you can use it normally.
 
 Bonus: auto-backup
 ------------------
 
-use the cron facilities to run automatic dump of your db.
+Use the cron facilities to run automatic dump of your db.
 
-The following example will create a dump every day of the month (be sure to create a backup directory in your home):
+Create a backup directory in your home:
 
-(as before, remember to change 9.1, 9.3 or 9.5)
+```sh
+mkdir -p ~/backup
+```
+
+The following example will create a dump every day of the month (as before, remember to change 9.1, 9.3, 9.5 or 9.6):
 
 ```ini
 [uwsgi]
 pg = $(HOME)/db.pg
-smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.5/bin/postgres -D %(pg)
+smart-attach-daemon = %(pg)/postmaster.pid /usr/lib/postgresql/9.6/bin/postgres -D %(pg)
 
 ; backup
 env = PGPASSWORD=XXX
-cron = 59 3 -1 -1 -1  pg_dump -U ZZZ YYY |bzip2 -9 > $(HOME)/backup/YYY_`date +"%%d"`.sql.bz2
+cron = 59 3 -1 -1 -1  pg_dump -U ZZZ YYY | bzip2 -9 > $(HOME)/backup/YYY_`date +"%%d"`.sql.bz2
 ```
 
 change XXX with your db password, ZZZ with the username and YYY with the db name
