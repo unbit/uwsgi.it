@@ -14,13 +14,15 @@ my $base_url = 'https://'.$cfg->val('uwsgi', 'api_domain').'/api/private';
 my $ssl_key = $cfg->val('uwsgi', 'api_client_key_file');
 my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
 
+my $timeout = 30;
+
 for(;;) {
 	my $ua = LWP::UserAgent->new;
 	$ua->ssl_opts(
 		SSL_key_file => $ssl_key,
 		SSL_cert_file => $ssl_cert,
 	);
-	$ua->timeout(3);
+	$ua->timeout($timeout);
 
 	my $response =  $ua->get($base_url.'/domains/rsa/');
 

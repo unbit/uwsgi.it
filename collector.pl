@@ -19,6 +19,8 @@ my $ssl_cert = $cfg->val('uwsgi', 'api_client_cert_file');
 
 my $root_dev = get_mountpoint('/');
 
+my $timeout = 30;
+
 sub collect_metrics {
 	my ($uid, $net_json) = @_;
 	collect_metrics_cpu($uid);
@@ -133,7 +135,7 @@ for(;;) {
 		SSL_key_file => $ssl_key,
 		SSL_cert_file => $ssl_cert,
 	);
-	$ua->timeout(3);
+	$ua->timeout($timeout);
 
 	my $response =  $ua->get($base_url.'/containers/');
 
@@ -214,7 +216,7 @@ sub push_metadata_file {
                 SSL_key_file => $ssl_key,
                 SSL_cert_file => $ssl_cert,
         );
-        $ua->timeout(3);
+        $ua->timeout($timeout);
 
 	open my $fh, '<',$filename;
 	return unless $fh;
@@ -239,7 +241,7 @@ sub push_metric {
                 SSL_key_file => $ssl_key,
                 SSL_cert_file => $ssl_cert,
         );
-        $ua->timeout(3);
+        $ua->timeout($timeout);
 
 	my $j = JSON->new;
 	$j->allow_bignum(1);
@@ -260,7 +262,7 @@ sub push_domain_metric {
                 SSL_key_file => $ssl_key,
                 SSL_cert_file => $ssl_cert,
         );
-        $ua->timeout(3);
+        $ua->timeout($timeout);
 
         my $j = JSON->new;
         $j->allow_bignum(1);
