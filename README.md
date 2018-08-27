@@ -1,15 +1,9 @@
 uwsgi.it
 ========
 
-The latest Unbit hosting platform, sponsored by:
+The latest Unbit hosting platform
 
-unbit.com
-
-20Tab S.r.l.
-
-Holey S.r.l.
-
-Consulthink S.p.a.
+Check unbit.com for commercial support
 
 Intro
 -----
