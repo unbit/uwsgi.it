@@ -344,6 +344,7 @@ openssl genrsa -out foobar.key 2048
 openssl req -new -key foobar.key -out foobar.csr
 openssl x509 -req -days 365 -in foobar.csr -signkey foobar.key -out foobar.crt
 ```
+IMPORTANT: check that file permissions allow access to them (ex: `chmod 644 *`)
 
 now you can instruct the http router to load it using ssl-domain instead of domain:
 
