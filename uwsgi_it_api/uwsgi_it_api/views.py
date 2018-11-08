@@ -762,9 +762,13 @@ def domains(request):
             return response
         if dns_check(j['name'], customer.uuid):
             try:
-                customer.domain_set.create(name=j['name'])
-                response = HttpResponse(json.dumps({'message': 'Created'}),
-                                        content_type="application/json")
+                domain = customer.domain_set.create(name=j['name'])
+                response = HttpResponse(json.dumps({
+                    'message': 'Created',
+                    'id': domain.pk, 'name': domain.name, 'uuid': domain.uuid,
+                    'tags': [t.name for t in domain.tags.all()],
+                    'note': domain.note
+                }), content_type="application/json")
                 response.status_code = 201
             except:
                 response = HttpResponse(json.dumps({'error': 'Conflict'}),
