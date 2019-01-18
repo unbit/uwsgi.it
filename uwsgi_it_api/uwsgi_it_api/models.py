@@ -463,8 +463,6 @@ class Container(models.Model):
 
     @property
     def cgroup_uid(self):
-        if self.server.systemd:
-            return 'cpu/%d' % self.uid
         return self.uid
 
     @property
