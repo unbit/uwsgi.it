@@ -3,7 +3,7 @@ Description=uWSGI Emperor
 After=syslog.target
 
 [Service]
-LimitNOFILE=65536
+LimitNOFILE=131072
 ExecStart=/opt/unbit/uwsgi/uwsgi /etc/uwsgi/emperor.ini
 Restart=always
 Type=notify

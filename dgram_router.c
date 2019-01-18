@@ -267,8 +267,12 @@ static int uwsgi_dgram_router_init() {
 		if (!uwsgi.ssl_initialized) uwsgi_ssl_init();	
 		char *secret = NULL;
 		char *iv = NULL;
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
 		dgr.decrypt_ctx = uwsgi_malloc(sizeof(EVP_CIPHER_CTX));
 		EVP_CIPHER_CTX_init(dgr.decrypt_ctx);
+#else
+		dgr.decrypt_ctx = EVP_CIPHER_CTX_new();
+#endif
 		const EVP_CIPHER *cipher = setup_secret_and_iv(dgr.psk_in, &secret, &iv);
 		if (EVP_DecryptInit_ex(dgr.decrypt_ctx, cipher, NULL, (const unsigned char *) secret, (const unsigned char *) iv) <= 0) {
                 	uwsgi_error("EVP_DecryptInit_ex()");
@@ -281,8 +285,12 @@ static int uwsgi_dgram_router_init() {
 		if (!uwsgi.ssl_initialized) uwsgi_ssl_init();	
 		char *secret = NULL;
 		char *iv = NULL;
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
                 dgr.encrypt_ctx = uwsgi_malloc(sizeof(EVP_CIPHER_CTX));
                 EVP_CIPHER_CTX_init(dgr.encrypt_ctx);
+#else
+		dgr.encrypt_ctx = EVP_CIPHER_CTX_new();
+#endif
                 const EVP_CIPHER *cipher = setup_secret_and_iv(dgr.psk_out, &secret, &iv);
                 if (EVP_EncryptInit_ex(dgr.encrypt_ctx, cipher, NULL, (const unsigned char *) secret, (const unsigned char *) iv) <= 0) {
                         uwsgi_error("EVP_EncryptInit_ex()");
