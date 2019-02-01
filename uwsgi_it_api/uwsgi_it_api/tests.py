@@ -214,10 +214,26 @@ class ApiTest(ViewsTest):
         self.assertEqual(response.status_code, 200)
 
     def test_containers_per_domain(self):
+        yesterday = today - datetime.timedelta(1)
+        HitsDomainMetric.objects.create(
+            domain=self.domain,
+            container=self.container,
+            year=yesterday.year,
+            month=yesterday.month,
+            day=yesterday.day,
+        )
         response = self.logged_get_response_for_view('domains/1/containers', containers_per_domain, {'id': self.domain.pk})
         self.assertEqual(response.status_code, 200)
 
     def test_domains_in_container(self):
+        yesterday = today - datetime.timedelta(1)
+        HitsDomainMetric.objects.create(
+            domain=self.domain,
+            container=self.container,
+            year=yesterday.year,
+            month=yesterday.month,
+            day=yesterday.day,
+        )
         response = self.logged_get_response_for_view('container/1/domains', domains_in_container, {'id': self.container.pk})
         self.assertEqual(response.status_code, 200)
 

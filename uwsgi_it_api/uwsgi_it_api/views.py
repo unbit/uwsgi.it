@@ -762,9 +762,13 @@ def domains(request):
             return response
         if dns_check(j['name'], customer.uuid):
             try:
-                customer.domain_set.create(name=j['name'])
-                response = HttpResponse(json.dumps({'message': 'Created'}),
-                                        content_type="application/json")
+                domain = customer.domain_set.create(name=j['name'])
+                response = HttpResponse(json.dumps({
+                    'message': 'Created',
+                    'id': domain.pk, 'name': domain.name, 'uuid': domain.uuid,
+                    'tags': [t.name for t in domain.tags.all()],
+                    'note': domain.note
+                }), content_type="application/json")
                 response.status_code = 201
             except:
                 response = HttpResponse(json.dumps({'error': 'Conflict'}),
@@ -950,10 +954,15 @@ def containers_per_domain(request, id):
             return HttpResponseNotFound(json.dumps({'error': 'Not found'}),
                                         content_type="application/json")
 
+        today = datetime.datetime.today()
         container_list = [{'id': c.pk, 'uuid': c.uuid, 'name': c.name, 'uid': c.uid} for c in Container.objects.filter(
             pk__in=HitsDomainMetric.objects.values_list(
-                'container', flat=True).filter(domain=domain).order_by(
-                    '-year', '-month', '-day')
+                'container', flat=True).filter(
+                domain=domain,
+                year=today.year,
+                month=today.month,
+                day=today.day
+            ).order_by('-year', '-month', '-day')
         )]
         return spit_json(request, container_list)
 
@@ -974,10 +983,15 @@ def domains_in_container(request, id):
             return HttpResponseNotFound(json.dumps({'error': 'Not found'}),
                                         content_type="application/json")
 
+        today = datetime.datetime.today()
         domain_list = [{'id': d.pk, 'uuid': d.uuid, 'name': d.name} for d in Domain.objects.filter(
             pk__in=HitsDomainMetric.objects.values_list(
-                'domain', flat=True).filter(container=container_obj).order_by(
-                    '-year', '-month', '-day')
+                'domain', flat=True).filter(
+                container=container_obj,
+                year=today.year,
+                month=today.month,
+                day=today.day
+            ).order_by('-year', '-month', '-day')
         )]
 
         return spit_json(request, domain_list)
