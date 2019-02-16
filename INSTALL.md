@@ -1,9 +1,9 @@
 Step by step guide for installing a uwsgi.it node
 -------------------------------------------------
 
-This procedure assumes an x86_64 Ubuntu 14.04 server (ubuntu-minimal) with ext4 filesystem or an x86_64 Ubuntu 16.04 server (ubuntu-minimal)
+This procedure assumes an x86_64 Ubuntu 14.04 server (ubuntu-minimal) with ext4 filesystem or an x86_64 Ubuntu 16.04 server (ubuntu-minimal) or an Ubuntu 18.04 server.
 
-Note: systemd is currently not supported, install upstart-sysv package on ubuntu xenial and be sure to fix the rsyslog logrotate script (bug described here: https://bugs.launchpad.net/ubuntu/+source/rsyslog/+bug/940030)
+Note: systemd is currently supported only on 18.04, install upstart-sysv package on ubuntu xenial and be sure to fix the rsyslog logrotate script (bug described here: https://bugs.launchpad.net/ubuntu/+source/rsyslog/+bug/940030)
 
 Note: you can set /etc/hostname to whatever you want, each container will have its own...
 
@@ -60,6 +60,14 @@ First step is finding the line on which the rootfs (or more general where /conta
 ```
 
 in this example /dev/md2 will store customer's file so we add `noatime,usrjquota=aquota.user,jqfmt=vfsv1` to its options
+
+Change it to
+
+```
+/dev/md/2 / ext4 defaults,noatime,usrjquota=aquota.user,jqfmt=vfsv1,private 0 0
+```
+
+for systemd (to set root mountpoint as private instead of shared)
 
 Finally add the cgroup line:
 
