@@ -38,6 +38,12 @@ If you do not plan to use ipv6, it is better to fully disable it
 GRUB_CMDLINE_LINUX_DEFAULT="nomodeset elevator=cfq ipv6.disable=1"
 ```
 
+If you are on bionic you need to disable dynamic network naming (remember to reconfigure netplan):
+
+```sh
+GRUB_CMDLINE_LINUX_DEFAULT="nomodeset elevator=cfq ipv6.disable=1 net.ifnames=0 biosdevname=0"
+```
+
 and re-run
 
 ```sh
