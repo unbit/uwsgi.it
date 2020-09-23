@@ -41,7 +41,7 @@ domain = mydomain.it
 basedir = $(HOME)/www/$(domain)
 offload-threads = 2
 route = ^/$ static:%(basedir)/index.html
-route = /(.*) static:%(basedir)$1
+route = /(.*) static:%(basedir)/$1
 ```
 
 Please note that the specific rule for */* must be placed before the
