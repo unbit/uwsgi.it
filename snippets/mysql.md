@@ -21,10 +21,16 @@ Note: if you need to import dumps with very large column values add the followin
 max_allowed_packet = 16M
 ```
 
-run
+For Precise and Wheezy run
 
 ```sh
 mysql_install_db --defaults-file=.my.cnf
+```
+
+or for Saucy and Trusty run
+
+```sh
+mysqld --defaults-file=~/.my.cnf --initialize --user=mysql
 ```
 
 and (for allowing transparent compatibility with debian/ubuntu mysql environment)

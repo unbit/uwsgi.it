@@ -52,7 +52,7 @@ An example mass virtualhosting configuration:
 Running it
 ==========
 
-Use this vassal as your base configuration (for precise and wheezy)
+Use this vassal in ~/vassals/apache.ini as your base configuration (for precise and wheezy)
 
 ```ini
 [uwsgi]
